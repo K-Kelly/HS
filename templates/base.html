@@ -1,0 +1,130 @@
+{% load i18n %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap.min.css">
+  <link rel="stylesheet/less" type="text/css" href="/assets/bootstrap/lib/bootstrap.less">
+<script src="less.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"type="text/javascript"></script>
+<script src="/assets/bootstrap/js/bootstrap-dropdown.js"type="text/javascript"></script>
+<title>{% block title %}Hockey Site{% endblock %}</title>
+</head>
+
+<body>
+ {% block header %}
+{% if user.is_authenticated %}
+  <div class="topbar-wrapper" style="z-index: 5;">
+    <div class="topbar" data-dropdown="dropdown">
+      <div class="topbar-inner">
+	<div class="container">
+	  <h3>
+	    <a href="">Hockey Site</a>
+	  </h3>
+	  <ul class="nav">
+	    <li>
+	      <a href="/profile">{% trans "Home" %}</a>
+	    </li>
+	    <li>
+	      <a href="/createPlayer">{% trans "Create Player" %}</a>
+	    </li>
+	    <li>
+	      <a href="/createTeam">{% trans "Create Team" %}</a>
+	    </li>	    
+	    <li class="dropdown">
+	      <a class="dropdown-toggle" >View Players</a>
+	      <ul class="dropdown-menu">
+		{% for player in player_list %}
+		<li>
+		<a href="/player/{{player.id}}">{{player.position}} - {{player.name}} </a>
+		</li>
+		{% endfor %}
+	      </ul>
+	    </li>
+	    <li class="dropdown">
+	      <a class="dropdown-toggle" >View Teams</a>
+	      <ul class="dropdown-menu">
+		{% for team in team_list %}
+		<li>
+		<a href="/team/{{team.id}}">{{team.name}} </a>
+		</li>
+		{% endfor %}
+	      </ul>
+	    </li>
+	  </ul>
+	  <form class="pull-left" action="">
+	    <input type="text" placeholder="Search">
+	    </form>
+	    <ul class="nav secondary-nav">
+	      <li class="dropdown">
+		<a class="dropdown-toggle" href="/profile/">{{ user.username }}</a>
+		<ul class="dropdown-menu">
+		  <li>
+		    <a href="{% url auth_password_change %}">{% trans "Change password" %}</a
+		  </li>		  		  
+		  <li class="divider"></li>
+		  <li>
+		    <a href="{% url auth_logout %}">{% trans "Log out"%}</a>
+		  </li>
+		</ul>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+{% else %}
+      <div class="topbar">
+	<div class="fill">
+	  <div class="container">
+	    <a class="brand" href="#">Hockey Site</a>
+	    <ul class="nav">
+	      <li>
+		<a href="/index">Home</a>
+	      </li>
+	      <li>
+		<a href=".">About</a>
+	      </li>
+	      <li>
+		<a href="/contact">Contact</a>
+	      </li>
+	    </ul>
+	    <form class="pull-right" action="/accounts/login">{%csrf_token %}
+	      <input class="input-small" type="text" placeholder="Username">
+		<input class="input-small" type="password" placeholder="Password">
+		  <button class="btn" type="submit">Sign in</button>
+		</form>
+	      </div>
+	    </div>
+	  </div>
+
+      <div class="container-fluid">
+	  <div class="sidebar" id="header">
+	    <p><a href="{% url auth_login %}">{% trans "Log in" %}</a></p>
+	    <p><a href="/accounts/register/">{% trans "register" %}</a></p>
+	  </div>
+      </div>
+	{% endif %}
+	
+        {% endblock %}
+
+
+    <div class="content" id="content">
+      <BR><BR><BR>
+        {% block content %}{% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        <hr />
+        {% endblock %}
+    </div>
+
+<script src="http://code.jquery.com/jquery-1.5.2.min.js">
+<script src="http://autobahn.tablesorter.com/jquery.tablesorter.min.js">
+<script src="assets/js/google-code-prettify/prettify.js">
+
+</body>
+
+</html>

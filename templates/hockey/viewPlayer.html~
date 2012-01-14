@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<html>
+  <head>
+    <style>
+      textarea{
+      resize:none;
+      }
+    </style>
+  </head>
+  <body>
+    <center>
+      <h2>{{ player.name }}</h2>
+      <table id="playerInfo">
+      </table>
+      {% if not_owner %}
+        <p style="color:red;">You are not the agent of this Player!</p>
+    {% else %}
+     <form action="upgradeSkills/" method="post">{% csrf_token %}
+      <table id="playerStats">
+	<tr>
+	  <td>Shooting:  {{player.shooting}}</td> <input type="submit" 
+	  <td> </td>
+	  <td>Strength:  {{player.strength}}</td>
+	</tr>
+	<tr>
+	  <td>Passing:  {{player.passing}}</td>
+	  <td> </td>
+	  <td>Endurance:  {{player.endurance}}</td>
+	</tr>
+	<tr>
+	  <td>Stick Handling: {{player.stickHandling}}</td>
+	  <td> </td>
+	  <td>Skating:  {{player.skating}}</td>
+	</tr>
+	<tr>
+	  <td>Checking:  {{player.checking}}</td>
+	  <td> </td>
+	  <td>Faceoffs:  {{player.faceoff}}</td>
+	</tr>
+	<tr>
+	  <td>Positioning: {{player.positioning}}</td>
+	  <td> </td> 
+	  <td>Leadership:  {{player.leadership}}</td>
+	</tr>
+	<tr>
+	  <td>Awareness:  {{player.awareness}}</td>
+	  <td> </td>
+	  <td>Fighting:  {{player.fighting}}</td>
+	</table>
+      </form>
+	<BR><BR>
+	<table id="equipment">
+	  <tr>
+	    <td>Helmet: {{player.helmet}}</td>
+	  </tr>
+	  <tr>
+	    <td>Gloves:  {{player.gloves}}</td>
+	  </tr>
+	  <tr>
+	    <td>Pads:  {{player.shoulder_pads}}</td>
+	  </tr>
+	  <tr>
+	    <td>Pants:  {{player.pants}}</td>
+	  </tr>
+	  <tr>
+	    <td>Skates:  {{player.skates}}</td>
+	  </tr>
+	  <tr>
+	    <td>Stick:  {{player.stick}}</td>
+	  </tr>
+	 {% endif %}   
+</center>
+</body>
+</html>
+
+{% endblock %}

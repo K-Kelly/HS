@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<html>
+  <head>
+   
+  </head>
+  <body>
+    <BR>
+    <div class="well" style="padding: 14px 19px;">
+      <div class="row" id="Line1">
+	<div class="span6 offset5" title="Line 1 LW" id="line1LW">
+	  <p>{{current_lines.8}}</p>
+	</div>
+	<div class="span6" title="Line 1 C" id="line1C">
+	  <p>{{current_lines.12}}</p>
+	</div>
+	<div class="span5" title="Line 1 RW" id="line1RW">
+	  <p>{{current_lines.16}}</p>
+	</div>
+       </div>
+      <div class="row" id="Line2">
+	<div class="span6 offset5" title="Line 2 LW" id="line2LW">
+	  <p>{{current_lines.9}}</p>
+	</div>
+	<div class="span6" title="Line 2 C" id="line2C">
+	  <p>{{current_lines.13}}</p>
+	</div>
+	<div class="span5" title="Line 2 RW" id="line2RW">
+	  <p>{{current_lines.17}}</p>
+	</div>
+       </div>
+      <div class="row" id="Line3">
+	<div class="span6 offset5" title="Line 3 LW" id="line3LW">
+	  <p>{{current_lines.10}}</p>
+	</div>
+	<div class="span6" title="Line 3 C" id="line3C">
+	  <p>{{current_lines.14}}</p>
+	</div>
+	<div class="span5" title="Line 3 RW" id="line3RW">
+	  <p>{{current_lines.18}}</p>
+	</div>
+       </div>
+      <div class="row" id="Line4">
+	<div class="span6 offset5 " title="Line 4 LW" id="line4LW">
+	  <p>{{current_lines.11}}</p>
+	</div>
+	<div class="span6" title="Line 4 C" id="line4C">
+	  <p>{{current_lines.15}}</p>
+	</div>
+	<div class="span5" title="Line 4 RW" id="line4RW">
+	  <p>{{current_lines.19}}</p>
+	</div>
+       </div>
+      
+       <div class="row" id="DPair1">
+	 <div class="span6 offset8" title="Defense Pairing 1 Left" id="DPair1L">
+	   <p>{{current_lines.2}}</p>
+	 </div>
+	 <div class="span6" title="Defense Pairing 1 Right" id="DPair1R">
+	   <p>{{current_lines.3}}</p>
+	 </div>
+        </div>
+       <div class="row" id="DPair2">
+	 <div class="span6 offset8" title="Defense Pairing 2 Left" id="DPair2L">
+	   <p>{{current_lines.4}}</p>
+	 </div>
+	 <div class="span6" title="Defense Pairing 2 Right" id="DPair2R">
+	   <p>{{current_lines.5}}</p>
+	 </div>
+        </div>
+       <div class="row" id="DPair3">
+	 <div class="span6 offset8" title="Defense Pairing 3 Left" id="DPair3L">
+	   <p>{{current_lines.6}}</p>
+	 </div>
+	 <div class="span6" title="Defense Pairing 3 Right" id="DPair3R">
+	   <p>{{current_lines.7}}</p>
+	 </div>
+        </div>
+       <div class="row" id="Goalie1">
+	 <div class="span6 offset11" title="Starting Goalie" id="Goalie1S">
+	   <p>{{current_lines.0}}</p>
+	 </div>
+       </div>
+       <div class="row" id="Goalie2">
+	 <div class="span6 offset11" title="Backup Goalie" id="Goalie2B">
+	 <p>{{current_lines.1}}</p>
+	 </div>
+       </div>
+     </div>
+</body>
+</html>
+
+{% endblock %}

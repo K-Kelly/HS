@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load i18n %}
+  
+<head>
+  </head>
+  <body>
+    <h2>Team Successfully created!</h2>
+  </body>
+</html>
+

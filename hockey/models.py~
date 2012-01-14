@@ -1,0 +1,143 @@
+from django.db import models
+# Create your models here.
+class Player(models.Model):
+    team_id = models.IntegerField()
+    user_id = models.IntegerField()
+    name = models.CharField(max_length = 35)
+    upgrades = models.IntegerField()
+    level = models.IntegerField()
+    experience = models.IntegerField()
+    age = models.IntegerField()
+    retired = models.BooleanField()
+    height = models.IntegerField()
+    weight = models.IntegerField()
+    salary = models.IntegerField()
+    contract_end = models.DateField()
+    no_trade = models.BooleanField()
+    position = models.CharField(max_length=1)
+    style = models.IntegerField()
+    shooting = models.IntegerField()
+    passing = models.IntegerField()
+    stickHandling = models.IntegerField()
+    checking = models.IntegerField()
+    positioning = models.IntegerField()
+    endurance = models.IntegerField()
+    skating = models.IntegerField()
+    strength = models.IntegerField()
+    faceoff = models.IntegerField()
+    fighting = models.IntegerField()
+    awareness = models.IntegerField()
+    leadership = models.IntegerField()
+    #for future potentially get deal with company to show their equipment
+    helmet = models.IntegerField()
+    gloves = models.IntegerField()
+    shoulder_pads = models.IntegerField()
+    pants = models.IntegerField()
+    skates = models.IntegerField()
+    stick = models.IntegerField()
+    def __unicode__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return "/player/%i/" %self.id
+
+    class Meta:
+        ordering = ['name']
+
+class Arena(models.Model):
+    name = models.CharField(max_length=50)
+    occupancy = models.IntegerField()
+    practice_Facility = models.IntegerField()
+    locker_Room = models.IntegerField()
+    equipment = models.IntegerField()
+    rink = models.IntegerField()
+    concessions = models.IntegerField()
+    lower_bowl = models.IntegerField()
+    mid_bowl = models.IntegerField()
+    upper_bowl = models.IntegerField()
+    box = models.IntegerField()
+    ticket_lower = models.IntegerField()
+    ticket_mid = models.IntegerField()
+    ticket_upper = models.IntegerField()
+    ticket_box = models.IntegerField()
+    def __unicode__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return "/arena/%i" % self.id
+
+    class Meta:
+        ordering = ['name']
+
+class team_statistics(models.Model):
+    year = models.IntegerField()
+    team_id = models.ForeignKey('hockey.Team')
+    wins = models.IntegerField()
+    losses = models.IntegerField()
+    points = models.IntegerField()
+    
+    def __unicode__(self):
+        return self.year
+
+    def get_absolute_url(self):
+        return "/team/%i/statistics/%i" % (self.team_id, self.year)
+
+    class Meta:
+        ordering = ['year']
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=35)
+    owner = models.IntegerField()
+    general_Manager = models.IntegerField()
+    league_id = models.IntegerField()
+    arena = models.ForeignKey(Arena, related_name = 'team_arena')
+    goalie1 = models.ForeignKey(Player, related_name = 'team_goalie1', blank=True)
+    goalie2 = models.ForeignKey(Player, related_name = 'team_goalie2',blank=True)
+    defense1 = models.ForeignKey(Player, related_name = 'team_defense1',blank=True)
+    defense2 = models.ForeignKey(Player, related_name = 'team_defense2',blank=True)
+    defense3 = models.ForeignKey(Player, related_name = 'team_defense3',blank=True)
+    defense4 = models.ForeignKey(Player, related_name = 'team_defense4',blank=True)
+    defense5 = models.ForeignKey(Player, related_name = 'team_defense5',blank=True)
+    defense6 = models.ForeignKey(Player, related_name = 'team_defense6',blank=True)
+    lw1 = models.ForeignKey(Player, related_name = 'team_lw1',blank=True)
+    lw2 = models.ForeignKey(Player, related_name = 'team_lw2',blank=True)
+    lw3 = models.ForeignKey(Player, related_name = 'team_lw3',blank=True)
+    lw4 = models.ForeignKey(Player, related_name = 'team_lw4',blank=True)
+    c1 = models.ForeignKey(Player, related_name = 'team_c1',blank=True)
+    c2 = models.ForeignKey(Player, related_name = 'team_c2',blank=True)
+    c3 = models.ForeignKey(Player, related_name = 'team_c3',blank=True)
+    c4 = models.ForeignKey(Player, related_name = 'team_c4',blank=True)
+    rw1 = models.ForeignKey(Player, related_name = 'team_rw1',blank=True)
+    rw2 = models.ForeignKey(Player, related_name = 'team_rw2',blank=True)
+    rw3 = models.ForeignKey(Player, related_name = 'team_rw3',blank=True)
+    rw4 = models.ForeignKey(Player, related_name = 'team_rw4',blank=True)
+    statistics = models.IntegerField(blank=True)
+    funds = models.IntegerField()
+    salary_used = models.IntegerField()
+    salary_left = models.IntegerField()
+    def __unicode__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return "/team/%i/" % self.id
+    
+    class Meta:
+        ordering = ['name']
+
+class League(models.Model):
+    name = models.CharField(max_length=50)
+    teams = models.ManyToManyField(Team, related_name = 'league_teams')
+    conference1 = models.ManyToManyField(Team, related_name = 'league_conference1')
+    conference2 = models.ManyToManyField(Team, related_name = 'league_conference2')
+    conference3 = models.ManyToManyField(Team, related_name = 'league_conference3')
+    conference4 = models.ManyToManyField(Team, related_name = 'league_conference4')
+    salary_cap = models.IntegerField()
+    def __unicode__(self):
+        return self.name
+    
+    def get_absolute_url(self):
+        return "/league/%i/" % self.id
+
+    class Meta:
+        ordering = ['name']

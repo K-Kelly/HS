@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<center>
+<BR>
+<p>You have {{profile.pucks }} pucks to spend!</p>
+<BR>
+
+Your Players:
+{% for player in player_list %}
+<a href="/player/{{player.id}}">{{player.position}} -
+  {{player.name}} </a>
+<BR>
+{% endfor %}
+</center>
+</body>
+</html>
+{% endblock %}
