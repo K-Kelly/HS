@@ -13,7 +13,7 @@ class Player(models.Model):
     height = models.IntegerField()
     weight = models.IntegerField()
     salary = models.IntegerField()
-    contract_end = models.DateField()
+    contract_end = models.IntegerField()
     no_trade = models.BooleanField()
     position = models.CharField(max_length=1)
     style = models.IntegerField()
@@ -35,6 +35,7 @@ class Player(models.Model):
     pants = models.IntegerField()
     skates = models.IntegerField()
     stick = models.IntegerField()
+    contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     def __unicode__(self):
         return self.name
     
@@ -85,6 +86,21 @@ class team_statistics(models.Model):
     class Meta:
         ordering = ['year']
 
+class Contract(models.Model):
+    player_id = models.IntegerField()
+    team_id = models.IntegerField()
+    team_name = models.CharField(max_length = 35)
+    salary = models.IntegerField()
+    length = models.IntegerField()
+    no_trade = models.BooleanField()
+    message = models.CharField(max_length = 2000)
+    is_accepted = models.BooleanField()
+    
+    def __unicode__(self):
+        return str(self.id)
+    
+    class Meta:
+        ordering = ['team_id']
 
 class Team(models.Model):
     name = models.CharField(max_length=35)
@@ -92,6 +108,7 @@ class Team(models.Model):
     general_Manager = models.IntegerField()
     league_id = models.IntegerField()
     arena = models.ForeignKey(Arena, related_name = 'team_arena')
+    players = models.ManyToManyField(Player, related_name = 'team_players')
     goalie1 = models.IntegerField(blank=True, default="-1")
     goalie2 = models.IntegerField(blank=True, default="-1")
     defense1 = models.IntegerField(blank=True, default="-1")
@@ -116,6 +133,7 @@ class Team(models.Model):
     funds = models.IntegerField()
     salary_used = models.IntegerField()
     salary_left = models.IntegerField()
+    contracts = models.ManyToManyField(Contract, related_name = 'team_contracts')
     def __unicode__(self):
         return self.name
 
@@ -123,7 +141,7 @@ class Team(models.Model):
         return "/team/%i/" % self.id
 
     def tempPlayer():
-        p = Player.objects.create(team_id = -1, user_id = -1, upgrades = 0, level = 0, experience = 0, name = "Computer", age = 18, retired = False, height = 60, weight = 175, salary =0, contract_end = "00-00-0000", no_trade = True, position = "C", style = 0, shooting = 1, passing = 1, stickHandling = 1, checking =1, positioning = 1, endurance = 1, skating = 1, strength = 1, faceoff = 1, fighting = 1, awareness = 1, leadership = 1, helmet = 1, gloves = 1, shoulder_pads = 1, pants = 1, skates = 1, stick = 1)
+        p = Player.objects.create(team_id = -1, user_id = -1, upgrades = 0, level = 0, experience = 0, name = "Computer", age = 18, retired = False, height = 60, weight = 175, salary =0, contract_end = 0, no_trade = True, position = "C", style = 0, shooting = 1, passing = 1, stickHandling = 1, checking =1, positioning = 1, endurance = 1, skating = 1, strength = 1, faceoff = 1, fighting = 1, awareness = 1, leadership = 1, helmet = 1, gloves = 1, shoulder_pads = 1, pants = 1, skates = 1, stick = 1)
         return p
     
     class Meta:

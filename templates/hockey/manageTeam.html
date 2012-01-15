@@ -1,0 +1,32 @@
+<html>
+  <body>
+    {% if can_manage %}
+    <div class="container-fluid">
+      <div class="sidebar">
+	<div class="well">
+	  <h5>Manage Team</h5>
+	  <ul>
+	    <li>
+	      <a href="/team/{{team.id}}/editLines">Edit Lines</a>
+	    </li>
+	    <li>
+	      <a href="/team/{{team.id}}/viewSchedule">View Schedule</a>
+	    </li>
+	    <li>
+	      <a href="/team/{{team.id}}/tactics">Tactics</a>
+	    </li>
+	    <li>
+	      <a href="/team/{{team.id}}/contracts">Contracts</a>
+	    </li>
+	    <li>
+	      <a href="/team/{{team.id}}/messageTeam">Message Team</a>
+	    </li>
+	    <li>
+	      <a href="/team/{{team.id}}/arena">Arena</a>
+	    </li>
+	  </ul>
+	</div>
+      </div>
+      {% endif %}
+  </body>
+</html>

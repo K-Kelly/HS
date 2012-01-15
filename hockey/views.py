@@ -19,12 +19,15 @@ def viewPlayer(request, player_id):
     can_upgrade = False
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    if p.upgrades > 0:
+    can_manage = False
+    if len(team_list)>0:
+        can_manage = True
+    if p.upgrades >= 1 :
         can_upgrade = True
     if request.user.id == p.user_id:
-        return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
+        return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage, 'owner':True},context_instance=RequestContext(request))
     else:
-        return render_to_response('hockey/viewPlayer.html', {'player':p, 'user':request.user, 'not_owner':True, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
+        return render_to_response('hockey/viewPlayer.html', {'player':p, 'user':request.user, 'not_owner':True, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage},context_instance=RequestContext(request))
 
 @login_required
 def viewTeam(request, team_id):
@@ -54,9 +57,9 @@ def viewTeam(request, team_id):
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
     if request.user.id == t.owner or request.user.id == t.general_Manager:
-        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'current_lines':current_lines, 'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
+        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'current_lines':current_lines, 'player_list':player_list, 'team_list':team_list, 'can_manage':True, 'offsetf':"span6", 'offsetd':"span6 offset3", 'offsetg':"span6 offset6"}, context_instance=RequestContext(request))
     else:
-        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user, 'current_lines':current_lines, 'player_list':player_list,'team_list':team_list})
+        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user, 'current_lines':current_lines, 'player_list':player_list,'team_list':team_list, 'can_manage':False, 'offsetf':"span6 offset5", 'offsetd':"span6 offset8", 'offsetg':"span6 offset11"})
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -106,7 +109,7 @@ def creatingPlayer(request):
         age = 18
         retired = False
         salary = 0
-        contract_end = datetime.now()
+        contract_end = 0
         no_trade = False
         style = 1 # need to make user choose this
         shooting = 1
@@ -186,4 +189,92 @@ def doUpgradeSkill(skill,player):
             player.upgrades +=1
         player.upgrades -=1
         player.save()
-        
+
+@login_required        
+def viewContracts(request, player_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    
+    player = get_object_or_404(Player, pk=player_id)
+    owner = False
+    if player.user_id == request.user.id:
+        owner = True
+    contract_list = player.contracts.all() 
+    if request.method == 'POST':
+        if 'Reject' in request.POST:
+            contract_id = request.POST['Reject']
+            Contract.objects.get(pk=contract_id).delete()
+        elif 'Accept' in request.POST:
+            contract_id = request.POST['Accept']
+            contract = get_object_or_404(Contract, pk=contract_id)
+            team = get_object_or_404(Team,pk=contract.team_id)
+            team.players.add(player)
+            team.contracts.remove(contract)
+            team.salary_used += contract.salary
+            team.salary_left -= contract.salary
+            team.save()
+            player.salary=contract.salary
+            player.team_id = contract.team_id
+            player.contracts.clear()
+            player.contract_end = contract.length
+            player.no_trade = contract.no_trade
+            player.save()
+            Contract.objects.get(pk=contract_id).delete()
+        return redirect('/player/%s' %(player_id))
+            
+    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner},context_instance=RequestContext(request))
+
+@login_required
+def viewMessages(request, player_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
+
+@login_required
+def buyEquipment(request, player_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
+
+@login_required
+def offerPlayerContract(request, player_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    if request.method == 'POST':
+        form = OfferPlayerContractForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            salary = cd['salary']
+            length = cd['length']
+            no_trade = cd['no_trade']
+            message = cd['message']
+            team_id = request.POST['team']
+            team = get_object_or_404(Team, pk=team_id)
+            team_name = team.name
+            contract = Contract(player_id=player_id, team_id=team_id, team_name=team_name, salary=salary, length = length,no_trade=no_trade, message=message, is_accepted=False)
+            contract.save()
+            team.contracts.add(contract)
+            team.save()
+            player = get_object_or_404(Player, pk=player_id)
+            player.contracts.add(contract)
+            player.save()
+            return render_to_response('hockey/contractOfferSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
+        else:
+            form = OfferPlayerContractForm(request.POST)
+            can_manage = False
+            if len(team_list)>0:
+                can_manage = True
+                return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage,'not_valid':True}, context_instance=RequestContext(request))
+    else:
+        form = OfferPlayerContractForm(request.POST)
+        can_manage = False
+        if len(team_list)>0:
+            can_manage = True
+        return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage}, context_instance=RequestContext(request))
+
+@login_required
+def messagePlayer(request, player_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
+

@@ -21,7 +21,7 @@ class PlayerTest(TestCase):
         height = 60
         weight = 160
         salary = 600000
-        contract_end = datetime.now()
+        contract_end = 0
         no_trade = False
         position = "D"
         style = 0

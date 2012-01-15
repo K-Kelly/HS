@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<html>
+  <head>
+  </head>
+  <body>
+    <center>
+      <h2>{{ player.name }}</h2>	
+	{% if can_manage %}
+	<div class="container-fluid">
+	  <div class="sidebar">
+	    <div class="well">
+	      {% if owner %}
+	      <h5>Manage Player</h5>
+	      <ul>
+		<li>
+		  <a href="/team/{{player.team_id}}/">View Team</a>
+		</li>
+		<li>
+		  <a href="/player/{{player.id}}/viewContracts">View
+		    Contract Offers</a>
+		</li>
+		<li>
+		  <a href="/player/{{player.id}}/viewMessages">View
+		  Messages</a>
+		</li>
+		<li>
+		  <a href="/player/{{player.id}}/buyEquipment">Buy
+		  Equipment</a>
+		</li>
+	      {% endif %}
+	      {% if can_manage %}
+	      <h5>Manage Team</h5>
+	      <ul>		
+		<li>
+		  <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+		</li>		
+	      </ul>
+	      {% endif %}
+	      <BR>
+	      <ul>
+		<li>
+		  <a href="/player/{{player.id}}/">View player</a>
+		</li>
+	      </ul>
+	    </div>
+	  </div>
+      {% endif %}
+	  {% if not_valid %}
+	  <p style="color:red;">Unable to offer the contract! Make
+	  sure salary and length are integers!</p>
+	  {% endif %}
+	  {% if not_owner %}
+          <p style="color:red;">You are not the agent of this Player!</p>
+	  {% else %}
+	  <div class="content">
+	  <h4> You have {{ player.upgrades }} upgrade points to spend!</h4>
+	  Click on the skill you wish to upgrade:
+	    <form action="" method="post">{% csrf_token %}
+	      <fieldset>
+		<legend>Offer Contract</legend>
+		<div class="team">
+		  <label for="team">Team</label>
+		  <div class="input">
+		    <select id="team" name="team">
+		      {% for team in team_list %}
+		      <option value='{{team.id}}'>{{team.name}}</option>
+		      {% endfor %}
+		    </select>
+		  </div>
+		</div>
+		{{ form }}
+		<button type="submit" class="btn primary">Offer Contract</button>
+	      </fieldset>
+	  </form>
+	    </div>
+	</tr>
+        <div class="content">
+	
+	</div>
+	
+	 {% endif %}   
+</center>
+</body>
+</html>
+
+{% endblock %}
