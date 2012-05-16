@@ -15,4 +15,9 @@ class OfferPlayerContractForm(BootstrapForm):
     salary = forms.IntegerField(max_value=20000000, min_value=100000)
     length = forms.IntegerField(max_value=10, min_value=1)
     no_trade = forms.BooleanField(required=False)
-    message = forms.CharField(max_length=2000)
+    message = forms.CharField(max_length=2000, widget=forms.Textarea)
+
+
+class MessageForm():
+    title = forms.CharField(max_length=100, widget=forms.Textarea)
+    body = forms.CharField(max_length=3000, widget=forms.Textarea)

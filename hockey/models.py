@@ -36,6 +36,7 @@ class Player(models.Model):
     skates = models.IntegerField()
     stick = models.IntegerField()
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
+    free_agent = models.BooleanField()
     def __unicode__(self):
         return self.name
     
@@ -102,6 +103,22 @@ class Contract(models.Model):
     class Meta:
         ordering = ['team_id']
 
+class Message(models.Model):
+    sender_user_id = models.IntegerField()
+    sender_player_id = models.IntegerField(blank=True, default="-1")
+    sender_team_id = models.IntegerField(blank=True, default="-1")
+    receiver_user_id = models.IntegerField()
+    receiver_player_id = models.IntegerField(blank=True, default="-1")
+    receiver_team_id = models.IntegerField(blank=True, default="-1")
+    title = models.CharField(max_length = 100)
+    message = models.CharField(max_length = 2000)
+    
+    def __unicode__(self):
+        return self.title
+    
+    class Meta:
+        ordering = ['sender_user_id']
+
 class Team(models.Model):
     name = models.CharField(max_length=35)
     owner = models.IntegerField()
@@ -129,6 +146,24 @@ class Team(models.Model):
     rw2 = models.IntegerField(blank=True, default="-1")
     rw3 = models.IntegerField(blank=True, default="-1")
     rw4 = models.IntegerField(blank=True, default="-1")
+    pp1lw = models.IntegerField(blank=True, default="-1")
+    pp1c = models.IntegerField(blank=True, default="-1")
+    pp1rw = models.IntegerField(blank=True, default="-1")
+    pp1ld = models.IntegerField(blank=True, default="-1")
+    pp1rd = models.IntegerField(blank=True, default="-1")
+    pp2lw = models.IntegerField(blank=True, default="-1")
+    pp2c = models.IntegerField(blank=True, default="-1")
+    pp2rw = models.IntegerField(blank=True, default="-1")
+    pp2ld = models.IntegerField(blank=True, default="-1")
+    pp2rd = models.IntegerField(blank=True, default="-1")
+    pk1c = models.IntegerField(blank=True, default="-1")
+    pk1w = models.IntegerField(blank=True, default="-1")
+    pk1ld = models.IntegerField(blank=True, default="-1")
+    pk1rd = models.IntegerField(blank=True, default="-1")
+    pk2c = models.IntegerField(blank=True, default="-1")
+    pk2w = models.IntegerField(blank=True, default="-1")
+    pk2ld = models.IntegerField(blank=True, default="-1")
+    pk2rd = models.IntegerField(blank=True, default="-1")    
     statistics = models.IntegerField(blank=True,default="-1")
     funds = models.IntegerField()
     salary_used = models.IntegerField()

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load i18n %}
+  {% block content %}
+<html>
+<head>
+</head>
+<body>
+  <table class="table zebra-striped">
+    <thead>
+      <tr>
+	<th><center>
+	  <a class="btn primary" href="/freeAgents/L">Only L</a>
+	</th>
+	<th><center>
+	  <a class="btn primary" href="/freeAgents/C">Only C</a>
+	</th>
+	<th><center>
+	  <a class="btn primary" href="/freeAgents/R">Only R</a>
+	</th>
+	<th><center>
+	  <a class="btn primary" href="/freeAgents/D">Only D</a>
+	</th>
+	<th><center>
+	  <a class="btn primary" href="/freeAgents/G">Only G</a>
+	</th>
+      <tr>
+	<th><center>Position</center></th>
+	<th><center>Name</center></th>
+	<th><center>Age</center></th>
+	<th><center>Level</center></th>
+	<th><center>Select</center></th>
+      </tr>
+    </thead>
+      <tbody>
+	{% for player in FA_list %}
+	<tr>
+	<td><center>{{ player.position }}</center></td>
+	<td><center>{{ player.name }}</center></td>
+	<td><center>{{ player.age }}</center></td>
+	<td><center>{{ player.level }}</center></td>
+	<td> 
+	  <center><a class="btn success" href="/player/{{ player.id }}">View</a></center>
+	</td>
+	</tr>
+	 {% endfor %}
+      </tbody>
+    </table>  
+</body>
+</html>
+
+{% endblock %}

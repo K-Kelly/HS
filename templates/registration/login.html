@@ -2,13 +2,25 @@
 {% load i18n %}
 
 {% block content %}
-<form method="post" action=".">{%csrf_token %}
-  {{ form.as_p }}
+<center>
+  <div class="content">
+    <div class="well" style="padding: 14px 19px;">
+      <div class="row">
+	<div class="span22"> <h1>Login</h1></div></div>
+      <form method="post" action=".">{% csrf_token %}
+	{% for field in form %}
+	<div class="row-fluid">
+	  <div class="span4">{{ field.label_tag }}{{ field }} </div>
+	  {{ field.errors }}
+	</div>
+	{% endfor %}
+	<input type="submit" value="{% trans 'Log in' %}" />
+	<input type="hidden" name="next" value="{{ next }}" />
+      </form>
+      <p>{% trans "Forgot password" %}? <a href="{% url auth_password_reset %}">{% trans "Reset it" %}</a></p>
+      <p>{% trans "Not member" %}? <a href="{% url registration_register %}">{% trans "Register" %}</a></p>
+    </div>
+  </div>
+</div>
 
-  <input type="submit" value="{% trans 'Log in' %}" />
-  <input type="hidden" name="next" value="{{ next }}" />
-</form>
-
-<p>{% trans "Forgot password" %}? <a href="{% url auth_password_reset %}">{% trans "Reset it" %}</a>!</p>
-<p>{% trans "Not member" %}? <a href="{% url registration_register %}">{% trans "Register" %}</a>!</p>
 {% endblock %}

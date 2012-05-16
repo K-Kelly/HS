@@ -90,21 +90,18 @@
 		<a href="/contact">Contact</a>
 	      </li>
 	    </ul>
-	    <form class="pull-right" action="/accounts/login">{%csrf_token %}
-	      <input class="input-small" type="text" placeholder="Username">
-		<input class="input-small" type="password" placeholder="Password">
+	    <form class="pull-right" action="/accounts/login">{% csrf_token %}
+	      <input class="input-small" type="text"
+		     placeholder="Username" id="id_username">
+		<input class="input-small" type="password"
+		       placeholder="Password" id="id_passowrd">
 		  <button class="btn" type="submit">Sign in</button>
 		</form>
 	      </div>
 	    </div>
 	  </div>
 
-      <div class="container-fluid">
-	  <div class="sidebar" id="header">
-	    <p><a href="{% url auth_login %}">{% trans "Log in" %}</a></p>
-	    <p><a href="/accounts/register/">{% trans "register" %}</a></p>
-	  </div>
-      </div>
+      
 	{% endif %}
 	
         {% endblock %}

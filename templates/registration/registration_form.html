@@ -2,9 +2,29 @@
 {% load i18n %}
 
 {% block content %}
-<form method="post" action=".">{% csrf_token %}
-  {{ form.as_p }}
-
-  <input type="submit" value="{% trans 'Submit' %}" />
-</form>
+<html>
+  <body>
+    <div class="container-fluid">
+      <div class="content">
+	<div class="well" style="padding: 14px 19px;">
+	  <div class="row">
+	    <div class="span17 offset7"> <h1>Register</h1></div></div>
+	  <form method="post" action=".">{% csrf_token %}
+	    <center>
+	    {% for field in form %}
+	    <div class="row-fluid">
+		<div class="span4">{{ field.label_tag }}{{ field }} </div>
+		{{ field.errors }}
+	    </div>
+	    {% endfor %}
+	    <div class="form-actions">
+	      <input class="btn btn-success" type="submit" value="Submit"/>
+	    </div>
+	  </form>
+	</div>
+      </div>
+    </div>
+</div>
+</body>
+</html>
 {% endblock %}
