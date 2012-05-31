@@ -1,110 +1,109 @@
-{% load i18n %}
+ {% load i18n %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
-<head>
-  <link rel="stylesheet" type="text/css" href="/assets/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet/less" type="text/css" href="/assets/bootstrap/lib/bootstrap.less">
-<script src="less.js" type="text/javascript"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"type="text/javascript"></script>
-<script src="/assets/bootstrap/js/bootstrap-dropdown.js"type="text/javascript"></script>
-<title>{% block title %}Hockey Site{% endblock %}</title>
-</head>
-
-<body>
- {% block header %}
+  <head>
+    <link rel="stylesheet" href="static/bootstrap/less/bootstrap.css">
+      <script src="/static/less.min.js" type="text/javascript"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"type="text/javascript"></script>
+      <script src="/static/bootstrap/docs/assets/js/bootstrap.js"type="text/javascript"></script>
+      <title>{% block title %}Hockey Site{% endblock %}</title>
+    </head>
+  
+<body data-offset="50" data-target=".subnav" data-spy="scroll" data-twttr-rendered="true">>
+  {% block header %}
 {% if user.is_authenticated %}
-  <div class="topbar-wrapper" style="z-index: 5;">
-    <div class="topbar" data-dropdown="dropdown">
-      <div class="topbar-inner">
-	<div class="container">
-	  <h3>
-	    <a href="">Hockey Site</a>
-	  </h3>
-	  <ul class="nav">
-	    <li>
-	      <a href="/profile">{% trans "Home" %}</a>
-	    </li>
-	    <li>
-	      <a href="/createPlayer">{% trans "Create Player" %}</a>
-	    </li>
-	    <li>
-	      <a href="/createTeam">{% trans "Create Team" %}</a>
-	    </li>	    
-	    <li class="dropdown">
-	      <a class="dropdown-toggle" >View Players</a>
-	      <ul class="dropdown-menu">
-		{% for player in player_list %}
-		<li>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+	<h3>
+	  <a class="brand" href="">Hockey Site</a>
+	</h3>
+	<div class="nav-collapse collapse">
+	<ul class="nav">
+	  <li>
+	    <a href="/profile">{% trans "Home" %}</a>
+	  </li>
+	  <li>
+	    <a href="/createPlayer">{% trans "Create Player" %}</a>
+	  </li>
+	  <li>
+	    <a href="/createTeam">{% trans "Create Team" %}</a>
+	  </li>	    
+	  <li class="dropdown">
+	    <a class="dropdown-toggle" data-toggle="dropdown">View Players</a>
+	    <ul class="dropdown-menu">
+	      {% for player in player_list %}
+	      <li>
 		<a href="/player/{{player.id}}">{{player.position}} - {{player.name}} </a>
-		</li>
-		{% endfor %}
-	      </ul>
-	    </li>
-	    <li class="dropdown">
-	      <a class="dropdown-toggle" >View Teams</a>
-	      <ul class="dropdown-menu">
-		{% for team in team_list %}
-		<li>
+	      </li>
+	      {% endfor %}
+	    </ul>
+	  </li>
+	  <li class="dropdown">
+	    <a class="dropdown-toggle" data-toggle="dropdown" >View Teams</a>
+	    <ul class="dropdown-menu">
+	      {% for team in team_list %}
+	      <li>
 		<a href="/team/{{team.id}}">{{team.name}} </a>
-		</li>
-		{% endfor %}
-	      </ul>
-	    </li>
-	  </ul>
-	  <form class="pull-left" action="">
-	    <input type="text" placeholder="Search">
-	    </form>
-	    <ul class="nav secondary-nav">
-	      <li class="dropdown">
-		<a class="dropdown-toggle" href="/profile/">{{ user.username }}</a>
-		<ul class="dropdown-menu">
-		  <li>
-		    <a href="{% url auth_password_change %}">{% trans "Change password" %}</a
-		  </li>		  		  
-		  <li class="divider"></li>
-		  <li>
-		    <a href="{% url auth_logout %}">{% trans "Log out"%}</a>
-		  </li>
-		</ul>
+	      </li>
+	      {% endfor %}
+	    </ul>
+	  </li>
+	</ul>
+	</div>
+	<form class="navbar-search pull-left" action="">
+	  <input type="text" placeholder="Search"/>
+	</form>
+	<ul class="nav pull-right">
+	  <li class="dropdown">
+	    <a class="dropdown-toggle" data-toggle="dropdown" href="/profile/">{{ user.username }}</a>
+	    <ul class="dropdown-menu">
+	      <li>
+		<a href="{% url auth_password_change %}">{% trans "Change password" %}</a>
+	      </li>		  		  
+	      <li class="divider"></li>
+	      <li>
+		<a href="{% url auth_logout %}">{% trans "Log out"%}</a>
 	      </li>
 	    </ul>
-	  </div>
+	  </li>
+	</ul>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+	<a class="brand" href="#">Hockey Site</a>
+	<div class="nav-collapse collapse">
+	<ul class="nav">
+	  <li>
+	    <a href="/index">Home</a>
+	  </li>
+	  <li>
+	    <a href=".">About</a>
+	  </li>
+	  <li>
+	    <a href="/contact">Contact</a>
+	  </li>
+	</ul>
+	<form class="pull-right" action="/accounts/login">{% csrf_token %}
+	  <input class="input-small" type="text"
+		 placeholder="Username" id="id_username_top"/>
+	  <input class="input-small" type="password"
+		 placeholder="Password" id="id_passowrd_top"/>
+	  <button class="btn" type="submit">Sign in</button>
+	</form>
 	</div>
       </div>
     </div>
-{% else %}
-      <div class="topbar">
-	<div class="fill">
-	  <div class="container">
-	    <a class="brand" href="#">Hockey Site</a>
-	    <ul class="nav">
-	      <li>
-		<a href="/index">Home</a>
-	      </li>
-	      <li>
-		<a href=".">About</a>
-	      </li>
-	      <li>
-		<a href="/contact">Contact</a>
-	      </li>
-	    </ul>
-	    <form class="pull-right" action="/accounts/login">{% csrf_token %}
-	      <input class="input-small" type="text"
-		     placeholder="Username" id="id_username">
-		<input class="input-small" type="password"
-		       placeholder="Password" id="id_passowrd">
-		  <button class="btn" type="submit">Sign in</button>
-		</form>
-	      </div>
-	    </div>
-	  </div>
-
-      
-	{% endif %}
-	
-        {% endblock %}
+  </div>  
+  {% endif %}
+  
+  {% endblock %}
 
 
     <div class="content" id="content">
