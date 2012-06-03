@@ -36,15 +36,15 @@ def viewTeam(request, team_id):
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
     if request.user.id == t.owner or request.user.id == t.general_Manager:
-        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'current_lines':current_lines, 'player_list':player_list, 'team_list':team_list, 'can_manage':True, 'offsetf':"span6", 'offsetd':"span6 offset3", 'offsetg':"span6 offset6"}, context_instance=RequestContext(request))
+        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'current_lines':current_lines, 'player_list':player_list, 'team_list':team_list, 'can_manage':True}, context_instance=RequestContext(request))
     else:
-        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user, 'current_lines':current_lines, 'player_list':player_list,'team_list':team_list, 'can_manage':False, 'offsetf':"span6 offset5", 'offsetd':"span6 offset8", 'offsetg':"span6 offset11"})
+        return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user, 'current_lines':current_lines, 'player_list':player_list,'team_list':team_list, 'can_manage':False})
 
 def getPlayer(p_id):
     if p_id == -1:
         return "Empty!"
     else:
-        return get_object_or_404(Player, pk= p_id).name
+        return get_object_or_404(Player, pk= p_id)
 
 @login_required
 def createTeam(request):

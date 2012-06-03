@@ -1,172 +1,189 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-<html>
-  <head>
-  </head>
-  <body>
-    <center>
-      <h2>{{ player.name }}</h2>	
-	{% if can_manage %}
-	<div class="container-fluid">
-	  <div class="sidebar">
-	    <div class="well">
-	      {% if owner %}
-	      <h5>Manage Player</h5>
-	      <ul>
-		<li>
-		  <a href="/team/{{player.team_id}}/">View Team</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/viewContracts">View
-		    Contract Offers</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/viewMessages">View
+
+    <div class="row-fluid">
+      <div class="span3">
+	{% if owner %}
+	<div class="well sidebar-nav">
+	  <ul class="nav nav-list">
+	    <li class="nav-header">Manage Player</li>
+	    <li>
+	      <a href="/team/{{player.team_id}}/">View Team</a>
+	    </li>
+	    <li>
+	      <a href="/player/{{player.id}}/viewContracts">View
+		Contract Offers</a>
+	    </li>
+	    <li>
+	      <a href="/player/{{player.id}}/viewMessages">View
 		  Messages</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/buyEquipment">Buy
-		  Equipment</a>
-		</li>
-	      {% endif %}
-	      {% if can_manage %}
-	      <h5>Manage Team</h5>
-	      <ul>
-		<li>
-		  <a href="/player/{{player.id}}/offerContract">Offer Contract</a>
-		</li>		
-		<li>
-		  <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
-		</li>		
-		<li>
-		  <a href="/freeAgents/all/">View Free Agents</a>
-		</li>
-		
-	      </ul>
-	      {% endif %}
-	    </div>
-	  </div>
-      {% endif %}
-	  {% if not_owner %}
-          <p style="color:red;">You are not the agent of this Player!</p>
-	  {% else %}
-	  {% if can_upgrade %}
-	  <div class="content">
-	    <div class="page-header">
-	      <h1>Upgrades</h1>
-	    </div>
-	  <h4> You have {{ player.upgrades }} upgrade points to spend!</h4>
-	  Click on the skill you wish to upgrade:
-	    <form action="upgradeSkill/" method="post">{% csrf_token %}
-	      <div class="well" style="padding: 15px 20px;">
-	      <button class="btn primary" name="skill"
-	      value="shooting"> Shooting</button> 
-	      <button class="btn primary" name="skill"
-	      value="strength"> Strength</button> 
-	      <button class="btn primary" name="skill"
-	      value="passing"> Passing</button> 
-	      <button class="btn primary" name="skill"
-	      value="endurance"> Endurance</button> 
-	      <button class="btn primary" name="skill"
-	      value="stickHandling">Stick Handling</button> 
-	      <button class="btn primary" name="skill"
-	      value="skating"> Skating</button> <BR><BR>
-	      <button class="btn primary" name="skill"
-	      value="checking"> Checking</button> 
-	      <button class="btn primary" name="skill"
-	      value="faceoff"> Faceoffs</button> 
-	      <button class="btn primary" name="skill"
-	      value="positioning"> Positioning</button> 
-	      <button class="btn primary" name="skill"
-	      value="leadership"> Leadership</button> 
-	      <button class="btn primary" name="skill"
-	      value="awareness"> Awareness</button> 
-	      <button class="btn primary" name="skill"
-	      value="fighting"> Fighting</button>
-	      </div>
-	    </form>
-	    </div>
-	</tr>
+	    </li>
+	    <li>
+	      <a href="/player/{{player.id}}/buyEquipment">Buy
+		Equipment</a>
+	    </li>
+	    {% if can_manage %}
+	    <li class="nav-header">Manage Team</li>
+	    <li>
+	      <a href="/player/{{player.id}}/offerContract">Offer Contract</a>
+	    </li>		
+	    <li>
+	      <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+	    </li>		
+	    <li>
+	      <a href="/freeAgents/all/">View Free Agents</a>
+	    </li>
+	    {% endif %}
+	    </ul>
+	</div>
+	{% elif can_manage %}
+	<div class="well sidebar-nav">
+	  <ul class="nav nav-list">
+	    <li class="nav-header">Manage Team</li>
+	    <li>
+	      <a href="/player/{{player.id}}/offerContract">Offer Contract</a>
+	    </li>		
+	    <li>
+	      <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+	    </li>		
+	      <li>
+		<a href="/freeAgents/all/">View Free Agents</a>
+	      </li>
+	  </ul>
+	</div>
+	{% else %}
+	<div class="well sidebar-nav">
+	    <ul class="nav nav-list">
+	      <li>
+		<a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+	      </li>		
+	      <li>
+		<a href="/freeAgents/all/">View Free Agents</a>
+	      </li>
+	    </ul>
+	</div>
 	{% endif %}
-        <div class="content">
-	  <div class="page-header">
-	    <h1>Skills</h1>
+      </div>
+      <div class="span9">
+	{% if not_owner %}
+        <div class="alert alert-info">
+	  <button class="close" data-dismiss="alert"
+		  type="button">x</button>
+	  You are not the agent of this Player!</div>
+	{% else %}
+	{% if can_upgrade %}
+	<div class="alert alert-success">
+	  <button class="close" data-dismiss="alert"
+		  type="button">x</button>
+	  You have <strong>{{ player.upgrades }}</strong> upgrade points to spend!	
+	<form class="well" action="upgradeSkill/" method="post">{% csrf_token %}
+	  <label>Click on the skill you wish to upgrade:</label>
+	  <div class="well" style="padding: 15px 20px;">
+	    <div class="btn-group">
+	      <button class="btn btn-primary" name="skill"
+		      value="shooting"> Shooting</button>
+	      <button class="btn btn-primary" name="skill"
+		      value="strength"> Strength</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="passing"> Passing</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="endurance"> Endurance</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="stickHandling">Stick Handling</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="skating"> Skating</button> <BR><BR>
+	      <button class="btn btn-primary" name="skill"
+		      value="checking"> Checking</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="faceoff"> Faceoffs</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="positioning"> Positioning</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="leadership"> Leadership</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="awareness"> Awareness</button> 
+	      <button class="btn btn-primary" name="skill"
+		      value="fighting"> Fighting</button>
+	    </div>
 	  </div>
-	  <div class="well" style="padding: 14px 19px;">
-	    <div class="row">
-	      <div class="span6 offset5">
-		<p>Shooting: {{player.shooting}}</p>
+	</form>
+	</div>
+	{% endif %}
+	<div class="hero-unit">	      
+	  <h2>{{ player.position }} - {{ player.name }}</h2><BR/>
+	  <div class="row">
+	    <div class="span6 offset5">
+	      <p>Shooting: {{player.shooting}}</p>
 	    </div>
-	      <div class="span6">
-		<p>Strength: {{player.strength}}</p>
-	      </div>
+	    <div class="span6">
+	      <p>Strength: {{player.strength}}</p>
 	    </div>
-	    <div class="row">
-	      <div class="span6 offset5">
-		<p>Passing: {{player.passing}}</p>
-	      </div>
-	      <div class="span6">
-		<p>Endurance: {{player.endurance}}</p>
-	      </div>
+	  </div>
+	  <div class="row">
+	    <div class="span6 offset5">
+	      <p>Passing: {{player.passing}}</p>
 	    </div>
-	    <div class="row">
+	    <div class="span6">
+	      <p>Endurance: {{player.endurance}}</p>
+	    </div>
+	  </div>
+	  <div class="row">
 	      <div class="span6 offset5">
 		<p>Stick Handling: {{player.stickHandling}}</p>
 	      </div>
 	      <div class="span6">
 		<p>Skating: {{player.skating}}</p>
 	      </div>
+	  </div>
+	  <div class="row">
+	    <div class="span6 offset5">
+	      <p>Checking: {{player.checking}}</p>
+	      </div>
+	    <div class="span6">
+	      <p>Faceoffs: {{player.faceoff}}</p>
 	    </div>
-	    <div class="row">
-	      <div class="span6 offset5">
-		<p>Checking: {{player.checking}}</p>
-	      </div>
-	      <div class="span6">
-		<p>Faceoffs: {{player.faceoff}}</p>
-	      </div>
+	  </div>
+	  <div class="row">
+	    <div class="span6 offset5">
+	      <p>Positioning: {{player.positioning}}</p>
 	    </div>
-	    <div class="row">
-	      <div class="span6 offset5">
-		<p>Positioning: {{player.positioning}}</p>
-	      </div>
 	      <div class="span6">
 		<p>Leadership: {{player.leadership}}</p>
 	      </div>
 	  </div>
-	    <div class="row">
-	      <div class="span6 offset5">
-		<p>Awareness: {{player.awareness}}</p>
-	      </div>
-	      <div class="span6">
-		<p>Fighting: {{player.fighting}}</p>
+	  <div class="row">
+	    <div class="span6 offset5">
+	      <p>Awareness: {{player.awareness}}</p>
 	    </div>
-	    </div>	
-	  </div>
+	    <div class="span6">
+	      <p>Fighting: {{player.fighting}}</p>
+	    </div>
+	  </div>	
 	</div>
-	<BR><BR>
-	<table id="equipment">
-	  <tr>
-	    <td>Helmet: {{player.helmet}}</td>
-	  </tr>
-	  <tr>
-	    <td>Gloves:  {{player.gloves}}</td>
-	  </tr>
-	  <tr>
-	    <td>Pads:  {{player.shoulder_pads}}</td>
-	  </tr>
-	  <tr>
-	    <td>Pants:  {{player.pants}}</td>
-	  </tr>
+      </div>
+      <BR><BR>
+      <table id="equipment">
+	<tr>
+	  <td>Helmet: {{player.helmet}}</td>
+	</tr>
+	<tr>
+	  <td>Gloves:  {{player.gloves}}</td>
+	</tr>
+	<tr>
+	  <td>Pads:  {{player.shoulder_pads}}</td>
+	</tr>
+	<tr>
+	  <td>Pants:  {{player.pants}}</td>
+	</tr>
 	  <tr>
 	    <td>Skates:  {{player.skates}}</td>
 	  </tr>
-	  <tr>
+	<tr>
 	    <td>Stick:  {{player.stick}}</td>
-	  </tr>
-	 {% endif %}   
-</center>
-</body>
+	</tr>
+	{% endif %}   
+  </body>
 </html>
 
 {% endblock %}

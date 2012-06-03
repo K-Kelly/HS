@@ -1,128 +1,96 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-<html>
-  <head>  
-  </head>
-  <body>  
+<div class="row-fluid">
+  <div class="span3">
     {% if can_manage %}
-    <div class="container-fluid">
-      <div class="sidebar">
-	<div class="well">
-	  <h5>Manage Team</h5>
-	  <ul>
-	    <li>
-	      <a href="/team/{{team.id}}/editLines">Edit Lines</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{team.id}}/viewSchedule">View Schedule</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{team.id}}/tactics">Tactics</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{team.id}}/contracts">Contracts</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{team.id}}/messageTeam">Message Team</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{team.id}}/arena">Arena</a>
-	    </li>
-	    <li>
-	      <a href="/freeAgents/all/">View Free
-	      Agents </a>
-	    </li>
-	  </ul>
-	</div>
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">
+	<li class="nav-header">Manage Team</li>
+	<li>
+	  <a href="/team/{{team.id}}/editLines">Edit Lines</a>
+	</li>
+	<li>
+	  <a href="/team/{{team.id}}/viewSchedule">View Schedule</a>
+	</li>
+	<li>
+	  <a href="/team/{{team.id}}/tactics">Tactics</a>
+	</li>
+	<li>
+	  <a href="/team/{{team.id}}/contracts">Contracts</a>
+	</li>
+	<li>
+	  <a href="/team/{{team.id}}/messageTeam">Message Team</a>
+	</li>
+	<li>
+	  <a href="/team/{{team.id}}/arena">Arena</a>
+	</li>
+	<li>
+	  <a href="/freeAgents/all/">View Free Agents </a>
+	</li>
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  <div class="span9">
+    <div class="row-fluid">
+      <div class="span4">
+	<h2>Left Wing</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.8.id}}">{{current_lines.8.name}}</a></li>
+	  <li><a href="/player/{{current_lines.9.id}}">{{current_lines.9.name}}</a></li>
+	  <li><a href="/player/{{current_lines.10.id}}">{{current_lines.10.name}}</a></li>
+	  <li><a href="/player/{{current_lines.11.id}}">{{current_lines.11.name}}</a></li>
+	</ul>
       </div>
-      {% endif %}
-
-    <div class="content">
-      <div class="well" style="padding: 14px 19px;">
-	<div class="row" id="Line1">
-	  <div class='{{ offsetf }}' title="Line 1 LW" id="line1LW">
-	    <p>{{current_lines.8}}</p>
-	  </div>
-	  <div class="span6" title="Line 1 C" id="line1C">
-	    <p>{{current_lines.12}}</p>
-	  </div>
-	  <div class="span5" title="Line 1 RW" id="line1RW">
-	    <p>{{current_lines.16}}</p>
-	  </div>
-	</div>
-	<div class="row" id="Line2">
-	  <div class='{{ offsetf }}' title="Line 2 LW" id="line2LW">
-	    <p>{{current_lines.9}}</p>
-	  </div>
-	  <div class="span6" title="Line 2 C" id="line2C">
-	    <p>{{current_lines.13}}</p>
-	  </div>
-	  <div class="span5" title="Line 2 RW" id="line2RW">
-	    <p>{{current_lines.17}}</p>
-	  </div>
-	</div>
-	<div class="row" id="Line3">
-	  <div class='{{ offsetf }}' title="Line 3 LW" id="line3LW">
-	    <p>{{current_lines.10}}</p>
-	  </div>
-	  <div class="span6" title="Line 3 C" id="line3C">
-	    <p>{{current_lines.14}}</p>
-	  </div>
-	  <div class="span5" title="Line 3 RW" id="line3RW">
-	    <p>{{current_lines.18}}</p>
-	  </div>
-	</div>
-	<div class="row" id="Line4">
-	  <div class='{{ offsetf }}' title="Line 4 LW" id="line4LW">
-	    <p>{{current_lines.11}}</p>
-	  </div>
-	  <div class="span6" title="Line 4 C" id="line4C">
-	    <p>{{current_lines.15}}</p>
-	  </div>
-	  <div class="span5" title="Line 4 RW" id="line4RW">
-	    <p>{{current_lines.19}}</p>
-	  </div>
-	</div>
-	
-	<div class="row" id="DPair1">
-	  <div class='{{ offsetd }}' title="Defense Pairing 1 Left" id="DPair1L">
-	    <p>{{current_lines.2}}</p>
-	 </div>
-	  <div class="span6" title="Defense Pairing 1 Right" id="DPair1R">
-	    <p>{{current_lines.3}}</p>
-	  </div>
-        </div>
-	<div class="row" id="DPair2">
-	  <div class='{{ offsetd }}' title="Defense Pairing 2 Left" id="DPair2L">
-	    <p>{{current_lines.4}}</p>
-	  </div>
-	  <div class="span6" title="Defense Pairing 2 Right" id="DPair2R">
-	    <p>{{current_lines.5}}</p>
-	  </div>
-        </div>
-	<div class="row" id="DPair3">
-	  <div class='{{ offsetd }}' title="Defense Pairing 3 Left" id="DPair3L">
-	    <p>{{current_lines.6}}</p>
-	  </div>
-	  <div class="span6" title="Defense Pairing 3 Right" id="DPair3R">
-	    <p>{{current_lines.7}}</p>
-	  </div>
-        </div>
-	<div class="row" id="Goalie1">
-	  <div class='{{ offsetg }}' title="Starting Goalie" id="Goalie1S">
-	    <p>{{current_lines.0}}</p>
-	  </div>
-	</div>
-	<div class="row" id="Goalie2">
-	  <div class= '{{ offsetg }}' title="Backup Goalie" id="Goalie2B">
-	    <p>{{current_lines.1}}</p>
-	  </div>
-	</div>
+      <div class="span4">
+	<h2>Center</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.12.id}}">{{current_lines.12.name}}</a></li>
+	  <li><a href="/player/{{current_lines.13.id}}">{{current_lines.13.name}}</a></li>
+	  <li><a href="/player/{{current_lines.14.id}}">{{current_lines.14.name}}</a></li>
+	  <li><a href="/player/{{current_lines.15.id}}">{{current_lines.15.name}}</a></li>
+	</ul>
+      </div>
+      <div class="span4">
+	<h2>Right Wing</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.16.id}}">{{current_lines.16.name}}</a></li>
+	  <li><a href="/player/{{current_lines.17.id}}">{{current_lines.17.name}}</a></li>
+	  <li><a href="/player/{{current_lines.18.id}}">{{current_lines.18.name}}</a></li>
+	  <li><a href="/player/{{current_lines.19.id}}">{{current_lines.19.name}}</a></li>
+	</ul>
       </div>
     </div>
-    
-  </body>
+    <div class="row-flud">
+      <div class="span5"><center>
+	<h2>Left Defense</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.2.id}}">{{current_lines.2.name}}</a></li>
+	  <li><a href="/player/{{current_lines.4.id}}">{{current_lines.4.name}}</a></li>
+	  <li><a href="/player/{{current_lines.6.id}}">{{current_lines.6.name}}</a></li>
+	</ul></center>
+      </div>
+      <div class="span4"><center>
+	<h2>Right Defense</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.3.id}}">{{current_lines.3.name}}</a></li>
+	  <li><a href="/player/{{current_lines.5.id}}">{{current_lines.5.name}}</a></li>
+	  <li><a href="/player/{{current_lines.7.id}}">{{current_lines.7.name}}</a></li>
+	</ul></center>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span4"></div>
+      <div class="span4">
+	<h2>Goalie</h2>
+	<ul class="unstyled">
+	  <li><a href="/player/{{current_lines.1.id}}">{{current_lines.1.name}}</a></li>
+	  <li><a href="/player/{{current_lines.2.id}}">{{current_lines.2.name}}</a></li>
+	</ul>
+      </div>
+    </div>
+</body>
 </html>
 
 {% endblock %}
