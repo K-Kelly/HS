@@ -62,7 +62,8 @@ def createTeam(request):
             team = Team(name = name, owner=request.user.id, general_Manager=-1, league_id= -1,arena=arena,funds = 2000000, salary_used=0, salary_left=2000000)
             team.save()
             request.user.get_profile().teams.add(team)            
-            return render_to_response('hockey/createTeamSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
+            next = "/team/%s"%(team.pk)
+            return redirect(next)
     else:
         form = TeamForm()
     return render_to_response('hockey/createTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
@@ -93,9 +94,12 @@ def offerPlayerContract(request, player_id):
         else:
             form = OfferPlayerContractForm(request.POST)
             can_manage = False
+            owner = False
+            if player_list.filter(pk=player_id).count() is 1:
+                owner = True
             if len(team_list)>0:
                 can_manage = True
-                return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage,'not_valid':True}, context_instance=RequestContext(request))
+                return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage,'not_valid':True, 'owner':owner}, context_instance=RequestContext(request))
     else:
         form = OfferPlayerContractForm(request.POST)
         can_manage = False

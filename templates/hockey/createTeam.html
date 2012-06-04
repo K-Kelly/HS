@@ -1,27 +1,20 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load bootstrap %}
 {% block content %}
-
-<html>
-  <head>
-    <title>Create A Team</title>
-  </head>
-  <body>
-    <h1>Create A Team</h1>
     
+<div class="row-fluid">
+  <div class="span3"></div>
+  <div class="span9">
     {% if form.errors %}
-       <p style="color:red;">
-	 Please correct the error{{ form.errors|pluralize }}
-       </p>
+    {{ form.errors|bootstrap }}
     {% endif %}
-
-    <form action ="" method="post">{% csrf_token %}
-      <table>
-	{{ form.as_table }}
-      <table>
-    <input type="submit" value="Create">
+    <form class="well" action ="" method="post">{% csrf_token %}
+      <legend>{% trans 'Create Team' %}</legend>
+      {{ form|bootstrap }}
+      <button class="btn btn-primary" type="submit"> {% trans 'Create Team' %}</button>
     </form>
-   </body>
-</html>
+  </div>
+</div>
 
 {% endblock %}

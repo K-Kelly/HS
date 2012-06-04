@@ -1,51 +1,64 @@
 {% extends "base.html" %}
 {% load i18n %}
-  {% block content %}
-<html>
-<head>
-</head>
-<body>
-  <table class="table zebra-striped">
-    <thead>
-      <tr>
-	<th><center>
-	  <a class="btn primary" href="/freeAgents/L">Only L</a>
-	</th>
-	<th><center>
-	  <a class="btn primary" href="/freeAgents/C">Only C</a>
-	</th>
-	<th><center>
-	  <a class="btn primary" href="/freeAgents/R">Only R</a>
-	</th>
-	<th><center>
-	  <a class="btn primary" href="/freeAgents/D">Only D</a>
-	</th>
-	<th><center>
-	  <a class="btn primary" href="/freeAgents/G">Only G</a>
-	</th>
-      <tr>
-	<th><center>Position</center></th>
-	<th><center>Name</center></th>
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span2">
+    <BR/><BR/>
+    <div class="btn-group">
+      <button class="btn btn-primary">
+	{% trans 'Filter Position' %}</button>
+      <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+	{{ position }}
+	<span class="caret"></span></button>
+      <ul class="dropdown-menu">
+	<li>
+	  <a href="/freeAgents/L">{% trans 'L' %}</a>
+	</li>
+	<li>
+	  <a href="/freeAgents/C">{% trans 'C' %}</a>
+	</li>
+	  <li>
+	    <a href="/freeAgents/R">{% trans 'R' %}</a>
+	  </li>
+	<li>
+	  <a href="/freeAgents/D">{% trans 'D' %}</a>
+	</li>
+	<li>
+	  <a href="/freeAgents/G">{% trans 'G' %}</a>
+	</li>
+	<li>
+	  <a href="/freeAgents/all">{% trans 'All' %}</a>
+	</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="span9">
+    <table class="table table-striped table-condensed">
+      <thead>
+	<tr>
+	  <th><center>Position</center></th>
+	  <th><center>Name</center></th>
 	<th><center>Age</center></th>
-	<th><center>Level</center></th>
-	<th><center>Select</center></th>
-      </tr>
-    </thead>
+	  <th><center>Level</center></th>
+	  <th><center>Select</center></th>
+	</tr>
+      </thead>
       <tbody>
 	{% for player in FA_list %}
 	<tr>
-	<td><center>{{ player.position }}</center></td>
-	<td><center>{{ player.name }}</center></td>
-	<td><center>{{ player.age }}</center></td>
-	<td><center>{{ player.level }}</center></td>
-	<td> 
-	  <center><a class="btn success" href="/player/{{ player.id }}">View</a></center>
-	</td>
+	  <td><center>{{ player.position }}</center></td>
+	  <td><center>{{ player.name }}</center></td>
+	  <td><center>{{ player.age }}</center></td>
+	  <td><center>{{ player.level }}</center></td>
+	  <td> 
+	    <center><a class="btn success" href="/player/{{ player.id }}">View</a></center>
+	  </td>
 	</tr>
-	 {% endfor %}
+	{% endfor %}
       </tbody>
     </table>  
-</body>
-</html>
-
+  </div>
+</di>
 {% endblock %}

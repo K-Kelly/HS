@@ -1,107 +1,81 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block content %}
-<html>
-  <head>
-  </head>
-  <body>
-    <center>
-      <h2>{{ player.name }}</h2>	
-	{% if can_manage %}
-	<div class="container-fluid">
-	  <div class="sidebar">
-	    <div class="well">
-	      {% if owner %}
-	      <h5>Manage Player</h5>
-	      <ul>
-		<li>
-		  <a href="/team/{{player.team_id}}/">View Team</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/viewContracts">View
-		    Contract Offers</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/viewMessages">View
-		  Messages</a>
-		</li>
-		<li>
-		  <a href="/player/{{player.id}}/buyEquipment">Buy
-		  Equipment</a>
-		</li>
-	      {% endif %}
-	      {% if can_manage %}
-	      <h5>Manage Team</h5>
-	      <ul>		
-		<li>
-		  <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
-		</li>		
-	      </ul>
-	      {% endif %}
-	      <BR>
-	      <ul>
-		<li>
-		  <a href="/player/{{player.id}}/">View player</a>
-		</li>
-	      </ul>
-	    </div>
-	  </div>
-      {% endif %}
-	  {% if owner %}
-	  <div class="content">
-	    <table id="contractTable" class="zebra-striped">
-	      <thead>
-		<tr>
-		  <th class="header">Team</th>
-		  <th class="blue header">Salary Per Season</th>
-		  <th class="green header">Length</th>
-		  <th class="blue header">No Trade Clause</th>
-		  <th class="green header">Message</th>
-		  <th class="red header">Action</th>
-		</tr>
-	      </thead>
-	      <tbody>
-		{% for contract in contract_list %}
-		<tr>
-		  <td>
-		    <a href="/team/{{contract.team_id}}">{{contract.team_name}}</a>
-		  </td>
-		  <td>
-		    {{contract.salary}}
-		  </td>
-		  <td>
+<div class="row-fluid">
+  <div class="span3">
+    {% if owner %}
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">
+	<li class="nav-header">Manage Player</li>
+	<li>
+	  <a href="/player/{{player.id}}/viewContracts">View
+	    Contract Offers</a>
+	</li>
+	<li>
+	  <a href="/player/{{player.id}}/viewMessages">View
+	    Messages</a>
+	</li>
+	<li>
+	  <a href="/player/{{player.id}}/buyEquipment">Buy
+	    Equipment</a>
+	</li>
+	{% endif %}
+	<li>
+	  <a href="/player/{{player.id}}/">View Player</a>
+	</li>
+      </ul>
+    </div>
+  </div>
+  {% if owner %}
+  <div class="span9">
+    <table id="contractTable" class="table table-striped table-condensed">
+      <thead>
+	<tr>
+	  <th class="header">Team</th>
+	  <th class="blue header">Salary Per Season</th>
+	  <th class="green header">Length</th>
+	  <th class="blue header">No Trade Clause</th>
+	  <th class="green header">Message</th>
+	  <th class="red header">Action</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for contract in contract_list %}
+	<tr>
+	  <td>
+	    <a href="/team/{{contract.team_id}}">{{contract.team_name}}</a>
+	  </td>
+	  <td>
+	    {{contract.salary}}
+	  </td>
+	  <td>
 		    {{contract.length}}
-		  </td>
-		  <td>
-		    {% if contract.no_trade %}
-		    Yes
-		    {% else %}
-		    No
-		    {% endif %}
-		  </td>
-		  <td>
-		    {{contract.message}}
-		  </td>
-		  <td>
-		    <form action="" method="post">{% csrf_token %}
-		      <button type="submit" class="btn success"
-		      name="Accept" value='{{contract.id}}'>Accept</button>
-		      <button type="submit" class="btn danger"
-		      name="Reject" value='{{contract.id}}'>Reject</button>
-		    </form>
-		</tr>
-		{% endfor %}
-	      </tbody>
-	    </table>
-	    
-	  </div>
-</tr>	
-
+	  </td>
+	  <td>
+	    {% if contract.no_trade %}
+	    Yes
+	    {% else %}
+	    No
+	    {% endif %}
+	  </td>
+	  <td style="overflow:hidden; max-width:150px;">
+	      {{contract.message}}
+	  </td>
+	  <td>
+	    <form action="" method="post">{% csrf_token %}
+	      <button type="submit" class="btn btn-success" name="Accept" value='{{contract.id}}'>{% trans 'Accept' %}</button>
+	      <button type="submit" class="btn btn-danger" name="Reject" value='{{contract.id}}'>{% trans 'Reject' %}</button>
+	    </form>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>	    
+  </div>
 {% else %}
-<p style="color:red;">You are not the agent of this Player!</p>
-{% endif %}   
-</center>
-</body>
-</html>
-
-{% endblock %}
+  <div class="alert">
+    <button class="close" data-dismiss="alert">x</button>
+    You are not the agent of this Player!
+  </div>
+</div>
+  {% endif %}   
+  {% endblock %}

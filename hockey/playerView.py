@@ -95,8 +95,10 @@ def creatingPlayer(request):
         free_agent = True
         player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stickHandling = stickHandling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent)
         player.save()
-        request.user.get_profile().players.add(player)        
-        return render_to_response('hockey/createPlayerSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
+        request.user.get_profile().players.add(player) 
+        next = "/player/%s"%(player.pk)
+        return redirect(next)
+        #return render_to_response('hockey/createPlayerSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
     else:
         return render_to_response('hockey/createPlayer.html', {'error': True, 'user':request.user, 'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
 
@@ -163,7 +165,7 @@ def viewContracts(request, player_id):
             Contract.objects.get(pk=contract_id).delete()
         return redirect('/player/%s' %(player_id))
             
-    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner},context_instance=RequestContext(request))
+    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner},context_instance=RequestContext(request))
 
 @login_required
 def viewMessages(request, player_id):

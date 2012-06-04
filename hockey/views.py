@@ -45,4 +45,4 @@ def viewFreeAgents(request, position):
         FA_list = Player.objects.all().filter(free_agent=True).order_by('-level','name')
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('hockey/viewFreeAgents.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'FA_list':FA_list})
+    return render_to_response('hockey/viewFreeAgents.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'FA_list':FA_list, 'position':position})
