@@ -101,7 +101,7 @@ def offerPlayerContract(request, player_id):
                 can_manage = True
                 return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage,'not_valid':True, 'owner':owner}, context_instance=RequestContext(request))
     else:
-        form = OfferPlayerContractForm(request.POST)
+        form = OfferPlayerContractForm()
         can_manage = False
         if len(team_list)>0:
             can_manage = True
@@ -142,3 +142,39 @@ def messagePlayer(request, player_id):
         if len(team_list)>0:
             can_manage = True
         return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage}, context_instance=RequestContext(request))
+
+@login_required
+def editLines(request, team_id):
+    player_list = Player.objects.all().filter(user_id=request.user.id)
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    t = get_object_or_404(Team, pk=team_id)
+    if request.method == 'POST':
+        form_get = make_edit_lines_form(player_list)
+        form = form_get(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            l1_field = cd['l1_field']
+            c1_field = cd['c1_field']
+            r1_field = cd['r1_field']
+            d1_field = cd['d1_field']
+            g1_field = cd['g1_field']
+            l2_field = cd['l2_field']
+            c2_field = cd['c2_field']
+            r2_field = cd['r2_field']
+            d2_field = cd['d2_field']
+            g2_field = cd['g2_field']
+            l3_field = cd['l3_field']
+            c3_field = cd['c3_field']
+            r3_field = cd['r3_field']
+            d3_field = cd['d3_field']
+            l4_field = cd['l4_field']
+            c4_field = cd['c4_field']
+            r4_field = cd['r4_field']
+            d4_field = cd['d4_field']
+            d5_field = cd['d5_field']
+            d6_field = cd['d6_field']
+            next = "/team/%s"%(t.pk)
+            return redirect(next)
+    else:
+        form = make_edit_lines_form(player_list)
+    return render_to_response('hockey/editLines.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
