@@ -1,8 +1,8 @@
 from django.conf.urls.defaults import *
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from wuska import settings
+from django.contrib.auth import views as auth_views
 admin.autodiscover()
 
 urlpatterns = patterns('hockey.views',
@@ -31,7 +31,8 @@ urlpatterns += patterns('hockey.teamView',
 
 urlpatterns += patterns('',
      (r'^admin/', include(admin.site.urls)),
-     (r'^accounts/', include('registration.urls')),
+     (r'^accounts/', include('registration.backends.default.urls')),
+
 )
 
 urlpatterns += patterns('',
