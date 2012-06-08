@@ -37,6 +37,7 @@ class Player(models.Model):
     stick = models.IntegerField()
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     free_agent = models.BooleanField()
+    messages = models.ManyToManyField('hockey.Message', related_name = 'player_messages')
     def __unicode__(self):
         return self.name
     
@@ -107,11 +108,10 @@ class Message(models.Model):
     sender_user_id = models.IntegerField()
     sender_player_id = models.IntegerField(blank=True, default="-1")
     sender_team_id = models.IntegerField(blank=True, default="-1")
-    receiver_user_id = models.IntegerField()
-    receiver_player_id = models.IntegerField(blank=True, default="-1")
+    receiver_players = models.ManyToManyField(Player, related_name = 'receiver_players')
     receiver_team_id = models.IntegerField(blank=True, default="-1")
     title = models.CharField(max_length = 100)
-    message = models.CharField(max_length = 2000)
+    body = models.CharField(max_length = 2000)
     
     def __unicode__(self):
         return self.title
@@ -169,6 +169,7 @@ class Team(models.Model):
     salary_used = models.IntegerField()
     salary_left = models.IntegerField()
     contracts = models.ManyToManyField(Contract, related_name = 'team_contracts')
+    messages = models.ManyToManyField('hockey.Message', related_name = 'team_messages')
     def __unicode__(self):
         return self.name
 

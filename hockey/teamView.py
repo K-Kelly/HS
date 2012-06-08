@@ -11,31 +11,9 @@ from django.db.models import Q
 @login_required
 def viewTeam(request, team_id):
     t = get_object_or_404(Team, pk=team_id)
-    goalie1 = getPlayer(t.goalie1)
-    goalie2 = getPlayer(t.goalie2)
-    defense1 = getPlayer(t.defense1)#2
-    defense2 = getPlayer(t.defense2)
-    defense3 = getPlayer(t.defense3)
-    defense4 = getPlayer(t.defense4)
-    defense5 = getPlayer(t.defense5)
-    defense6 = getPlayer(t.defense6)
-    lw1 = getPlayer(t.lw1)#8
-    lw2 = getPlayer(t.lw2)
-    lw3 = getPlayer(t.lw3)
-    lw4 = getPlayer(t.lw4)
-    c1 = getPlayer(t.c1)#12
-    c2 = getPlayer(t.c2)
-    c3 = getPlayer(t.c3)
-    c4 = getPlayer(t.c4)
-    rw1 = getPlayer(t.rw1)#16
-    rw2 = getPlayer(t.rw2)
-    rw3 = getPlayer(t.rw3)
-    rw4 = getPlayer(t.rw4)
-
-    current_lines = (goalie2, goalie2, defense1, defense2, defense3, defense4, defense5, defense6, lw1, lw2, lw3, lw4, c1,c2,c3,c4, rw1, rw2, rw3, rw4)
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'current_lines':current_lines, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_Manager)}, context_instance=RequestContext(request))
+    return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_Manager)}, context_instance=RequestContext(request))
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -105,40 +83,33 @@ def offerPlayerContract(request, player_id):
         return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage}, context_instance=RequestContext(request))
 
 @login_required
-def messagePlayer(request, player_id):
+def message_players_on_team(request,team_id):
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team = get_object_or_404(Team, pk=team_id)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_Manager)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            salary = cd['salary']
-            length = cd['length']
-            no_trade = cd['no_trade']
-            message = cd['message']
-            team_id = request.POST['team']
-            team = get_object_or_404(Team, pk=team_id)
-            team_name = team.name
-            contract = Contract(player_id=player_id, team_id=team_id, team_name=team_name, salary=salary, length = length,no_trade=no_trade, message=message, is_accepted=False)
-            contract.save()
-            team.contracts.add(contract)
+            title = cd['title']
+            body = cd['body']
+            team_players = team.players
+            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_id,receiver_team_id=team_id,title=title,body=body)
+            message.save()
+            message.receiver_players=team_players.all()
+            message.save()
+            team.messages.add(message)
             team.save()
-            player = get_object_or_404(Player, pk=player_id)
-            player.contracts.add(contract)
-            player.save()
-            return render_to_response('hockey/contractOfferSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
-        else:
-            form = OfferPlayerContractForm(request.POST)
-            can_manage = False
-            if len(team_list)>0:
-                can_manage = True
-                return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage,'not_valid':True}, context_instance=RequestContext(request))
+            for player in team_players.all():
+                player.messages.add(message)
+                player.save()
+            alert="Message sent to all players on the team."
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
     else:
-        form = OfferPlayerContractForm(request.POST)
-        can_manage = False
-        if len(team_list)>0:
-            can_manage = True
-        return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage}, context_instance=RequestContext(request))
+        form = MessageForm(request.POST)
+    return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+
 
 @login_required
 def editLines(request, team_id):
@@ -151,38 +122,38 @@ def editLines(request, team_id):
         if form.is_valid():
             t_players = t.players
             cd = form.cleaned_data
-            l1 = cd['l1_field']
+            lw1 = cd['l1_field']
             c1 = cd['c1_field']
-            r1 = cd['r1_field']
+            rw1 = cd['r1_field']
             d1 = cd['d1_field']
             g1 = cd['g1_field']
-            l2 = cd['l2_field']
+            lw2 = cd['l2_field']
             c2 = cd['c2_field']
-            r2 = cd['r2_field']
+            rw2 = cd['r2_field']
             d2 = cd['d2_field']
             g2 = cd['g2_field']
-            l3 = cd['l3_field']
+            lw3 = cd['l3_field']
             c3 = cd['c3_field']
-            r3 = cd['r3_field']
+            rw3 = cd['r3_field']
             d3 = cd['d3_field']
-            l4 = cd['l4_field']
+            lw4 = cd['l4_field']
             c4 = cd['c4_field']
-            r4 = cd['r4_field']
+            rw4 = cd['r4_field']
             d4 = cd['d4_field']
             d5 = cd['d5_field']
             d6 = cd['d6_field']
-            if player_id_in_team(l1,t_players):
-                t.lw1 = l1
-                t_players = t_players.exclude(pk = l1)
-            if player_id_in_team(l2,t_players):
-                t.lw2 = l2
-                t_players = t_players.exclude(pk = l2)
-            if player_id_in_team(l3,t_players):
-                t.lw3 = l3
-                t_players = t_players.exclude(pk = l3)
-            if player_id_in_team(l4,t_players):
-                t.lw4 = l4
-                t_players = t_players.exclude(pk = l4)
+            if player_id_in_team(lw1,t_players):
+                t.lw1 = lw1
+                t_players = t_players.exclude(pk = lw1)
+            if player_id_in_team(lw2,t_players):
+                t.lw2 = lw2
+                t_players = t_players.exclude(pk = lw2)
+            if player_id_in_team(lw3,t_players):
+                t.lw3 = lw3
+                t_players = t_players.exclude(pk = lw3)
+            if player_id_in_team(lw4,t_players):
+                t.lw4 = lw4
+                t_players = t_players.exclude(pk = lw4)
 
             if player_id_in_team(c1,t_players):
                 t.c1 = c1
@@ -197,18 +168,18 @@ def editLines(request, team_id):
                 t.c4 = c4
                 t_players = t_players.exclude(pk = c4)
 
-            if player_id_in_team(r1,t_players):
-                t.rw1 = r1
-                t_players = t_players.exclude(pk = r1)
-            if player_id_in_team(r2,t_players):
-                t.rw2 = r2
-                t_players = t_players.exclude(pk = r2)
-            if player_id_in_team(r3,t_players):
-                t.rw3 = r3
-                t_players = t_players.exclude(pk = r3)
-            if player_id_in_team(r4,t_players):
-                t.rw4 = r4
-                t_players = t_players.exclude(pk = r4)
+            if player_id_in_team(rw1,t_players):
+                t.rw1 = rw1
+                t_players = t_players.exclude(pk = rw1)
+            if player_id_in_team(rw2,t_players):
+                t.rw2 = rw2
+                t_players = t_players.exclude(pk = rw2)
+            if player_id_in_team(rw3,t_players):
+                t.rw3 = rw3
+                t_players = t_players.exclude(pk = rw3)
+            if player_id_in_team(rw4,t_players):
+                t.rw4 = rw4
+                t_players = t_players.exclude(pk = rw4)
 
             if player_id_in_team(d1,t_players):
                 t.defense1 = d1
@@ -249,8 +220,6 @@ def can_manage(request_user_id,team_owner, team_general_manager):
         return True
     return False
         
-#def check_lines(l1,l2,l3,l4,c1,c2,c3,c4,r1,r2,r3,r4,d1,d2,d3,d4,d5,d6,g1,g2):
-
 def player_id_in_team(p_id,playerlist):
     if playerlist.filter(pk=p_id).count() == 1:
         return True

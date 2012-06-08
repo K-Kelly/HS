@@ -15,8 +15,8 @@ class OfferPlayerContractForm(forms.Form):
 
 
 class MessageForm(forms.Form):
-    title = forms.CharField(max_length=100, widget=forms.Textarea)
-    body = forms.CharField(max_length=3000, widget=forms.Textarea)
+    title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea)
+    body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea)
 
 
 def make_edit_lines_form(player_list):

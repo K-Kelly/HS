@@ -33,33 +33,40 @@
     {% endif %}
   </div>
   <div class="span9">
+    {% if alert_success %}
+    <div class="alert alert-success">
+      <a class="close" data-dismiss="alert" href="#">x</a>
+      <h4 class="alert-heading">Success!</h4>
+      {{ alert_message }}
+    </div>
+    {% endif %}
     <div class="well">
       <div class="row-fluid">
 	<div class="span4">
 	  <h2>Left Wing</h2>
 	  <ul class="unstyled">
-	    <li><a href="/player/{{current_lines.8.id}}">{{current_lines.8.name}}</a></li>
-	    <li><a href="/player/{{current_lines.9.id}}">{{current_lines.9.name}}</a></li>
-	    <li><a href="/player/{{current_lines.10.id}}">{{current_lines.10.name}}</a></li>
-	    <li><a href="/player/{{current_lines.11.id}}">{{current_lines.11.name}}</a></li>
+	    <li><a href="/player/{{t.lw1.id}}">{{t.lw1.name}}</a></li>
+	    <li><a href="/player/{{t.lw2.id}}">{{t.lw2.name}}</a></li>
+	    <li><a href="/player/{{t.lw3.id}}">{{t.lw3.name}}</a></li>
+	    <li><a href="/player/{{t.lw4.id}}">{{t.lw4.name}}</a></li>
 	  </ul>
 	</div>
 	<div class="span4">
 	  <h2>Center</h2>
 	  <ul class="unstyled">
-	    <li><a href="/player/{{current_lines.12.id}}">{{current_lines.12.name}}</a></li>
-	    <li><a href="/player/{{current_lines.13.id}}">{{current_lines.13.name}}</a></li>
-	    <li><a href="/player/{{current_lines.14.id}}">{{current_lines.14.name}}</a></li>
-	    <li><a href="/player/{{current_lines.15.id}}">{{current_lines.15.name}}</a></li>
+	    <li><a href="/player/{{t.c1.id}}">{{t.c1.name}}</a></li>
+	    <li><a href="/player/{{t.c2.id}}">{{t.c2.name}}</a></li>
+	    <li><a href="/player/{{t.c3.id}}">{{t.c3.name}}</a></li>
+	    <li><a href="/player/{{t.c4.id}}">{{t.c4.name}}</a></li>
 	  </ul>
 	</div>
 	<div class="span4">
 	  <h2>Right Wing</h2>
 	  <ul class="unstyled">
-	    <li><a href="/player/{{current_lines.16.id}}">{{current_lines.16.name}}</a></li>
-	    <li><a href="/player/{{current_lines.17.id}}">{{current_lines.17.name}}</a></li>
-	    <li><a href="/player/{{current_lines.18.id}}">{{current_lines.18.name}}</a></li>
-	    <li><a href="/player/{{current_lines.19.id}}">{{current_lines.19.name}}</a></li>
+	    <li><a href="/player/{{t.rw1.id}}">{{t.rw1.name}}</a></li>
+	    <li><a href="/player/{{t.rw2.id}}">{{t.rw2.name}}</a></li>
+	    <li><a href="/player/{{t.rw3.id}}">{{t.rw3.name}}</a></li>
+	    <li><a href="/player/{{t.rw4.id}}">{{t.rw4.name}}</a></li>
 	  </ul>
 	</div>
       </div>
@@ -67,17 +74,17 @@
 	<div class="span5"><center>
 	    <h2>Left Defense</h2>
 	    <ul class="unstyled">
-	      <li><a href="/player/{{current_lines.2.id}}">{{current_lines.2.name}}</a></li>
-	      <li><a href="/player/{{current_lines.4.id}}">{{current_lines.4.name}}</a></li>
-	      <li><a href="/player/{{current_lines.6.id}}">{{current_lines.6.name}}</a></li>
+	      <li><a href="/player/{{t.defense1.id}}">{{t.defense1.name}}</a></li>
+	      <li><a href="/player/{{t.defense3.id}}">{{t.defense3.name}}</a></li>
+	      <li><a href="/player/{{t.defense5.id}}">{{t.defense5.name}}</a></li>
 	  </ul></center>
 	</div>
 	<div class="span4"><center>
 	    <h2>Right Defense</h2>
 	    <ul class="unstyled">
-	      <li><a href="/player/{{current_lines.3.id}}">{{current_lines.3.name}}</a></li>
-	      <li><a href="/player/{{current_lines.5.id}}">{{current_lines.5.name}}</a></li>
-	      <li><a href="/player/{{current_lines.7.id}}">{{current_lines.7.name}}</a></li>
+	      <li><a href="/player/{{t.defense2.id}}">{{t.defense2.name}}</a></li>
+	      <li><a href="/player/{{t.defense4.id}}">{{t.defense4.name}}</a></li>
+	      <li><a href="/player/{{t.defense6.id}}">{{t.defense6.name}}</a></li>
 	  </ul></center>
 	</div>
       </div>
@@ -86,8 +93,8 @@
 	<div class="span4">
 	  <h2>Goalie</h2>
 	  <ul class="unstyled">
-	    <li><a href="/player/{{current_lines.1.id}}">{{current_lines.1.name}}</a></li>
-	    <li><a href="/player/{{current_lines.2.id}}">{{current_lines.2.name}}</a></li>
+	    <li><a href="/player/{{t.goalie1.id}}">{{t.goalie1.name}}</a></li>
+	    <li><a href="/player/{{t.goalie2.id}}">{{t.goalie2.name}}</a></li>
 	  </ul>
 	</div>
       </div>
