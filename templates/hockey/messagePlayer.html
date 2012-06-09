@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3">
+    <div class="well sidebar-nav">
+      <ul class="nav nav-list">	
+	<li>
+	  <a href="/player/{{player.id}}">View Player</a>
+	</li>
+      </ul>
+    </div>
+  </div>
+  <div class="span9">
+    <form class="well" action="" method="post">{% csrf_token %}
+      <fieldset>
+	<legend>Message {{player.name}}</legend>
+	{% if can_manage %}
+	{{form.team_field}}
+	{% endif %}
+	{{form.title|bootstrap}}
+	{{form.body|bootstrap}}
+	<button type="submit" class="btn btn-primary">{% trans 'Send Message' %}</button>
+      </fieldset>
+    </form>
+  </div>
+</div>
+  {% endblock %}

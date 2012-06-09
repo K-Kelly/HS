@@ -19,6 +19,7 @@ urlpatterns += patterns('hockey.playerView',
                         (r'^(?i)player/(?P<player_id>\d+)/buyEquipment/$', 'buyEquipment'),
                         (r'^(?i)createPlayer/','createPlayer'),
                         (r'^(?i)creatingPlayer/','creatingPlayer'),
+                        (r'^(?i)player/(?P<player_id>\d+)/messagePlayer/$', 'messagePlayer'),
 )
 
 urlpatterns += patterns('hockey.teamView',

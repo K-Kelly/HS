@@ -60,11 +60,22 @@
 	      <li>
 		<a href="/freeAgents/all/">View Free Agents</a>
 	      </li>
+	      <li>
+		<a href="/team/{{player.team}}">View Team</a>
+	      </li>
 	    </ul>
 	</div>
 	{% endif %}
       </div>
       <div class="span9">
+	{% if alert_success %}
+	<div class="alert alert-success">
+	  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+	  <strong>Success! </strong>{{alert_message}}
+	</div>
+	{% endif %}
+
 	{% if not_owner %}
         <div class="alert alert-info">
 	  <button class="close" data-dismiss="alert"

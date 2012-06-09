@@ -18,7 +18,32 @@ class MessageForm(forms.Form):
     title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea)
     body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea)
 
-
+def message_player(team_list):
+    class MessagePlayerForm(forms.Form):
+        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea)
+        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea)
+        list_id = []
+        list_name = []
+        list_id.append(-1)
+        list_name.append("Don't send from a team")
+        for team in team_list:
+            list_id.append(team.id)
+            list_name.append(team.name)      
+        team_choices = zip(list_id,list_name)
+        team_field = forms.ChoiceField(choices=team_choices,label='Choose your team:',initial=-1)
+    
+        def clean_team_field(self):
+            data = self.cleaned_data['team_field']
+            data = int(data)
+            if data == -1:
+                return data
+            for team in team_list:
+                if team.id == data:
+                    return data
+            raise forms.ValidationError("You don't have access to this team.")  
+    return MessagePlayerForm 
+        
+        
 def make_edit_lines_form(player_list):
     class EditLinesForm(forms.Form):
         l_list = player_list.filter(position = "L")

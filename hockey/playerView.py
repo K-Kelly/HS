@@ -16,18 +16,16 @@ def index(request):
 @login_required
 def viewPlayer(request, player_id):
     p = get_object_or_404(Player, pk=player_id)
-    can_upgrade = False
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    can_manage = False
-    if len(team_list)>0:
-        can_manage = True
-    if p.upgrades >= 1 :
+    can_upgrade = False
+    if p.upgrades > 0 :
         can_upgrade = True
+    owner = False
     if request.user.id == p.user_id:
-        return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage, 'owner':True},context_instance=RequestContext(request))
-    else:
-        return render_to_response('hockey/viewPlayer.html', {'player':p, 'user':request.user, 'not_owner':True, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage},context_instance=RequestContext(request))
+        owner = True
+    return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'owner':owner, 'not_owner':not(owner), 'alert_success':""},context_instance=RequestContext(request))
+
 
 @login_required    
 def profile(request):
@@ -183,5 +181,42 @@ def buyEquipment(request, player_id):
 def messagePlayer(request, player_id):
     player_list = Player.objects.all().filter(user_id=request.user.id)
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
+    player = get_object_or_404(Player, pk=player_id)
+    if request.method == 'POST':
+        form_get = message_player(team_list)
+        form = form_get(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            title = cd['title']
+            body = cd['body']
+            team_field = cd['team_field']
+            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_field,receiver_team_id=-1,title=title,body=body)
+            message.save()
+            message.receiver_players.add(player)
+            message.save()
+            player.messages.add(message)
+            player.save()
+            can_upgrade = False
+            if player.upgrades > 0 :
+                can_upgrade = True
+            owner = False
+            if player.id == request.user.id:
+                owner = True
+            alert="Message sent to %s." %(player.name)
+            return render_to_response('hockey/viewPlayer.html', {'player':player, 'user':request.user,'owner':owner, 'not_owner':not(owner), 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'alert_success':True,'alert_message':alert},context_instance=RequestContext(request))
+    else:
+        form = message_player(team_list)
+    return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list)}, context_instance=RequestContext(request))
 
+
+
+
+def can_manage(request_user_id,team_owner, team_general_manager):
+    if request_user_id == team_owner or request_user_id == team_general_manager:
+        return True
+    return False 
+
+def can_manage_by_num_teams(team_list):
+    if team_list.count >0:
+        return True
+    return False
