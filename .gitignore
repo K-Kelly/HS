@@ -1,4 +1,8 @@
-settings.py
+venv
+settings_local.py
+settings_local.py~
+#settings_local.py#
+settings_local.pyc
 settings.py~
 settings.pyc
 *.pyc
