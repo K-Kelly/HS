@@ -1,6 +1,22 @@
 {% load i18n %}
+
+{% blocktrans %} Thank you for registering an account at {{ site.name }}.  To finish the registration process, please activate your account
+by visiting this link: {% endblocktrans %}
+
 {% trans "Activate account at" %} {{ site.name }}:
 
 http://{{ site.domain }}{% url registration_activate activation_key %}
 
-{% blocktrans %}Link is valid for {{ expiration_days }} days.{% endblocktrans %}
+{% blocktrans %}This link is valid for {{ expiration_days }} days.{% endblocktrans %}
+
+{% blocktrans %} Thanks,
+
+the {{ site.name }} Team
+
+
+If you have any comments or questions, don't hesitate to contact us at:
+support@{{ side.domain }}
+
+{% endblocktrans %}
+
+

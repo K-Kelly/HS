@@ -19,7 +19,7 @@ class Player(models.Model):
     style = models.IntegerField()
     shooting = models.IntegerField()
     passing = models.IntegerField()
-    stickHandling = models.IntegerField()
+    stick_handling = models.IntegerField()
     checking = models.IntegerField()
     positioning = models.IntegerField()
     endurance = models.IntegerField()

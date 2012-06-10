@@ -8,6 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('hockey.views',
                        (r'^$', 'index'),                      
                        (r'^(?i)profile/','profile'),
+                       (r'^(?i)users/(?P<user_id>\d+)/$','publicProfile'),
                        (r'^(?i)freeAgents/(?P<position>\w+)/$','viewFreeAgents'),
 )
 
@@ -15,7 +16,8 @@ urlpatterns += patterns('hockey.playerView',
                         (r'^(?i)player/(?P<player_id>\d+)/$', 'viewPlayer'),
                         (r'^(?i)player/(?P<player_id>\d+)/upgradeSkill/$', 'upgradeSkill'),
                         (r'^(?i)player/(?P<player_id>\d+)/viewContracts/$', 'viewContracts'),
-                        (r'^(?i)player/(?P<player_id>\d+)/viewMessages/$', 'viewMessages'),
+                        (r'^(?i)player/(?P<player_id>\d+)/viewMessages/$', 'viewMessagesRedirect'),
+                        (r'^(?i)player/(?P<player_id>\d+)/viewMessages/(?P<last_message>\d+)/$', 'viewMessages'),
                         (r'^(?i)player/(?P<player_id>\d+)/buyEquipment/$', 'buyEquipment'),
                         (r'^(?i)createPlayer/','createPlayer'),
                         (r'^(?i)creatingPlayer/','creatingPlayer'),
@@ -35,8 +37,8 @@ urlpatterns += patterns('hockey.teamView',
 
 urlpatterns += patterns('',
      (r'^admin/', include(admin.site.urls)),
-     (r'^accounts/', include('registration.backends.default.urls')),
-
+     (r'^accounts/', include('registration.backends.simple.urls')),
+                        (r'^(?i)users/(?P<username>\w+)/$','hockey.views.registration_complete_simple'),
 )
 
 urlpatterns += patterns('',

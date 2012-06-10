@@ -1,18 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 
+{% block title %}{% if account %}Activation complete{% else %} Activation Unsuccessful{% endif %}{% endblock %}
 {% block content %}
-
 {% if account %}
-
-<p>{% trans "Account successfully activated" %}</p>
-
-<p><a href="{% url auth_login %}">{% trans "Log in" %}</a></p>
-
+Thanks {{ account }}, activation complete!  You may now <a href='{% url auth_login %}'>Login</a>.
 {% else %}
-
-<p>{% trans "Account activation failed" %}</p>
-
+Unable to activate your account! It seems that your activation key is
+invalid.  Please check the activation url again and try again!
 {% endif %}
-
 {% endblock %}
