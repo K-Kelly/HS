@@ -1,5 +1,5 @@
 # Django settings for hockeysite project.
-import os
+import os 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
