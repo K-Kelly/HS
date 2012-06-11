@@ -96,7 +96,6 @@ def creatingPlayer(request):
         request.user.get_profile().players.add(player) 
         next = "/player/%s"%(player.pk)
         return redirect(next)
-        #return render_to_response('hockey/createPlayerSuccess.html',{'user':request.user, 'player_list':player_list, 'team_list':team_list})
     else:
         return render_to_response('hockey/createPlayer.html', {'error': True, 'user':request.user, 'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
 
@@ -261,6 +260,6 @@ def can_manage(request_user_id,team_owner, team_general_manager):
     return False 
 
 def can_manage_by_num_teams(team_list):
-    if team_list.count >0:
+    if team_list.count() >0:
         return True
     return False

@@ -10,6 +10,7 @@ urlpatterns = patterns('wuska.hockey.views',
                        (r'^(?i)profile/','profile'),
                        (r'^(?i)users/(?P<user_id>\d+)/$','publicProfile'),
                        (r'^(?i)freeAgents/(?P<position>\w+)/$','viewFreeAgents'),
+                       (r'^(?i)index/','index'),
 )
 
 urlpatterns += patterns('wuska.hockey.playerView',
