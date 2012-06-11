@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3">
+    <div class="well sidebar-nav">
+      <div class="tabbable tabs-left">
+	<ul class="nav nav-tabs">
+	  <li class="active">
+	    <a href="#1A" data-toggle="tab">{{player.name}}</a>
+	  </li>
+	  {% if show_manage %}
+	  <li class>
+	    <a href="#1B" data-toggle="tab">Manage Team</a>
+	  </li>
+	  {% endif %}
+	  <li class>
+	    <a href="#1C" data-toggle="tab">Other</a>
+	  </li>
+	</ul>
+	<div class="tab-content">
+	  <div class="tab-pane active" id="1A">
+	    <ul class="nav nav-list">
+	      <li>
+		<a href="/player/{{player.id}}/">View {{player.name}}</a>
+	      </li>
+	      <li>
+		<a href="/team/{{player.team_id}}/">View
+		  {{player.name}}'s Team</a>
+	      </li>
+	      {% if owner %}
+	      <li>
+		<a href="/player/{{player.id}}/viewContracts">View
+		  Contract Offers</a>
+	      </li>
+	      <li>
+		<a href="/player/{{player.id}}/viewMessages/">View
+		  Messages</a>
+	      </li>
+	      <li>
+		<a href="/player/{{player.id}}/buyEquipment">Buy
+		  Equipment</a>
+	      </li>
+	      {% endif %}
+	    </ul>
+	  </div>
+	  <div class="tab-pane" id="1B">
+	    <ul class="nav nav-list">	    
+	      {% if can_manage %}
+	      <li>
+		<a href="/player/{{player.id}}/offerContract">Offer Contract</a>
+	      </li>		
+	      <li>
+		<a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+	      </li>
+	      {% else %}
+	      <p> You are not the owner or general manager of any
+		teams.</p>
+	      <a href="/createTeam/">Create a Team </a>
+	      {% endif %}
+	    </ul>
+	  </div>
+	  <div class="tab-pane" id="1C">
+	    <ul class="nav nav-list">
+	      <li>
+		<a href="/allPlayers/All/25">All Players </a>
+	      </li>
+	      <li>
+		<a href="/freeAgents/All/25">Free Agents </a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div class="span9">
+    {% block content_span9 %}
+    
+    {% endblock %}
+
+  </div>
+</div>
+{% endblock %}  

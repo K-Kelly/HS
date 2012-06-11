@@ -10,10 +10,10 @@ from django.db.models import Q
 
 @login_required
 def viewTeam(request, team_id):
-    t = get_object_or_404(Team, pk=team_id)
+    team = get_object_or_404(Team, pk=team_id)
     player_list = request.user.get_profile().players.all()
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('hockey/viewTeam.html', {'team':t, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_Manager)}, context_instance=RequestContext(request))
+    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_Manager)}, context_instance=RequestContext(request))
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -46,13 +46,13 @@ def createTeam(request):
 @login_required
 def offerPlayerContract(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
     player = get_object_or_404(Player, pk=player_id)
     owner = False
     if player_list.filter(pk=player_id).count() is 1:
         owner = True
     can_manage = False
-    if len(team_list)>0:
+    if team_list.count()>0:
         can_manage = True
     if request.method == 'POST':
         form = OfferPlayerContractForm(request.POST)
@@ -78,9 +78,9 @@ def offerPlayerContract(request, player_id):
             return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list,'player':player,'team_list':team_list,'alert_success':True,'alert_message':alert,'can_manage':can_manage}, context_instance=RequestContext(request))
         else:
             form = OfferPlayerContractForm(request.POST)
-            return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
+            return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player':player,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'show_manage':True,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
     form = OfferPlayerContractForm()
-    return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
+    return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player':player,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'show_manage':True,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
 
 @login_required
 def message_players_on_team(request,team_id):
@@ -108,7 +108,7 @@ def message_players_on_team(request,team_id):
             return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
     else:
         form = MessageForm(request.POST)
-    return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+    return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
 
 
 @login_required

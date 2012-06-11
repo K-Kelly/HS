@@ -1,102 +1,34 @@
-{% extends "base.html" %}
+{% extends "playerPageNav.html" %}
 {% load i18n %}
-{% block content %}
-    <div class="row-fluid">
-      <div class="span3">
-	{% if owner %}
-	<div class="well sidebar-nav">
-	  <ul class="nav nav-list">
-	    <li class="nav-header">Manage Player</li>
-	    <li>
-	      <a href="/player/{{player.id}}/">View Skills</a>
-	    </li>
-	    <li>
-	      <a href="/team/{{player.team_id}}/">View Team</a>
-	    </li>
-	    <li>
-	      <a href="/player/{{player.id}}/viewContracts">View
-		Contract Offers</a>
-	    </li>
-	    <li>
-	      <a href="/player/{{player.id}}/buyEquipment">Buy
-		Equipment</a>
-	    </li>
-	    {% if can_manage %}
-	    <li class="nav-header">Manage Team</li>
-	    <li>
-	      <a href="/player/{{player.id}}/offerContract">Offer Contract</a>
-	    </li>		
-	    <li>
-	      <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
-	    </li>		
-	    <li>
-	      <a href="/freeAgents/all/">View Free Agents</a>
-	    </li>
-	    {% endif %}
-	    </ul>
-	</div>
-	{% elif can_manage %}
-	<div class="well sidebar-nav">
-	  <ul class="nav nav-list">
-	    <li class="nav-header">Manage Team</li>
-	    <li>
-	      <a href="/player/{{player.id}}/offerContract">Offer Contract</a>
-	    </li>		
-	    <li>
-	      <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
-	    </li>		
-	      <li>
-		<a href="/freeAgents/all/">View Free Agents</a>
-	      </li>
-	  </ul>
-	</div>
-	{% else %}
-	<div class="well sidebar-nav">
-	    <ul class="nav nav-list">
-	      <li>
-		<a href="/player/{{player.id}}/">View Skills</a>
-	      </li>
-	      <li>
-		<a href="/player/{{player.id}}/messagePlayer">Message Player</a>
-	      </li>		
-	      <li>
-		<a href="/freeAgents/all/">View Free Agents</a>
-	      </li>
-	      <li>
-		<a href="/team/{{player.team}}">View Team</a>
-	      </li>
-	    </ul>
-	</div>
-	{% endif %}
-      </div>
-      <div class="span9">
-	{% if not_owner %}
-        <div class="alert alert-info">
-	  <button class="close" data-dismiss="alert"
-		  type="button">x</button>
-	  You are not the agent of this Player!</div>
-	{% else %}
-	{% for message,from,href,name in message_list %}
-	<div class="alert alert-information">
-	  <button class="close" data-dismiss="alert"
-		  type="button">x</button>
-	  <strong>From {{from}}</strong> <a href="{{href}}"> {{name}}</a>
-	  <BR/><BR>
-	  <strong>Title:  </strong>{{message.title}}
-	  <BR/><BR/>
-	  {{message.body}}
-	</div>
-	{% endfor %}
-	{% if have_older_messages %}
-	<a class="btn btn-primary"
-	href="/player/{{player.id}}/viewMessages/{{older_message}}/">Older
-	Messages</a>
-	{% endif %}
-	{% if have_new_messages %}
-	<a class="btn btn-primary pull-right"
-	href="/player/{{player.id}}/viewMessages/{{newer_message}}/">Newer
-	Messages</a>
-	{% endif %}
-      </div>
-	{% endif %}   
+{% block content_span9 %}
+
+{% if not_owner %}
+<div class="alert alert-info">
+  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+  You are not the agent of this Player!</div>
+{% else %}
+{% for message,from,href,name in message_list %}
+<div class="alert alert-information">
+  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+  <strong>From {{from}}</strong> <a href="{{href}}"> {{name}}</a>
+  <BR/><BR>
+  <strong>Title:  </strong>{{message.title}}
+  <BR/><BR/>
+  {{message.body}}
+</div>
+{% endfor %}
+{% if have_older_messages %}
+<a class="btn btn-primary"
+   href="/player/{{player.id}}/viewMessages/{{older_message}}/">Older
+  Messages</a>
+{% endif %}
+{% if have_new_messages %}
+<a class="btn btn-primary pull-right"
+   href="/player/{{player.id}}/viewMessages/{{newer_message}}/">Newer
+  Messages</a>
+{% endif %}
+</div>
+{% endif %}   
 {% endblock %}

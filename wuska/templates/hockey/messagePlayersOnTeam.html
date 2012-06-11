@@ -1,38 +1,21 @@
-{% extends "base.html" %}
+{% extends "teamPageNav.html" %}
 {% load i18n %}
 {% load bootstrap %}
-{% block content %}
+{% block content_span9 %}
 
-<div class="row-fluid">
-  <div class="span3">
-    <div class="well sidebar-nav">
-      <ul class="nav nav-list">
-	{% if can_manage %}
-	<li class="nav-header">Manage Team</li>		
-	<li>
-	  <a href="/team/{{t.id}}">View Team</a>
-	</li>
-	<li>
-	  <a href="/freeAgents/all/">View Free Agents</a>
-	</li>
-	{% endif %}
-      </ul>
-    </div>
-  </div>
-  <div class="span9">
-    {% if can_manage %}
-    <form class="well" action="" method="post">{% csrf_token %}
-      <fieldset>
-	<legend>Message Players on the Team</legend>
-	{{ form|bootstrap }}
-	<button type="submit" class="btn btn-primary">{% trans 'Send Message' %}</button>
-      </fieldset>
-    </form>
-    {% else %}
-    <div class="alert">
-      <button class="close" data-dismiss="alert">x</button>
-      You are not the agent of this Player!
-    </div>
-  </div>
-  {% endif %}   
-  {% endblock %}
+{% if can_manage %}
+<form class="well" action="" method="post">{% csrf_token %}
+  <fieldset>
+    <legend>Message Players on the Team</legend>
+    {{ form|bootstrap }}
+    <button type="submit" class="btn btn-primary">{% trans 'Send Message' %}</button>
+  </fieldset>
+</form>
+{% else %}
+<div class="alert">
+  <button class="close" data-dismiss="alert">x</button>
+  You are not the agent of this Player!
+</div>
+</div>
+{% endif %}   
+{% endblock %}

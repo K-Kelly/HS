@@ -24,14 +24,8 @@ def viewPlayer(request, player_id):
     owner = False
     if request.user.id == p.user_id:
         owner = True
-    return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'owner':owner, 'not_owner':not(owner)},context_instance=RequestContext(request))
+    return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner)},context_instance=RequestContext(request))
 
-
-@login_required    
-def profile(request):
-    player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('profile.html', {'user':request.user,'player_list':player_list, 'team_list':team_list,'profile':request.user.get_profile()})
 
 @login_required
 def createPlayer(request):
@@ -165,7 +159,7 @@ def viewContracts(request, player_id):
             player.save()
             Contract.objects.get(pk=contract_id).delete()
             return redirect('/player/%s' %(player_id))          
-    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner},context_instance=RequestContext(request))
+    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner,'can_manage':can_manage_by_num_teams(team_list),'show_manage':False},context_instance=RequestContext(request))
 
 @login_required
 def viewMessagesRedirect(request, player_id):
@@ -211,7 +205,7 @@ def viewMessages(request, player_id, last_message):
                 href_list.append("/users/%d/"%(message.sender_user_id))
                 name_list.append(request.user.username)            
         m_list = zip(message_list,from_list,href_list,name_list)  
-        return render_to_response('hockey/playerViewMessages.html', {'player': player, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'owner':owner, 'not_owner':not(owner)},context_instance=RequestContext(request))
+        return render_to_response('hockey/playerViewMessages.html', {'player': player, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':False,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'owner':owner, 'not_owner':not(owner)},context_instance=RequestContext(request))
     return redirect('player/%s'%(player_id))  #not owner of player
 
 @login_required
@@ -246,10 +240,10 @@ def messagePlayer(request, player_id):
             if player.id == request.user.id:
                 owner = True
             alert="Message sent to %s." %(player.name)
-            return render_to_response('hockey/viewPlayer.html', {'player':player, 'user':request.user,'owner':owner, 'not_owner':not(owner), 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'alert_success':True,'alert_message':alert},context_instance=RequestContext(request))
+            return render_to_response('hockey/viewPlayer.html', {'player':player, 'user':request.user,'owner':owner, 'not_owner':not(owner), 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':False, 'alert_success':True,'alert_message':alert},context_instance=RequestContext(request))
     else:
         form = message_player(team_list)
-    return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list)}, context_instance=RequestContext(request))
+    return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':False}, context_instance=RequestContext(request))
 
 
 
