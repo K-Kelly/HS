@@ -43,7 +43,7 @@
 	  <th><center>Name</center></th>
 	<th><center>Age</center></th>
 	  <th><center>Level</center></th>
-	  <th><center>Free Agent?</center></th>
+	  <th><center>Team</center></th>
 	  <th><center>Select</center></th>
 	</tr>
       </thead>
@@ -56,9 +56,9 @@
 	  <td><center>{{ player.level }}</center></td>
 	  <td><center>
 	      {% if player.free_agent %}
-	      Yes
+	      Free Agent
 	      {% else %}
-	      No
+	      <a href="/team/{{player.team_id}}/">View Team</a>
 	      {% endif %}
 	  </center></td>
 	  <td> 
