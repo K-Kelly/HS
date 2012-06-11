@@ -95,7 +95,7 @@ def message_players_on_team(request,team_id):
             title = cd['title']
             body = cd['body']
             team_players = team.players
-            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_id,receiver_team_id=team_id,title=title,body=body)
+            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_id,receiver_team_id=-1,title=title,body=body)
             message.save()
             message.receiver_players=team_players.all()
             message.save()
@@ -106,8 +106,11 @@ def message_players_on_team(request,team_id):
                 player.save()
             alert="Message sent to all players on the team."
             return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
+        else:
+            form = MessageForm(request.POST)
+            return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
     else:
-        form = MessageForm(request.POST)
+        form = MessageForm()
     return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
 
 
@@ -213,6 +216,95 @@ def editLines(request, team_id):
     else:
         form = make_edit_lines_form(t_players)
     return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_Manager)}, context_instance=RequestContext(request))
+
+@login_required
+def teamViewMessagesRedirect(request, team_id):
+    return redirect('/team/%s/viewMessages/received/10'%(team_id))
+@login_required
+def teamViewMessages(request, team_id, last_message,sent_or_rec):
+    player_list = request.user.get_profile().players.all()
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team = get_object_or_404(Team, pk=team_id)
+    sent = False
+    if sent_or_rec == "sent":
+        sent = True
+    can_manage2 = can_manage(request.user.id,team.owner, team.general_Manager)
+    if can_manage:
+        last_message = int(last_message)
+        newer_message = last_message - 10
+        older_message = last_message + 10
+        have_new_messages = False
+        have_older_messages = True
+        num_messages = team.messages.count()
+        if older_message >= num_messages:
+            have_older_messages = False
+        if last_message <10:
+            last_message = 10
+            newer_message = last_message
+        elif last_message > 10:
+            have_new_messages = True
+        message_list = team.messages.order_by('-id')[(newer_message):last_message]
+        from_list = []
+        href_list = []
+        name_list = []
+        for message in message_list:
+            if sent:
+                if message.receiver_team_id != -1:
+                    t = get_object_or_404(Team,pk=message.sender_team_id)
+                    from_list.append("Team: ")
+                    href_list.append("/team/%d/"%(t.id))
+                    name_list.append(t.name)
+                else:
+                    from_list.append("Agent: ")
+                    href_list.append("/users/%d/"%(message.sender_user_id))
+                    name_list.append(request.user.username) 
+            else:
+                if message.sender_player_id != -1:
+                    p = get_object_or_404(Player,pk=message.sender_player_id)
+                    from_list.append("Player: ")
+                    href_list.append("/player/%d/"%(p.id))
+                    name_list.append(p.name)
+                elif message.sender_team_id != -1:
+                    t = get_object_or_404(Team,pk=message.sender_team_id)
+                    from_list.append("Team: ")
+                    href_list.append("/team/%d/"%(t.id))
+                    name_list.append(t.name)
+                else:
+                    from_list.append("Agent: ")
+                    href_list.append("/users/%d/"%(message.sender_user_id))
+                    name_list.append(request.user.username)            
+        m_list = zip(message_list,from_list,href_list,name_list)  
+        return render_to_response('hockey/teamViewMessages.html', {'team': team, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'can_manage':can_manage2,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':True, 'not_owner':False},context_instance=RequestContext(request))
+    return redirect('team/%s/'%(team_id))  #not a team manager
+
+
+@login_required
+def message_team_management(request,team_id):
+    player_list = request.user.get_profile().players.all()
+    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team = get_object_or_404(Team, pk=team_id)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_Manager)
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            title = cd['title']
+            body = cd['body']
+            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=-1,receiver_team_id=team_id,title=title,body=body)
+            message.save()
+            team.messages.add(message)
+            team.save()
+            #TO DO: Add to User Profile Messages
+            alert="Message sent to the management of %s." % (team.name)
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
+        else:
+            form = MessageForm(request.POST)
+            return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+    else:
+        form = MessageForm()
+    return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+
+        
 
 
 def can_manage(request_user_id,team_owner, team_general_manager):

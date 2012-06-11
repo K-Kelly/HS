@@ -20,40 +20,47 @@
 	    <ul class="nav nav-list">	
 	      {% if can_manage %}
 	      <li>
-		<a href="/team/{{team.id}}/editLines">Edit Lines</a>
+		<a href="/team/{{team.id}}/editLines/">Edit Lines</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/viewSchedule">View Schedule</a>
+		<a href="/team/{{team.id}}/viewSchedule/">View Schedule</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/tactics">Tactics</a>
+		<a href="/team/{{team.id}}/tactics/">Tactics</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/contracts">Contracts</a>
+		<a href="/team/{{team.id}}/contracts/">Contracts</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/messageTeam">Message Team</a>
+		<a href="/team/{{team.id}}/messageTeam/">Message Team</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/arena">Arena</a>
+		<a href="/team/{{team.id}}/arena/">Arena</a>
 	      </li>
 	      <li>
 		<a href="/freeAgents/all/25/">View Free Agents </a>
 	      </li>
+	      <li>
+		<a href="/team/{{team.id}}/viewMessages/">View
+		Messages</a>
+	      </li>
+	      {% else %}
+	      <li>
+		<a href="/team/{{team.id}}/messageTeamManagement/">Message
+		{{team.name}}'s Management</a>
+	      </li>
 	      {% endif %}
+	      
 	    </ul>
 	  </div>
 	  <div class="tab-pane" id="1B">
 	    <ul class="nav nav-list">	    
 	      <li>
-		<a href="/allPlayers/All/25">All Players </a>
+		<a href="/allPlayers/All/25/">All Players </a>
 	      </li>
 	      <li>
-		<a href="/freeAgents/All/25">Free Agents </a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/messageTeam">Message {{team.name}}</a>
-	      </li>
+		<a href="/freeAgents/All/25/">Free Agents </a>
+	      </li>	      
 	    </ul>
 	  </div>
 	</div>

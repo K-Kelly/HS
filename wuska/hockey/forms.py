@@ -19,8 +19,8 @@ class MessageForm(forms.Form):
 
 def message_player(team_list):
     class MessagePlayerForm(forms.Form):
-        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea(attrs={'class':'input-xlarge'}))
-        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea(attrs={'class':'input-xlarge'}))
+        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'4'}))
+        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'17'}))
         list_id = []
         list_name = []
         list_id.append(-1)

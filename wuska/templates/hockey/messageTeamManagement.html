@@ -3,19 +3,12 @@
 {% load bootstrap %}
 {% block content_span9 %}
 
-{% if can_manage %}
 <form class="well" action="" method="post">{% csrf_token %}
   <fieldset>
-    <legend>Message Players on {{team.name}}</legend>
+    <legend>Message {{team.name}}'s Management</legend>
     {{ form|bootstrap }}
     <button type="submit" class="btn btn-primary">{% trans 'Send Message' %}</button>
   </fieldset>
 </form>
-{% else %}
-<div class="alert">
-  <button class="close" data-dismiss="alert">x</button>
-  You are not the agent of this Player!
-</div>
-</div>
-{% endif %}   
+ 
 {% endblock %}

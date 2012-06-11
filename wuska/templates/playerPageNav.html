@@ -32,7 +32,7 @@
 	      </li>
 	      {% if owner %}
 	      <li>
-		<a href="/player/{{player.id}}/viewContracts">View
+		<a href="/player/{{player.id}}/viewContracts/">View
 		  Contract Offers</a>
 	      </li>
 	      <li>
@@ -40,8 +40,14 @@
 		  Messages</a>
 	      </li>
 	      <li>
-		<a href="/player/{{player.id}}/buyEquipment">Buy
+		<a href="/player/{{player.id}}/buyEquipment/">Buy
 		  Equipment</a>
+	      </li>
+	      {% elif can_manage  %}
+	      {% else %}
+	      <li>
+		<a href="/player/{{player.id}}/messagePlayer/">Message
+		Player</a>
 	      </li>
 	      {% endif %}
 	    </ul>
@@ -50,10 +56,10 @@
 	    <ul class="nav nav-list">	    
 	      {% if can_manage %}
 	      <li>
-		<a href="/player/{{player.id}}/offerContract">Offer Contract</a>
+		<a href="/player/{{player.id}}/offerContract/">Offer Contract</a>
 	      </li>		
 	      <li>
-		<a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+		<a href="/player/{{player.id}}/messagePlayer/">Message Player</a>
 	      </li>
 	      {% else %}
 	      <p> You are not the owner or general manager of any
@@ -65,10 +71,10 @@
 	  <div class="tab-pane" id="1C">
 	    <ul class="nav nav-list">
 	      <li>
-		<a href="/allPlayers/All/25">All Players </a>
+		<a href="/allPlayers/All/25/">All Players </a>
 	      </li>
 	      <li>
-		<a href="/freeAgents/All/25">Free Agents </a>
+		<a href="/freeAgents/All/25/">Free Agents </a>
 	      </li>
 	    </ul>
 	  </div>

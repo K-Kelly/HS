@@ -1,4 +1,4 @@
-{% extends "playerPageNav.html" %}
+{% extends "teamPageNav.html" %}
 {% load i18n %}
 {% block content_span9 %}
 
@@ -10,20 +10,26 @@
 {% else %}
 {% if sent %}
 <a class="btn btn-primary pull-right"
-   href="/player/{{player.id}}/viewMessages/received/10/">Go
+   href="/team/{{team.id}}/viewMessages/received/10/">Go
   To Received Messages</a>
 <h2> Sent Messages </h2>
 {% else %}
-<!---<a class="btn btn-primary pull-right"
-   href="/player/{{player.id}}/viewMessages/sent/10/">Go To Sent
-  Messages</a> --->
+<a class="btn btn-primary pull-right"
+   href="/team/{{team.id}}/viewMessages/sent/10/">Go To Sent
+  Messages</a> 
 <h2> Received Messages </h2>
 {% endif %}
 {% for message,from,href,name in message_list %}
 <div class="alert alert-information">
   <button class="close" data-dismiss="alert"
 	  type="button">x</button>
-  <strong>From {{from}}</strong> <a href="{{href}}"> {{name}}</a>
+  <strong>
+    {% if sent %}
+    To
+    {% else %}
+    From
+    {% endif %}
+    {{from}}</strong> <a href="{{href}}"> {{name}}</a>
   <BR/><BR>
   <strong>Title:  </strong>{{message.title}}
   <BR/><BR/>
@@ -31,14 +37,26 @@
 </div>
 {% endfor %}
 {% if have_older_messages %}
+ {% if sent %}
 <a class="btn btn-primary"
-   href="/player/{{player.id}}/viewMessages/{{older_message}}/">Older
+   href="/team/{{team.id}}/viewMessages/sent/{{older_message}}/">Older
   Messages</a>
+ {% else %}
+<a class="btn btn-primary"
+   href="/team/{{team.id}}/viewMessages/received/{{older_message}}/">Older
+  Messages</a>
+ {% endif %}
 {% endif %}
 {% if have_new_messages %}
-<a class="btn btn-primary pull-right"
-   href="/player/{{player.id}}/viewMessages/{{newer_message}}/">Newer
+ {% if sent %}
+<a class="btn btn-primary"
+   href="/team/{{team.id}}/viewMessages/sent/{{newer_message}}/">Newer
   Messages</a>
+ {% else %}
+<a class="btn btn-primary"
+   href="/team/{{team.id}}/viewMessages/received/{{newer_message}}/">Newer
+  Messages</a>
+ {% endif %}
 {% endif %}
 </div>
 {% endif %}   
