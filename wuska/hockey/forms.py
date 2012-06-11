@@ -1,5 +1,4 @@
 from django import forms
-from bootstrap.forms import *
 
 class TeamForm(forms.Form):
     name = forms.CharField(max_length=40)
@@ -8,20 +7,20 @@ class TeamForm(forms.Form):
 
 
 class OfferPlayerContractForm(forms.Form):
-    salary = forms.IntegerField(max_value=20000000, min_value=100000)
-    length = forms.IntegerField(max_value=10, min_value=1)
+    salary = forms.IntegerField(max_value=20000000, min_value=50000, label="Salary Per Year (Integer between 50000 and 20000000)",widget=forms.TextInput(attrs={'class':'span2'}))
+    length = forms.IntegerField(max_value=10, min_value=1, label="Length of the Contract (Integer between 1 and 10)",widget=forms.TextInput(attrs={'class':'span1'}))
     no_trade = forms.BooleanField(required=False)
-    message = forms.CharField(max_length=2000, widget=forms.Textarea)
+    message = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'class':'input-xlarge'}))
 
 
 class MessageForm(forms.Form):
-    title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea)
-    body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea)
+    title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'4'}))
+    body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'20'}))
 
 def message_player(team_list):
     class MessagePlayerForm(forms.Form):
-        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea)
-        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea)
+        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea(attrs={'class':'input-xlarge'}))
+        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea(attrs={'class':'input-xlarge'}))
         list_id = []
         list_name = []
         list_id.append(-1)

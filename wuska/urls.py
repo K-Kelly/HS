@@ -6,11 +6,16 @@ from django.contrib.auth import views as auth_views
 admin.autodiscover()
 
 urlpatterns = patterns('wuska.hockey.views',
-                       (r'^$', 'index'),                      
+                       (r'^$', 'index'),   
+                       (r'^(?i)index/','index'),
                        (r'^(?i)profile/','profile'),
                        (r'^(?i)users/(?P<user_id>\d+)/$','publicProfile'),
-                       (r'^(?i)freeAgents/(?P<position>\w+)/$','viewFreeAgents'),
-                       (r'^(?i)index/','index'),
+                       (r'^(?i)freeAgents/$','viewFreeAgentsRedirect'), 
+                       (r'^(?i)freeAgents/(?P<position>\w+)/$','viewFreeAgentsRedirect2'), 
+                       (r'^(?i)freeAgents/(?P<position>\w+)/(?P<number>\d+)/$','viewFreeAgents'),                      
+                       (r'^(?i)allPlayers/$','viewAllPlayersRedirect'), 
+                       (r'^(?i)allPlayers/(?P<position>\w+)/$','viewAllPlayersRedirect2'),       
+                       (r'^(?i)allPlayers/(?P<position>\w+)/(?P<number>\d+)/$','viewAllPlayers'),                      
 )
 
 urlpatterns += patterns('wuska.hockey.playerView',

@@ -14,6 +14,7 @@ class PlayerTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)
+    
     def test_create_Player(self):
         #Create Player
         response = self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
@@ -107,7 +108,7 @@ class PlayerTest(TestCase):
         self.assertEqual(t.salary_used,0)
         self.assertEqual(t.salary_left,2000000)
         #Team views free agents
-        response = self.client.get('/freeAgents/all/')
+        response = self.client.get('/freeAgents/all/25/')
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewFreeAgents.html')
         #team offers contract to player
@@ -143,6 +144,11 @@ class PlayerTest(TestCase):
         self.assertEqual(t.salary_used,1000000)
         self.assertEqual(t.salary_left,(2000000-1000000))
         
+        #Attempt to offer contract to non-Free agent player
+        response = self.client.post('/player/1/offerContract/',{'team':'1','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'hockey/offerPlayerContract.html')
+
 
         #message Players on Team
         title1="Message to Team"
@@ -194,68 +200,68 @@ class PlayerTest(TestCase):
         self.assertContains(response,title2)
         self.assertContains(response,body2,count=2)
         
-"""    
-    def test_messaging(self):
-        title = "Test Message Title"
-        body = "Test Message Body"
-        message = Message(sender_user_id=self.player1.user_id,sender_player_id=self.player1.id,sender_team_id=-1,receiver_team_id=-1,title=title,body=body)
-        message.save()
-        message.receiver_players.add(self.player2)
-        message.save()
-        self.player1.messages.add(message)
-        self.player1.save()
-        self.player2.messages.add(message)
-        m_id = message.id
-        p1_message = self.player1.messages.all().filter(id = m_id)
-        self.assertEquals(message,p1_message)
-        self.assertEquals(title,p1_message.title)
-        self.assertEquals(body,p1_message.body)
-        self.assertEquals(self.player1.user_id,p1_message.sender_user_id)
-        self.assertEquals(self.player1.id,p1_message.sender_player_id)
-        self.assertEquals(-1,p1_message.sender_team_id)
-        self.assertEquals(-1,p1_message.receiver_team_id)
-        p2_message = self.player2.messages.all().filter(id = m_id)
-        self.assertEquals(message,p2_message)
-        self.assertEquals(title,p2_message.title)
-        self.assertEquals(body,p2_message.body)
-        self.assertEquals(self.player1.user_id,p2_message.sender_user_id)
-        self.assertEquals(self.player1.id,p2_message.sender_player_id)
-        self.assertEquals(-1,p2_message.sender_team_id)
-        self.assertEquals(-1,p2_message.receiver_team_id)
-"""        
+    def test_view_free_agents_all_players(self):       
+        response = self.client.post('/freeAgents/',follow=True)
+        self.assertEqual(response.status_code,200)#redirects to /freeAgents/All/25/
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
 
+        response = self.client.post('/freeAgents/All',follow=True)
+        self.assertEqual(response.status_code,200)#redirects to /freeAgents/All/25/
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
 
-"""def setUp(self):
-        upgrades = 10
-        level = 1
-        experience = 2
-        age = 20
-        retired = False
-        height = 60
-        weight = 160
-        salary = 600000
-        contract_end = 0
-        no_trade = False
-        style = 0
-        shooting = 50
-        passing = 51
-        stickHandling = 52
-        checking = 53
-        positioning = 54
-        endurance = 55
-        skating = 56
-        strength = 57
-        faceoff = 58
-        fighting = 59
-        awareness = 60
-        leadership = 61
-        helmet = 1
-        gloves = 1
-        shoulder_pads = 1
-        pants = 1
-        skates = 1
-        stick = 1
-        free_agent = True
-        self.player1 = Player.objects.create(team_id = -1, user_id = 1, upgrades = upgrades, level = level, experience = experience, name = "TestPlayer1", age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = "D", style = style, shooting = shooting, passing = passing, stickHandling = stickHandling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent)
-        self.player1.save()
-"""
+        response = self.client.post('/freeAgents/All/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+        
+        response = self.client.post('/freeAgents/L/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+
+        response = self.client.post('/freeAgents/C/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+        
+        response = self.client.post('/freeAgents/R/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+
+        response = self.client.post('/freeAgents/D/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+        
+        response = self.client.post('/freeAgents/G/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewFreeAgents.html")
+
+        #Test viewing All Players
+        response = self.client.post('/allPlayers/',follow=True)
+        self.assertEqual(response.status_code,200)#redirects to /allPlayers/All/25/
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+
+        response = self.client.post('/allPlayers/All',follow=True)
+        self.assertEqual(response.status_code,200)#redirects to /allPlayers/All/25/
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+
+        response = self.client.post('/allPlayers/All/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+        
+        response = self.client.post('/allPlayers/L/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+
+        response = self.client.post('/allPlayers/C/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+        
+        response = self.client.post('/allPlayers/R/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+
+        response = self.client.post('/allPlayers/D/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+        
+        response = self.client.post('/allPlayers/G/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")

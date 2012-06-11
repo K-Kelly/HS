@@ -19,7 +19,7 @@ def getPlayer(p_id):
     if p_id == -1:
         return "Empty!"
     else:
-        return get_object_or_404(Player, pk= p_id)
+        return get_object_or_404(Player, pk = p_id)
 
 @login_required
 def createTeam(request):
@@ -47,9 +47,16 @@ def createTeam(request):
 def offerPlayerContract(request, player_id):
     player_list = request.user.get_profile().players.all()
     team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    player = get_object_or_404(Player, pk=player_id)
+    owner = False
+    if player_list.filter(pk=player_id).count() is 1:
+        owner = True
+    can_manage = False
+    if len(team_list)>0:
+        can_manage = True
     if request.method == 'POST':
         form = OfferPlayerContractForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and player.free_agent:
             cd = form.cleaned_data
             salary = cd['salary']
             length = cd['length']
@@ -62,23 +69,18 @@ def offerPlayerContract(request, player_id):
             contract.save()
             team.contracts.add(contract)
             team.save()
-            player = get_object_or_404(Player, pk=player_id)
             player.contracts.add(contract)
             player.save()
             can_manage = False
             if request.user.id == team.owner or request.user.id == team.general_manager:
                 can_manage = True
             alert = "You have offered a contract to %s" % (player.name)
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list,'team_list':team_list,'alert_success':True,'alert_message':alert,'can_manage':can_manage}, context_instance=RequestContext(request))
-
-    form = OfferPlayerContractForm(request.POST)
-    owner = False
-    if player_list.filter(pk=player_id).count() is 1:
-        owner = True
-    can_manage = False
-    if len(team_list)>0:
-        can_manage = True
-    return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'can_manage':can_manage,'owner':owner}, context_instance=RequestContext(request))
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list,'player':player,'team_list':team_list,'alert_success':True,'alert_message':alert,'can_manage':can_manage}, context_instance=RequestContext(request))
+        else:
+            form = OfferPlayerContractForm(request.POST)
+            return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
+    form = OfferPlayerContractForm()
+    return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'player_list':player_list,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id}, context_instance=RequestContext(request))
 
 @login_required
 def message_players_on_team(request,team_id):

@@ -37,8 +37,13 @@
 	</h3>
 	<div class="nav-collapse collapse" style="height: 0px;">
 	  <ul class="nav">
+	    <li class="divider-vertical"></li>
 	    <li>
 	      <a href="/index/">{% trans "Home" %}</a>
+	    </li>
+	    <li class="divider-vertical"></li>
+	    <li>
+	      <a href="/createPlayer/">{% trans "Create Player" %}</a>
 	    </li>
 	    <li>
 	      <a href="/createPlayer/">{% trans "Create Player" %}</a>
@@ -68,6 +73,20 @@
 		{% endfor %}
 	      </ul>
 	    </li>
+	    <li class="divider-vertical"></li>
+	    <li class="dropdown">
+	      <a class="dropdown-toggle" data-toggle="dropdown" >Other Players
+		<span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+		<li>
+		  <a href="/allPlayers/All/25/">{% trans "All Players" %}</a>
+		</li>
+		<li>
+		  <a href="/freeAgents/All/25/">{% trans "Free Agents" %}</a>
+		</li>
+	      </ul>
+	    </li>
+	    <li class="divider-vertical"></li>
 	  </ul>
 	  <div class="btn-group pull-right">
 	    <a class="btn dropdown-toggle" data-toggle="dropdown"

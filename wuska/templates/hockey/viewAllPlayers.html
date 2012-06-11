@@ -4,7 +4,7 @@
 
 <div class="row-fluid">
   <div class="span2">
-    <h2>{% trans 'Free Agents' %}</h2>
+         <h2>{% trans 'All Players' %}</h2>
     <BR/>
     <div class="btn-group">
       <button class="btn btn-primary">
@@ -14,22 +14,22 @@
 	<span class="caret"></span></button>
       <ul class="dropdown-menu">
 	<li>
-	  <a href="/freeAgents/L/25/">{% trans 'L' %}</a>
+	  <a href="/allPlayers/L/25/">{% trans 'L' %}</a>
 	</li>
 	<li>
-	  <a href="/freeAgents/C/25/">{% trans 'C' %}</a>
+	  <a href="/allPlayers/C/25/">{% trans 'C' %}</a>
+	</li>
+	  <li>
+	    <a href="/allPlayers/R/25/">{% trans 'R' %}</a>
+	  </li>
+	<li>
+	  <a href="/allPlayers/D/25/">{% trans 'D' %}</a>
 	</li>
 	<li>
-	  <a href="/freeAgents/R/25/">{% trans 'R' %}</a>
+	  <a href="/allPlayers/G/25">{% trans 'G' %}</a>
 	</li>
 	<li>
-	  <a href="/freeAgents/D/25/">{% trans 'D' %}</a>
-	</li>
-	<li>
-	  <a href="/freeAgents/G/25/">{% trans 'G' %}</a>
-	</li>
-	<li>
-	  <a href="/freeAgents/All/25/">{% trans 'All' %}</a>
+	  <a href="/allPlayers/All/25">{% trans 'All' %}</a>
 	</li>
       </ul>
     </div>
@@ -43,28 +43,38 @@
 	  <th><center>Name</center></th>
 	<th><center>Age</center></th>
 	  <th><center>Level</center></th>
+	  <th><center>Free Agent?</center></th>
 	  <th><center>Select</center></th>
 	</tr>
       </thead>
       <tbody>
-	{% for player in FA_list %}
+	{% for player in all_player_list %}
 	<tr>
 	  <td><center>{{ player.position }}</center></td>
 	  <td><center>{{ player.name }}</center></td>
 	  <td><center>{{ player.age }}</center></td>
 	  <td><center>{{ player.level }}</center></td>
+	  <td><center>
+	      {% if player.free_agent %}
+	      Yes
+	      {% else %}
+	      No
+	      {% endif %}
+	  </center></td>
 	  <td> 
-	    <center><a class="btn btn-primary" href="/player/{{ player.id }}">View</a></center>
+	    <center>
+	      <a class="btn btn-primary" href="/player/{{ player.id }}">View</a>
+	    </center>
 	  </td>
 	</tr>
 	{% endfor %}
 	{% if have_older_messages %}
 	<a class="btn btn-info"
-	   href="/freeAgents/{{position}}/{{previous_number}}/">Previous Players</a>
+	href="/allPlayers/{{position}}/{{previous_number}}/">Previous Players</a>
 	{% endif %}
 	{% if have_new_messages %}
 	<a class="btn btn-info pull-right"
-	   href="/freeAgents/{{position}}/{{next_number}}/">Next Players</a>
+	href="/allPlayers/{{position}}/{{next_number}}/">Next Players</a>
 	{% endif %}
       </tbody>
     </table>  

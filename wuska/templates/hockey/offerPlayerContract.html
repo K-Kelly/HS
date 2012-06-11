@@ -5,13 +5,13 @@
 
 <div class="row-fluid">
   <div class="span3">
-    <h2>{{ player.name }}</h2>	
+    <h2>{{ player_name }}</h2>	
     <div class="well sidebar-nav">
       <ul class="nav nav-list">
 	{% if can_manage %}
 	<li class="nav-header">Manage Team</li>		
 	<li>
-	    <a href="/player/{{player.id}}/messagePlayer">Message Player</a>
+	    <a href="/player/{{player_id}}/messagePlayer">Message Player</a>
 	</li>
 	<li>
 	      <a href="/freeAgents/all/">View Free Agents</a>
@@ -19,24 +19,25 @@
 	{% endif %}
 	<BR>
 	<li>
-	  <a href="/player/{{player.id}}/">View player</a>
+	  <a href="/player/{{player_id}}/">View player</a>
 	</li>
       </ul>
     </div>
   </div>
   <div class="span9">
-  {% if not_valid %}
-  <div class="alert">
-    <button class="close" data-dismiss="alert">x</button>
-    Unable to offer the contract! Make sure salary and length are integers and don't have commas!
-  </div>
-  {% endif %}
-  {% if not_owner %}
-    <div class="alert">
+    {% if is_free_agent %}
+    {% if not_valid %}
+    <div class="alert alert-error">
+      <button class="close" data-dismiss="alert">x</button>
+      Unable to offer the contract! Make sure salary and length are integers and don't have commas!
+    </div>
+    {% endif %}
+    {% if not_owner %}
+    <div class="alert alert-block">
       <button class="close" data-dismiss="alert">x</button>
       You are not the agent of this Player!
     </div>
-   {% else %}
+    {% else %}
     <form class="well" action="" method="post">{% csrf_token %}
       <fieldset>
 	<legend>Offer Contract</legend>
@@ -49,12 +50,18 @@
 	      {% endfor %}
 	    </select>
 	  </div>
-	</div>
-	{{ form|bootstrap }}
+	</div>	   
+	  {{ form|bootstrap }}
 	<button type="submit" class="btn btn-primary">{% trans 'Offer Contract' %}</button>
       </fieldset>
     </form>
-  </div>
-  
-  {% endif %}   
-{% endblock %}
+    {% endif %}  
+    {% else %}
+    <div class="alert alert-info">
+      <button class="close" data-dismiss="alert">x</button>
+      <strong>Unable to offer contract! </strong>
+      {{player_name}} has <strong>{{contract_end}}</strong> season(s) left before becoming a free agent.
+    </div>
+  </div> 
+  {% endif %}
+  {% endblock %}
