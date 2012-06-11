@@ -122,7 +122,7 @@ class Message(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=35)
     owner = models.IntegerField()
-    general_Manager = models.IntegerField()
+    general_manager = models.IntegerField()
     league_id = models.IntegerField()
     arena = models.ForeignKey(Arena, related_name = 'team_arena')
     players = models.ManyToManyField(Player, related_name = 'team_players')
@@ -170,6 +170,12 @@ class Team(models.Model):
     salary_left = models.IntegerField()
     contracts = models.ManyToManyField(Contract, related_name = 'team_contracts')
     messages = models.ManyToManyField('hockey.Message', related_name = 'team_messages')
+    numLWNeed = models.IntegerField(blank=True,default="-1")
+    numCNeed = models.IntegerField(blank=True,default="-1")
+    numRWNeed = models.IntegerField(blank=True,default="-1")
+    numDNeed = models.IntegerField(blank=True,default="-1")
+    numGNeed = models.IntegerField(blank=True,default="-1")
+    avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
     def __unicode__(self):
         return self.name
 

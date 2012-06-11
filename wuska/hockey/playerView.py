@@ -10,14 +10,14 @@ from django.db.models import Q
 
 def index(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
 def viewPlayer(request, player_id):
     p = get_object_or_404(Player, pk=player_id)
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     can_upgrade = False
     if p.upgrades > 0 :
         can_upgrade = True
@@ -30,7 +30,7 @@ def viewPlayer(request, player_id):
 @login_required
 def createPlayer(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     return render_to_response('hockey/createPlayer.html', {'user':request.user, 'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
 
 @login_required
@@ -49,7 +49,7 @@ def upgradeSkill(request, player_id):
 @login_required
 def creatingPlayer(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     if request.method == 'POST' and 'name' in request.POST and request.POST['name']!="" and 'position' in request.POST and request.POST['position'] and 'height' in request.POST and request.POST['height'] and 'weight' in request.POST and request.POST['weight']:
         name = request.POST['name']
         position = request.POST['position']
@@ -127,7 +127,7 @@ def doUpgradeSkill(skill,player):
 @login_required        
 def viewContracts(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))   
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))   
     player = get_object_or_404(Player, pk=player_id)
     owner = False
     if player.user_id == request.user.id:
@@ -145,10 +145,25 @@ def viewContracts(request, player_id):
             if contract not in player.contracts.all():
                 return redirect('/player/%s/viewContracts' %(player_id))
             team = get_object_or_404(Team,pk=contract.team_id)
-            team.players.add(player)
-            team.contracts.remove(contract)
             team.salary_used += contract.salary
             team.salary_left -= contract.salary
+            if player.position == "L":
+                team.numLWNeed -= 1
+            elif player.position == "C":
+                team.numCNeed -= 1
+            elif player.position == "R":
+                team.numRWNeed -= 1
+            elif player.position == "D":
+                team.numDNeed -= 1
+            elif player.position == "G":
+                team.numGNeed -= 1
+            else:
+                return redirect('/player/%s/viewContracts' %(player_id))   
+
+            team_age_sum = team.avgAge * team.players.count()
+            team_age_sum += player.age
+            team.players.add(player)
+            team.avgAge = team_age_sum / team.players.count() 
             team.save()
             player.salary=contract.salary
             player.team_id = contract.team_id
@@ -157,7 +172,8 @@ def viewContracts(request, player_id):
             player.no_trade = contract.no_trade
             player.free_agent = False
             player.save()
-            Contract.objects.get(pk=contract_id).delete()
+            contract.is_accepted = True
+            contract.save()
             return redirect('/player/%s' %(player_id))          
     return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner,'can_manage':can_manage_by_num_teams(team_list),'show_manage':False},context_instance=RequestContext(request))
 
@@ -167,7 +183,7 @@ def viewMessagesRedirect(request, player_id):
 @login_required
 def viewMessages(request, player_id, last_message,sent_or_rec):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     player = get_object_or_404(Player, pk=player_id)
     sent = False
     #if sent_or_rec == "sent":#Players don't currently "send" messages, so shouldn't show "Go To Sent Button"
@@ -213,13 +229,13 @@ def viewMessages(request, player_id, last_message,sent_or_rec):
 @login_required
 def buyEquipment(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
 def messagePlayer(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     player = get_object_or_404(Player, pk=player_id)
     if request.method == 'POST':
         form_get = message_player(team_list)

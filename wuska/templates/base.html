@@ -42,17 +42,19 @@
 	      <a href="/index/">{% trans "Home" %}</a>
 	    </li>
 	    <li class="divider-vertical"></li>
-	    <li>
-	      <a href="/createPlayer/">{% trans "Create Player" %}</a>
-	    </li>
-	    <li>
-	      <a href="/createPlayer/">{% trans "Create Player" %}</a>
-	    </li>
-	    <li>
-	      <a href="/createTeam/">{% trans "Create Team" %}</a>
+	    <li class="dropdown">
+	      <a class="dropdown-toggle" data-toggle="dropdown">Create<span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+		<li>
+		  <a href="/createPlayer/">{% trans "Create Player" %}</a>
+		</li>
+		<li>
+		  <a href="/createTeam/">{% trans "Create Team" %}</a>
+		</li>
+	      </ul>
 	    </li>	    
 	    <li class="dropdown">
-	      <a class="dropdown-toggle" data-toggle="dropdown">View
+	      <a class="dropdown-toggle" data-toggle="dropdown">My
 		Players <span class="caret"></span></a>
 	      <ul class="dropdown-menu">
 		{% for player in player_list %}
@@ -63,7 +65,7 @@
 	      </ul>
 	    </li>
 	    <li class="dropdown">
-	      <a class="dropdown-toggle" data-toggle="dropdown" >View
+	      <a class="dropdown-toggle" data-toggle="dropdown" >My
 		Teams <span class="caret"></span></a>
 	      <ul class="dropdown-menu">
 		{% for team in team_list %}
@@ -75,7 +77,7 @@
 	    </li>
 	    <li class="divider-vertical"></li>
 	    <li class="dropdown">
-	      <a class="dropdown-toggle" data-toggle="dropdown" >Other Players
+	      <a class="dropdown-toggle" data-toggle="dropdown" >Other
 		<span class="caret"></span></a>
 	      <ul class="dropdown-menu">
 		<li>
@@ -83,6 +85,9 @@
 		</li>
 		<li>
 		  <a href="/freeAgents/All/25/">{% trans "Free Agents" %}</a>
+		</li>
+		<li>
+		  <a href="/allTeams/25/">{% trans "All Teams" %}</a>
 		</li>
 	      </ul>
 	    </li>

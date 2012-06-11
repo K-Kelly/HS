@@ -9,7 +9,7 @@ class TeamForm(forms.Form):
 class OfferPlayerContractForm(forms.Form):
     salary = forms.IntegerField(max_value=20000000, min_value=50000, label="Salary Per Year (Integer between 50000 and 20000000)",widget=forms.TextInput(attrs={'class':'span2'}))
     length = forms.IntegerField(max_value=10, min_value=1, label="Length of the Contract (Integer between 1 and 10)",widget=forms.TextInput(attrs={'class':'span1'}))
-    no_trade = forms.BooleanField(required=False)
+    no_trade = forms.BooleanField(required=False,label="No Trade Clause")
     message = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'class':'input-xlarge'}))
 
 

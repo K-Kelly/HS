@@ -12,8 +12,8 @@ from django.db.models import Q
 def viewTeam(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
-    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_Manager)}, context_instance=RequestContext(request))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager)}, context_instance=RequestContext(request))
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -24,7 +24,7 @@ def getPlayer(p_id):
 @login_required
 def createTeam(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     if request.method == 'POST':
         form = TeamForm(request.POST)
         if form.is_valid():
@@ -34,7 +34,7 @@ def createTeam(request):
             arena_name = cd['arena_name']
             arena = Arena(name=arena_name, occupancy=5000, practice_Facility = 0,locker_Room = 0, equipment = 0, rink = 0, concessions = 0, lower_bowl = 1, mid_bowl = 0, upper_bowl = 0, box = 0, ticket_lower = 5, ticket_mid = 2, ticket_upper = 1, ticket_box = 10)
             arena.save()
-            team = Team(name = name, owner=request.user.id, general_Manager=-1, league_id= -1,arena=arena,funds = 2000000, salary_used=0, salary_left=2000000)
+            team = Team(name = name, owner=request.user.id, general_manager=-1, league_id= -1,arena=arena,funds = 2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000)
             team.save()
             request.user.get_profile().teams.add(team)            
             next = "/team/%s"%(team.pk)
@@ -46,7 +46,7 @@ def createTeam(request):
 @login_required
 def offerPlayerContract(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     player = get_object_or_404(Player, pk=player_id)
     owner = False
     if player_list.filter(pk=player_id).count() is 1:
@@ -85,9 +85,9 @@ def offerPlayerContract(request, player_id):
 @login_required
 def message_players_on_team(request,team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     team = get_object_or_404(Team, pk=team_id)
-    can_manage2 = can_manage(request.user.id,team.owner,team.general_Manager)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
@@ -117,7 +117,7 @@ def message_players_on_team(request,team_id):
 @login_required
 def editLines(request, team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     t = get_object_or_404(Team, pk=team_id)
     t_players = t.players
     if request.method == 'POST':
@@ -223,12 +223,12 @@ def teamViewMessagesRedirect(request, team_id):
 @login_required
 def teamViewMessages(request, team_id, last_message,sent_or_rec):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     team = get_object_or_404(Team, pk=team_id)
     sent = False
     if sent_or_rec == "sent":
         sent = True
-    can_manage2 = can_manage(request.user.id,team.owner, team.general_Manager)
+    can_manage2 = can_manage(request.user.id,team.owner, team.general_manager)
     if can_manage:
         last_message = int(last_message)
         newer_message = last_message - 10
@@ -281,9 +281,9 @@ def teamViewMessages(request, team_id, last_message,sent_or_rec):
 @login_required
 def message_team_management(request,team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.all().filter(Q(owner=request.user.id)|Q(general_Manager=request.user.id))
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
     team = get_object_or_404(Team, pk=team_id)
-    can_manage2 = can_manage(request.user.id,team.owner,team.general_Manager)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
@@ -304,8 +304,20 @@ def message_team_management(request,team_id):
         form = MessageForm()
     return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
 
-        
-
+@login_required
+def viewContracts(request,team_id):
+    player_list = request.user.get_profile().players.all()
+    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team = get_object_or_404(Team, pk=team_id)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
+    if can_manage2:
+        name_list = []
+        contracts = team.contracts.all()
+        for contract in contracts:
+            p = get_object_or_404(Player,pk=contract.player_id)
+            name_list.append(p.name)
+        contract_list = zip(contracts,name_list)
+        return render_to_response('hockey/viewContractOffersTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'contract_list':contract_list}, context_instance=RequestContext(request))
 
 def can_manage(request_user_id,team_owner, team_general_manager):
     if request_user_id == team_owner or request_user_id == team_general_manager:
