@@ -1,4 +1,5 @@
 from django import forms
+from itertools import chain
 
 class TeamForm(forms.Form):
     name = forms.CharField(max_length=40)
@@ -80,26 +81,59 @@ def make_edit_lines_form(player_list):
             list_id.append(player.id)
             list_name.append(player.name)
         g_choices = zip(list_id,list_name) 
-        l1_field = forms.ChoiceField(choices=l_choices,label='Line 1 L')
-        c1_field = forms.ChoiceField(choices=c_choices,label='Line 1 C')
-        r1_field = forms.ChoiceField(choices=r_choices,label='Line 1 R')
-        d1_field = forms.ChoiceField(choices=d_choices,label='Pairing 1 ')
+        forward_list = list(chain(l_list,c_list,r_list))
+        list_id = []
+        list_name = []
+        for player in forward_list:
+            list_id.append(player.id)
+            list_name.append(player.name)
+        pp_forward_choices = zip(list_id,list_name) 
+        forward_defense_list = list(chain(forward_list,d_list))
+        list_id = []
+        list_name = []
+        for player in forward_defense_list:
+            list_id.append(player.id)
+            list_name.append(player.name)
+        pp_defense_choices = zip(list_id,list_name) 
+
+        l1_field = forms.ChoiceField(choices=l_choices,label='Line 1 Left Wing')
+        c1_field = forms.ChoiceField(choices=c_choices,label='Line 1 Center')
+        r1_field = forms.ChoiceField(choices=r_choices,label='Line 1 Right Wing')
+        d1_field = forms.ChoiceField(choices=d_choices,label='Pairing 1 Left Defense')
         g1_field = forms.ChoiceField(choices=g_choices,label='Starting Goalie')
-        l2_field = forms.ChoiceField(choices=l_choices,label='Line 2 L')
-        c2_field = forms.ChoiceField(choices=c_choices,label='Line 2 C')
-        r2_field = forms.ChoiceField(choices=r_choices,label='Line 2 R')
-        d2_field = forms.ChoiceField(choices=d_choices,label='Pairing 1')
+        l2_field = forms.ChoiceField(choices=l_choices,label='Line 2 Left Wing')
+        c2_field = forms.ChoiceField(choices=c_choices,label='Line 2 Center')
+        r2_field = forms.ChoiceField(choices=r_choices,label='Line 2 Right Wing')
+        d2_field = forms.ChoiceField(choices=d_choices,label='Pairing 1 Right Defense')
         g2_field = forms.ChoiceField(choices=g_choices,label='Backup Goalie')
-        l3_field = forms.ChoiceField(choices=l_choices,label='Line 3 L')
-        c3_field = forms.ChoiceField(choices=c_choices,label='Line 3 C')
-        r3_field = forms.ChoiceField(choices=r_choices,label='Line 3 R')
-        d3_field = forms.ChoiceField(choices=d_choices,label='Pairing 2')
-        l4_field = forms.ChoiceField(choices=l_choices,label='Line 4 L')
-        c4_field = forms.ChoiceField(choices=c_choices,label='Line 4 C')
-        r4_field = forms.ChoiceField(choices=r_choices,label='Line 4 R')
-        d4_field = forms.ChoiceField(choices=d_choices,label='Pairing 2')
-        d5_field = forms.ChoiceField(choices=d_choices,label='Pairing 3')
-        d6_field = forms.ChoiceField(choices=d_choices,label='Pairing 3')
+        l3_field = forms.ChoiceField(choices=l_choices,label='Line 3 Left Wing')
+        c3_field = forms.ChoiceField(choices=c_choices,label='Line 3 Center')
+        r3_field = forms.ChoiceField(choices=r_choices,label='Line 3 Right Wing')
+        d3_field = forms.ChoiceField(choices=d_choices,label='Pairing 2 Left Defense')
+        l4_field = forms.ChoiceField(choices=l_choices,label='Line 4 Left Wing')
+        c4_field = forms.ChoiceField(choices=c_choices,label='Line 4 Center')
+        r4_field = forms.ChoiceField(choices=r_choices,label='Line 4 Right Wing')
+        d4_field = forms.ChoiceField(choices=d_choices,label='Pairing 2 Right Defense')
+        d5_field = forms.ChoiceField(choices=d_choices,label='Pairing 3 Left Defense')
+        d6_field = forms.ChoiceField(choices=d_choices,label='Pairing 3 Right Defense')
+        pp1l_field = forms.ChoiceField(choices=pp_forward_choices,label='PP1 Left Wing')
+        pp1c_field = forms.ChoiceField(choices=pp_forward_choices,label='PP1 Center')
+        pp1r_field = forms.ChoiceField(choices=pp_forward_choices,label='PP1 Right Wing')
+        pp1ld_field = forms.ChoiceField(choices=pp_defense_choices,label='PP1 Left Defense')
+        pp1rd_field = forms.ChoiceField(choices=pp_defense_choices,label='PP1 Right Defense')
+        pp2l_field = forms.ChoiceField(choices=pp_forward_choices,label='PP2 Left Wing')
+        pp2c_field = forms.ChoiceField(choices=pp_forward_choices,label='PP2 Center')
+        pp2r_field = forms.ChoiceField(choices=pp_forward_choices,label='PP2 Right Wing')
+        pp2ld_field = forms.ChoiceField(choices=pp_defense_choices,label='PP2 Left Defense')
+        pp2rd_field = forms.ChoiceField(choices=pp_defense_choices,label='PP2 Right Defense')
+        pk1c_field = forms.ChoiceField(choices=pp_defense_choices,label='PK1 Center')
+        pk1w_field = forms.ChoiceField(choices=pp_defense_choices,label='PK1 Wing')
+        pk1ld_field = forms.ChoiceField(choices=pp_defense_choices,label='PK1 Left Defense')
+        pk1rd_field = forms.ChoiceField(choices=pp_defense_choices,label='PK1 Right Defense')
+        pk2c_field = forms.ChoiceField(choices=pp_defense_choices,label='PK2 Center')
+        pk2w_field = forms.ChoiceField(choices=pp_defense_choices,label='PK2 Wing')
+        pk2ld_field = forms.ChoiceField(choices=pp_defense_choices,label='PK2 Left Defense')
+        pk2rd_field = forms.ChoiceField(choices=pp_defense_choices,label='PK2 Right Defense')    
     return EditLinesForm
 
 

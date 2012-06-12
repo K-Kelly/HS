@@ -145,6 +145,26 @@ def editLines(request, team_id):
             d4 = cd['d4_field']
             d5 = cd['d5_field']
             d6 = cd['d6_field']
+            pp1l = cd['pp1l_field']
+            pp1c = cd['pp1c_field']
+            pp1r = cd['pp1r_field']
+            pp1ld = cd['pp1ld_field']
+            pp1rd = cd['pp1rd_field']
+            pp2l = cd['pp2l_field']
+            pp2c = cd['pp2c_field']
+            pp2r = cd['pp2r_field']
+            pp2ld = cd['pp2ld_field']
+            pp2rd = cd['pp2rd_field']
+            pk1c = cd['pk1c_field']
+            pk1w = cd['pk1w_field']
+            pk1ld = cd['pk1ld_field']
+            pk1rd = cd['pk1rd_field']
+            pk2c = cd['pk2c_field']
+            pk2w = cd['pk2w_field']
+            pk2ld = cd['pk2ld_field']
+            pk2rd = cd['pk2rd_field']
+
+
             if player_id_in_team(lw1,t_players):
                 t.lw1 = lw1
                 t_players = t_players.exclude(pk = lw1)
@@ -210,12 +230,74 @@ def editLines(request, team_id):
                 t.goalie2 = g2
                 t_players = t_players.exclude(pk = g2)
 
+                #special teams
+            pp_players = t.players
+            if player_id_in_team(pp1l,pp_players):
+                t.pp1lw = pp1l
+                pp_players = pp_players.exclude(pk = pp1w)
+            if player_id_in_team(pp1c,pp_players):
+                t.pp1c = pp1c
+                pp_players = pp_players.exclude(pk = pp1c)
+            if player_id_in_team(pp1r,pp_players):
+                t.pp1rw = pp1r
+                pp_players = pp_players.exclude(pk = pp1r)
+            if player_id_in_team(pp1ld,pp_players):
+                t.pp1ld = pp1ld
+                pp_players = pp_players.exclude(pk = pp1ld)
+            if player_id_in_team(pp1rd,pp_players):
+                t.pp1rd = pp1rd
+                pp_players = pp_players.exclude(pk = pp1rd)
+                
+            if player_id_in_team(pp2l,pp_players):
+                t.pp2lw = pp2l
+                pp_players = pp_players.exclude(pk = pp2l)
+            if player_id_in_team(pp2c,pp_players):
+                t.pp2c = pp2c
+                pp_players = pp_players.exclude(pk = pp2c)
+            if player_id_in_team(pp2r,pp_players):
+                t.pp2rw = pp2r
+                pp_players = pp_players.exclude(pk = pp2r)
+            if player_id_in_team(pp2ld,pp_players):
+                t.pp2ld = pp2ld
+                pp_players = pp_players.exclude(pk = pp2ld)
+            if player_id_in_team(pp2rd,pp_players):
+                t.pp2rd = pp2rd
+                pp_players = pp_players.exclude(pk = pp2rd)
+
+                #Penalty Kill
+            pp_players = t.players
+            if player_id_in_team(pk1w,pp_players):
+                t.pk1w = pk1w
+                pp_players = pp_players.exclude(pk = pk1w)
+            if player_id_in_team(pk1c,pp_players):
+                t.pk1c = pk1c
+                pp_players = pp_players.exclude(pk = pk1c)
+            if player_id_in_team(pk1ld,pp_players):
+                t.pk1ld = pk1ld
+                pp_players = pp_players.exclude(pk = pk1ld)
+            if player_id_in_team(pk1rd,pp_players):
+                t.pk1rd = pk1rd
+                pp_players = pp_players.exclude(pk = pk1rd)
+
+            if player_id_in_team(pk2w,pp_players):
+                t.pk2w = pk2w
+                pp_players = pp_players.exclude(pk = pk2w)
+            if player_id_in_team(pk2c,pp_players):
+                t.pk2c = pk2c
+                pp_players = pp_players.exclude(pk = pk2c)
+            if player_id_in_team(pk2ld,pp_players):
+                t.pk2ld = pk2ld
+                pp_players = pp_players.exclude(pk = pk2ld)
+            if player_id_in_team(pk2rd,pp_players):
+                t.pk2rd = pk2rd
+                pp_players = pp_players.exclude(pk = pk2rd)
+
             t.save()
             next = "/team/%s"%(t.pk)
             return redirect(next)
     else:
         form = make_edit_lines_form(t_players)
-    return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_Manager)}, context_instance=RequestContext(request))
+    return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_manager)}, context_instance=RequestContext(request))
 
 @login_required
 def teamViewMessagesRedirect(request, team_id):

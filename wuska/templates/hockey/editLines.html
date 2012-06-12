@@ -8,56 +8,133 @@
 {{ form.errors|bootstrap }}
 {% endif %}
 <form class="well" action ="" method="post">{% csrf_token %}
-  <center>
-    <div class="row-fluid">
-      <div class="span4">
-	<h2>Left Wing</h2>
-	{{ form.l1_field|bootstrap }}
-	{{ form.l2_field|bootstrap }}
-	{{ form.l3_field|bootstrap }}
-	{{ form.l4_field|bootstrap }}
+  <div class="tabbable">
+    <ul class="nav nav-tabs">
+      <li class="active">
+	<a href="#EvenStrength" data-toggle="tab">Even Strength</a>
+      </li>
+      <li class>
+	<a href="#PowerPlay" data-toggle="tab">Power Play</a>
+      </li>
+      <li class>
+	<a href="#PenaltyKill" data-toggle="tab">Penalty Kill</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="EvenStrength">
+	<center>
+	  <div class="row-fluid">
+	    <div class="span4">
+	      <h2>Left Wing</h2>
+	      {{ form.l1_field|bootstrap }}
+	      {{ form.l2_field|bootstrap }}
+	      {{ form.l3_field|bootstrap }}
+	      {{ form.l4_field|bootstrap }}
+	    </div>
+	    <div class="span4">
+	      <h2>Center</h2>
+	      {{ form.c1_field|bootstrap }}
+	      {{ form.c2_field|bootstrap }}
+	      {{ form.c3_field|bootstrap }}
+	      {{ form.c4_field|bootstrap }}
+	    </div>
+	    <div class="span4">
+	      <h2>Right Wing</h2>
+	      {{ form.r1_field|bootstrap }}
+	      {{ form.r2_field|bootstrap }}
+	      {{ form.r3_field|bootstrap }}
+	      {{ form.r4_field|bootstrap }}
+	    </div>
+	  </div>
+	</center>
+	<div class="row-fluid">
+	  <div class="span1"></div>
+	  <div class="span5"><center>
+	      <h2>Left Defense</h2>
+	      {{ form.d1_field|bootstrap }}
+	      {{ form.d3_field|bootstrap }}
+	      {{ form.d5_field|bootstrap }}</center>
+	  </div>
+	  <div class="span5"><center>
+	      <h2>Right Defense</h2>
+	      {{ form.d2_field|bootstrap }}
+	      {{ form.d4_field|bootstrap }}
+	      {{ form.d6_field|bootstrap }}</center>
+	  </div>
+	</div>
+	<div class="row-fluid">
+	  <center>
+	    <div class="span4"></div>
+	    <div class="span4">
+	      <h2>Goalie</h2>
+	      {{ form.g1_field|bootstrap }}
+	      {{ form.g2_field|bootstrap }}
+	    </div>
+	  </center>
+	</div>
       </div>
-      <div class="span4">
-	<h2>Center</h2>
-	{{ form.c1_field|bootstrap }}
-	{{ form.c2_field|bootstrap }}
-	{{ form.c3_field|bootstrap }}
-	{{ form.c4_field|bootstrap }}
+      <div class="tab-pane" id="PowerPlay">
+	<h2>Powerplay</h2>
+	<center>
+	  <div class="row-fluid">
+	    <div class="span4">
+	      {{ form.pp1l_field|bootstrap }}
+	      {{ form.pp2l_field|bootstrap }}
+	    </div>
+	    <div class="span4">
+	      {{ form.pp1c_field|bootstrap }}
+	      {{ form.pp2c_field|bootstrap }}
+	    </div>
+	    <div class="span4">
+	      {{ form.pp1r_field|bootstrap }}
+	      {{ form.pp2r_field|bootstrap }}
+	    </div>
+	  </div>
+	  <div class="row-fluid">
+	    <div class="span1"></div>
+	    <div class="span5"><center>
+		{{ form.pp1ld_field|bootstrap }}
+		{{ form.pp2ld_field|bootstrap }}</center>
+	    </div>
+	    <div class="span5"><center>
+		{{ form.pp1rd_field|bootstrap }}
+		{{ form.pp2rd_field|bootstrap }}</center>
+	    </div>
+	  </div>
+	</center>
       </div>
-      <div class="span4">
-	<h2>Right Wing</h2>
-	{{ form.r1_field|bootstrap }}
-	{{ form.r2_field|bootstrap }}
-	{{ form.r3_field|bootstrap }}
-	{{ form.r4_field|bootstrap }}
+      <div class="tab-pane" id="PenaltyKill">
+	<div class="row-fluid">
+	  <h2>Penalty Kill Unit 1</h2>
+	  <div class="span1"></div>
+	  <div class="span5"><center>
+	      {{ form.pk1c_field|bootstrap }}
+	      {{ form.pk1ld_field|bootstrap }}<center>
+	  </div>
+	  <div class="span5"><center>
+	      {{ form.pk1w_field|bootstrap }}
+	      {{ form.pk1rd_field|bootstrap }}</center>
+	  </div>
+	</div>
+	<div class="row-fluid">
+	<h2>Penalty Kill Unit 2</h2>
+	  <div class="span1"></div>
+	  <div class="span5"><center>
+	      {{ form.pk2c_field|bootstrap }}
+	      {{ form.pk2ld_field|bootstrap }}</center>
+	  </div>
+	  <div class="span5"><center>
+	      {{ form.pk2w_field|bootstrap }}
+	      {{ form.pk2rd_field|bootstrap }}</center>
+	  </div>
+	</div>
       </div>
-  </div></center>
-  <div class="row-flud">
-    <div class="span1"></div>
-    <div class="span5"><center>
-	<h2>Left Defense</h2>
-	{{ form.d1_field|bootstrap }}
-	{{ form.d3_field|bootstrap }}
-	{{ form.d5_field|bootstrap }}</center>
-    </div>
-    <div class="span5"><center>
-	<h2>Right Defense</h2>
-	{{ form.d2_field|bootstrap }}
-	{{ form.d4_field|bootstrap }}
-	{{ form.d6_field|bootstrap }}</center>
     </div>
   </div>
-  <div class="row-fluid"><center>
-      <div class="span4"></div>
-      <div class="span4">
-	<h2>Goalie</h2>
-	{{ form.g1_field|bootstrap }}
-	{{ form.g2_field|bootstrap }}
-	<button class="btn btn-primary" type="submit"> {% trans 'Edit Lines' %}</button>
-      </div>
-  </div></center>
+  <center>
+    <button class="btn btn-primary" type="submit"> {% trans 'Edit Lines' %}</button>
+  </center>
 </form>
-</div>
 {% else %}
 <div class="alert">
   <button class="close" data-dismiss="alert">×</button>
