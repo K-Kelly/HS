@@ -110,6 +110,7 @@ class Message(models.Model):
     sender_team_id = models.IntegerField(blank=True, default="-1")
     receiver_players = models.ManyToManyField(Player, related_name = 'receiver_players')
     receiver_team_id = models.IntegerField(blank=True, default="-1")
+    receiver_user_id = models.IntegerField(blank=True, default="-1")
     title = models.CharField(max_length = 100)
     body = models.CharField(max_length = 2000)
     
@@ -122,7 +123,8 @@ class Message(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=35)
     owner = models.IntegerField()
-    general_manager = models.IntegerField()
+    general_manager1 = models.IntegerField(blank=True, default="-1")
+    general_manager2 = models.IntegerField(blank=True, default="-1")
     league_id = models.IntegerField()
     arena = models.ForeignKey(Arena, related_name = 'team_arena')
     players = models.ManyToManyField(Player, related_name = 'team_players')

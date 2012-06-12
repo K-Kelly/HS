@@ -12,21 +12,21 @@ def index(request):
         return render_to_response('index.html',{},context_instance=RequestContext(request))
     else:
         player_list = request.user.get_profile().players.all()
-        team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+        team_list = request.user.get_profile().teams.all()
         return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
 
 @login_required    
 def profile(request):
     profile = request.user.get_profile()
     player_list = profile.players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = profile.teams.all()
     return render_to_response('profile.html', {'user':request.user,'player_list':player_list, 'team_list':team_list,'profile':profile})
 
 @login_required    
 def publicProfile(request,user_id):
     profile = request.user.get_profile()
     player_list = profile.players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = profile.teams.all()
     return render_to_response('profile.html', {'user':request.user,'player_list':player_list, 'team_list':team_list,'profile':profile})
 
 def registration_complete_simple(request,username):
@@ -35,13 +35,13 @@ def registration_complete_simple(request,username):
 @login_required
 def viewMessages(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
 def messagePlayer(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
@@ -59,7 +59,7 @@ def viewFreeAgents(request, position, number):
         number,have_previous,have_next,previous_number,next_number = pagination_vars(number,25,Player.objects.filter(position=position,free_agent=True).count())
 
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('hockey/viewFreeAgents.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'FA_list':FA_list, 'position':position, 'have_previous':have_previous,'have_next':have_next,'next_number':next_number,'previous_number':previous_number})
 
 @login_required
@@ -77,13 +77,13 @@ def viewAllPlayers(request, position, number):
     else:
         all_player_list = Player.objects.order_by('-level','name')[(previous_number):number]
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('hockey/viewAllPlayers.html',{'user':request.user,'player_list':player_list, 'team_list':team_list, 'all_player_list':all_player_list, 'position':position, 'have_previous':have_previous,'have_next':have_next,'next_number':next_number,'previous_number':previous_number})
 
 @login_required
 def viewAllTeams(request,number):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     number,have_previous,have_next,previous_number,next_number = pagination_vars(number,25,Team.objects.count())
     all_team_list = Team.objects.order_by('name')[(previous_number):number]
  

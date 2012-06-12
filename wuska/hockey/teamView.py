@@ -7,13 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from wuska.hockey.forms import *
 from django.db.models import Q
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def viewTeam(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
-    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager)}, context_instance=RequestContext(request))
+    team_list = request.user.get_profile().teams.all()
+    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -24,7 +26,7 @@ def getPlayer(p_id):
 @login_required
 def createTeam(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     if request.method == 'POST':
         form = TeamForm(request.POST)
         if form.is_valid():
@@ -34,9 +36,10 @@ def createTeam(request):
             arena_name = cd['arena_name']
             arena = Arena(name=arena_name, occupancy=5000, practice_Facility = 0,locker_Room = 0, equipment = 0, rink = 0, concessions = 0, lower_bowl = 1, mid_bowl = 0, upper_bowl = 0, box = 0, ticket_lower = 5, ticket_mid = 2, ticket_upper = 1, ticket_box = 10)
             arena.save()
-            team = Team(name = name, owner=request.user.id, general_manager=-1, league_id= -1,arena=arena,funds = 2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000)
+            team = Team(name = name, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id= -1,arena=arena,funds = 2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000)
             team.save()
-            request.user.get_profile().teams.add(team)            
+            request.user.get_profile().teams_owned.add(team)
+            request.user.get_profile().teams.add(team)           
             next = "/team/%s"%(team.pk)
             return redirect(next)
     else:
@@ -46,7 +49,7 @@ def createTeam(request):
 @login_required
 def offerPlayerContract(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     player = get_object_or_404(Player, pk=player_id)
     owner = False
     if player_list.filter(pk=player_id).count() is 1:
@@ -72,7 +75,7 @@ def offerPlayerContract(request, player_id):
             player.contracts.add(contract)
             player.save()
             can_manage = False
-            if request.user.id == team.owner or request.user.id == team.general_manager:
+            if request.user.id == team.owner or request.user.id == team.general_manager1 or request.user.id == team.general_manager2:
                 can_manage = True
             alert = "You have offered a contract to %s" % (player.name)
             return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list,'player':player,'team_list':team_list,'alert_success':True,'alert_message':alert,'can_manage':can_manage}, context_instance=RequestContext(request))
@@ -85,9 +88,9 @@ def offerPlayerContract(request, player_id):
 @login_required
 def message_players_on_team(request,team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     team = get_object_or_404(Team, pk=team_id)
-    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
@@ -105,19 +108,19 @@ def message_players_on_team(request,team_id):
                 player.messages.add(message)
                 player.save()
             alert="Message sent to all players on the team."
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
         else:
             form = MessageForm(request.POST)
-            return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+            return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
     else:
         form = MessageForm()
-    return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+    return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
 
 
 @login_required
 def editLines(request, team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     t = get_object_or_404(Team, pk=team_id)
     t_players = t.players
     if request.method == 'POST':
@@ -297,7 +300,7 @@ def editLines(request, team_id):
             return redirect(next)
     else:
         form = make_edit_lines_form(t_players)
-    return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_manager)}, context_instance=RequestContext(request))
+    return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_manager1,t.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
 
 @login_required
 def teamViewMessagesRedirect(request, team_id):
@@ -305,12 +308,12 @@ def teamViewMessagesRedirect(request, team_id):
 @login_required
 def teamViewMessages(request, team_id, last_message,sent_or_rec):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     team = get_object_or_404(Team, pk=team_id)
     sent = False
     if sent_or_rec == "sent":
         sent = True
-    can_manage2 = can_manage(request.user.id,team.owner, team.general_manager)
+    can_manage2 = can_manage(request.user.id,team.owner, team.general_manager1,team.general_manager2)
     if can_manage:
         last_message = int(last_message)
         newer_message = last_message - 10
@@ -356,16 +359,16 @@ def teamViewMessages(request, team_id, last_message,sent_or_rec):
                     href_list.append("/users/%d/"%(message.sender_user_id))
                     name_list.append(request.user.username)            
         m_list = zip(message_list,from_list,href_list,name_list)  
-        return render_to_response('hockey/teamViewMessages.html', {'team': team, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'can_manage':can_manage2,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':True, 'not_owner':False},context_instance=RequestContext(request))
+        return render_to_response('hockey/teamViewMessages.html', {'team': team, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'can_manage':can_manage2,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':is_owner(team.owner,request.user.id)},context_instance=RequestContext(request))
     return redirect('team/%s/'%(team_id))  #not a team manager
 
 
 @login_required
 def message_team_management(request,team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     team = get_object_or_404(Team, pk=team_id)
-    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2)
     if request.method == 'POST':
         form = MessageForm(request.POST)
         if form.is_valid():
@@ -378,20 +381,20 @@ def message_team_management(request,team_id):
             team.save()
             #TO DO: Add to User Profile Messages
             alert="Message sent to the management of %s." % (team.name)
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert}, context_instance=RequestContext(request))
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
         else:
             form = MessageForm(request.POST)
-            return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+            return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
     else:
         form = MessageForm()
-    return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2}, context_instance=RequestContext(request))
+    return render_to_response('hockey/messageTeamManagement.html',{'form':form, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
 
 @login_required
 def viewContracts(request,team_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     team = get_object_or_404(Team, pk=team_id)
-    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager)
+    can_manage2 = can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2)
     if can_manage2:
         name_list = []
         contracts = team.contracts.all()
@@ -399,14 +402,105 @@ def viewContracts(request,team_id):
             p = get_object_or_404(Player,pk=contract.player_id)
             name_list.append(p.name)
         contract_list = zip(contracts,name_list)
-        return render_to_response('hockey/viewContractOffersTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'contract_list':contract_list}, context_instance=RequestContext(request))
+        return render_to_response('hockey/viewContractOffersTeam.html', {'team':team, 'user':request.user,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'contract_list':contract_list,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
+    return redirect('/team/%s/'%(team_id))
 
-def can_manage(request_user_id,team_owner, team_general_manager):
-    if request_user_id == team_owner or request_user_id == team_general_manager:
+@login_required
+def viewManagement(request,team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    if request.user.id != team.owner:#only owner should alter management
+        return redirect('/team/%s/'%(team_id))
+
+    player_list = request.user.get_profile().players.all()
+    team_list = request.user.get_profile().teams.all()
+    try:
+        gm1_name = User.objects.get(id=team.general_manager1)
+    except ObjectDoesNotExist:
+        gm1_name = ""
+    try:
+        gm2_name = User.objects.get(id=team.general_manager2)
+    except ObjectDoesNotExist:
+        gm2_name = ""
+    if request.method == 'POST':
+        form_get = get_management_form(gm1_name,gm2_name,team.owner)
+        form = form_get(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            gm1_id = cd['gm1_username']
+            gm2_id = cd['gm2_username']
+            if gm1_id != -1 and team.general_manager1 == -1:#if not already gm, send msg
+                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                title = "General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=gm1_id)
+                send_message(title,message,team, user)
+                user.get_profile().teams_gmed.add(team)
+                user.get_profile().teams.add(team)
+            elif gm1_id != team.general_manager1:
+                message_to_old = "You are no longer the General Manager of %s.\n\n This is an automated message"%(team.name)
+                title_to_old = "No Longer General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=team.general_manager1)
+                send_message(title_to_old,message_to_old,user)
+                user.get_profile().teams_gmed.remove(team)
+                user.get_profile().teams.remove(team)
+                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                title = "General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=gm1_id)
+                send_message(title,message,team, user)
+                user.get_profile().teams_gmed.add(team)
+                user.get_profile().teams.add(team)
+            if gm2_id != -1 and team.general_manager2 == -1:#if not already gm, send msg
+                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                title = "General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=gm2_id)
+                user.get_profile().teams_gmed.add(team)
+                user.get_profile().teams.add(team)                
+                send_message(title,message,team, user)
+            elif gm2_id != team.general_manager2:
+                message_to_old = "You are no longer the General Manager of %s.\n\n This is an automated message"%(team.name)
+                title_to_old = "No Longer General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=team.general_manager2)
+                send_message(title_to_old,message_to_old,user)
+                user.get_profile().teams_gmed.remove(team)
+                user.get_profile().teams.remove(team)
+                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                title = "General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=gm2_id)
+                send_message(title,message,team, user)
+                user.get_profile().teams_gmed.add(team)
+                user.get_profile().teams.add(team)
+
+            team.general_manager1 = gm1_id
+            team.general_manager2 = gm2_id
+            team.save()
+            next = "/team/%s"%(team.pk)
+            return redirect(next)
+        else:
+            form = get_management_form(gm1_name,gm2_name,team.owner)
+            form = form(request.POST)
+    else:
+        form = get_management_form(gm1_name,gm2_name,team.owner)
+    return render_to_response('hockey/viewManagement.html',{'form':form, 'team':team,'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
+            
+
+def can_manage(request_user_id,team_owner, team_general_manager1,team_general_manager2):
+    if request_user_id == team_owner or request_user_id == team_general_manager1 or request_user_id == team_general_manager2:
         return True
     return False
         
 def player_id_in_team(p_id,playerlist):
     if playerlist.filter(pk=p_id).count() == 1:
+        return True
+    return False
+
+def send_message(title,message,team, user):
+    msg = Message(sender_user_id =-1,sender_player_id = -1,sender_team_id=team.id,receiver_team_id=-1,receiver_user_id = user.id,title=title,body=message)
+    msg.save()
+    team.messages.add(msg)
+    team.save()
+    user.get_profile().messages.add(msg)
+    user.get_profile().save()
+
+def is_owner(team_owner,user_id):
+    if (team_owner == user_id):
         return True
     return False

@@ -10,14 +10,14 @@ from django.db.models import Q
 
 def index(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
 def viewPlayer(request, player_id):
     p = get_object_or_404(Player, pk=player_id)
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     can_upgrade = False
     if p.upgrades > 0 :
         can_upgrade = True
@@ -30,7 +30,7 @@ def viewPlayer(request, player_id):
 @login_required
 def createPlayer(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('hockey/createPlayer.html', {'user':request.user, 'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
 
 @login_required
@@ -49,7 +49,7 @@ def upgradeSkill(request, player_id):
 @login_required
 def creatingPlayer(request):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     if request.method == 'POST' and 'name' in request.POST and request.POST['name']!="" and 'position' in request.POST and request.POST['position'] and 'height' in request.POST and request.POST['height'] and 'weight' in request.POST and request.POST['weight']:
         name = request.POST['name']
         position = request.POST['position']
@@ -127,7 +127,7 @@ def doUpgradeSkill(skill,player):
 @login_required        
 def viewContracts(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))   
+    team_list = request.user.get_profile().teams.all() 
     player = get_object_or_404(Player, pk=player_id)
     owner = False
     if player.user_id == request.user.id:
@@ -183,7 +183,7 @@ def viewMessagesRedirect(request, player_id):
 @login_required
 def viewMessages(request, player_id, last_message,sent_or_rec):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     player = get_object_or_404(Player, pk=player_id)
     sent = False
     #if sent_or_rec == "sent":#Players don't currently "send" messages, so shouldn't show "Go To Sent Button"
@@ -229,13 +229,13 @@ def viewMessages(request, player_id, last_message,sent_or_rec):
 @login_required
 def buyEquipment(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     return render_to_response('index.html',{'user':request.user,'player_list':player_list, 'team_list':team_list})
 
 @login_required
 def messagePlayer(request, player_id):
     player_list = request.user.get_profile().players.all()
-    team_list = Team.objects.filter(Q(owner=request.user.id)|Q(general_manager=request.user.id))
+    team_list = request.user.get_profile().teams.all()
     player = get_object_or_404(Player, pk=player_id)
     if request.method == 'POST':
         form_get = message_player(team_list)
@@ -245,7 +245,7 @@ def messagePlayer(request, player_id):
             title = cd['title']
             body = cd['body']
             team_field = cd['team_field']
-            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_field,receiver_team_id=-1,title=title,body=body)
+            message = Message(sender_user_id=request.user.id,sender_player_id=-1,sender_team_id=team_field,receiver_team_id=-1,receiver_user_id = player.user_id,title=title,body=body)
             message.save()
             message.receiver_players.add(player)
             message.save()
@@ -270,8 +270,8 @@ def messagePlayer(request, player_id):
 
 
 
-def can_manage(request_user_id,team_owner, team_general_manager):
-    if request_user_id == team_owner or request_user_id == team_general_manager:
+def can_manage(request_user_id,team_owner, team_general_manager1, team_general_manager2):
+    if request_user_id == team_owner or request_user_id == team_general_manager1 or request_user_id == team_general_manager2:
         return True
     return False 
 

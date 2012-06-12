@@ -8,9 +8,11 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     accepted_eula = models.BooleanField()
     players = models.ManyToManyField(Player)
-    teams = models.ManyToManyField(Team)
+    teams_owned = models.ManyToManyField(Team, related_name='UserProfile_teams_owned')
+    teams_gmed = models.ManyToManyField(Team, related_name='UserProfile_teams_gmed')
+    teams = models.ManyToManyField(Team, related_name='UserProfile_teams')
     pucks = models.IntegerField(default = 300)
-    
+    messages = models.ManyToManyField(Message, related_name='UserProfile_messages')
     def __unicode__(self):
         return "%s's profile" % self.user
 

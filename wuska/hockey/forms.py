@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from itertools import chain
 
 class TeamForm(forms.Form):
@@ -6,6 +8,37 @@ class TeamForm(forms.Form):
     abbreviation = forms.CharField(max_length=3, min_length=2)
     arena_name = forms.CharField(max_length=40)
 
+def get_management_form(gm1_name,gm2_name,owner_id):
+    class TeamManagementForm(forms.Form):
+        gm1_username = forms.CharField(max_length=50,label="Username of the General Manager",initial=gm1_name,required=False)
+        gm2_username = forms.CharField(max_length=50,label="Username of the Assistant General Manager",initial=gm2_name,required=False)
+
+        def clean_gm1_username(self):
+            data = self.cleaned_data['gm1_username']
+            if data == "":
+                return -1
+            else:
+                try:
+                    gm1 = User.objects.get(username=data)
+                    if gm1.id == owner_id:
+                        raise forms.ValidationError("Owner can't also be a general manager. Leave the field blank if you don't want a general manager")
+                    return gm1.id
+                except ObjectDoesNotExist:
+                    raise forms.ValidationError("Unable to find user %s"%(data))
+        def clean_gm2_username(self):
+            data = self.cleaned_data['gm2_username']
+            if data == "":
+                return -1
+            else:
+                try:
+                    gm2 = User.objects.get(username=data)
+                    if gm2.id == owner_id:
+                        raise forms.ValidationError("Owner can't also be an assistant general manager. Leave the field blank if you don't want an assistant general manager")
+                    return gm2.id
+                except ObjectDoesNotExist:
+                    raise forms.ValidationError("Unable to find user %s"%(data))
+
+    return TeamManagementForm
 
 class OfferPlayerContractForm(forms.Form):
     salary = forms.IntegerField(max_value=20000000, min_value=50000, label="Salary Per Year (Integer between 50000 and 20000000)",widget=forms.TextInput(attrs={'class':'span2'}))
@@ -46,7 +79,7 @@ def message_player(team_list):
         
 def make_edit_lines_form(player_list):
     class EditLinesForm(forms.Form):
-        l_list = player_list.filter(position = "L")
+        l_list = player_list.filter(position="L")
         c_list = player_list.filter(position="C")
         r_list = player_list.filter(position="R")
         d_list = player_list.filter(position="D")

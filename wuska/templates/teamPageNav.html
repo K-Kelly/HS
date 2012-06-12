@@ -50,6 +50,12 @@
 		{{team.name}}'s Management</a>
 	      </li>
 	      {% endif %}
+	      {% if owner %}
+	      <li>
+		<a href="/team/{{team.id}}/viewManagement/">Change
+		Management</a>
+	      </li>
+	      {% endif %}
 	      
 	    </ul>
 	  </div>

@@ -1,9 +1,3 @@
-"""
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
-"""
 from django.shortcuts import get_object_or_404
 from django.test import TestCase, LiveServerTestCase
 from selenium import webdriver
@@ -14,6 +8,7 @@ class PlayerTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)
+        self.client.post('/accounts/register/',{'username':'PlayerTest2', 'email':'test@localhosttestregister2.com','password1':'test','password2':'test'},follow=True)
     
     def test_create_Player(self):
         #Create Player
@@ -215,6 +210,9 @@ class PlayerTest(TestCase):
         self.assertContains(response,title2)
         self.assertContains(response,body2,count=2)
         
+        #team adds general manager
+        #response = self.client.post('/team/1/management/',{'username':title1},follow=True)
+
     def test_view_free_agents_all_players(self):       
         response = self.client.post('/freeAgents/',follow=True)
         self.assertEqual(response.status_code,200)#redirects to /freeAgents/All/25/
@@ -280,3 +278,12 @@ class PlayerTest(TestCase):
         response = self.client.post('/allPlayers/G/25',follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,"hockey/viewAllPlayers.html")
+
+        response = self.client.post('/allTeams/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllTeams.html")
+
+        """response = self.client.post('/allUsers/25',follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,"hockey/viewAllUsers.html")
+        """

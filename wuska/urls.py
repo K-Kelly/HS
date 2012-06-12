@@ -43,6 +43,7 @@ urlpatterns += patterns('wuska.hockey.teamView',
                         (r'^(?i)team/(?P<team_id>\d+)/messageTeamManagement/$', 'message_team_management'),
                         (r'^(?i)team/(?P<team_id>\d+)/viewMessages/$', 'teamViewMessagesRedirect'),
                         (r'^(?i)team/(?P<team_id>\d+)/viewMessages/(?P<sent_or_rec>\w+)/(?P<last_message>\d+)/$', 'teamViewMessages'),
+                        (r'^(?i)team/(?P<team_id>\d+)/viewManagement/$', 'viewManagement'),
 )
 
 urlpatterns += patterns('',
