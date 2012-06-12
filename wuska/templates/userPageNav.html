@@ -9,7 +9,7 @@
       <div class="tabbable tabs-left">
 	<ul class="nav nav-tabs">
 	  <li class="active">
-	    <a href="#1A" data-toggle="tab">{{team.name}}</a>
+	    <a href="#1A" data-toggle="tab">{{user.username}}</a>
 	  </li>
 	  <li class>
 	    <a href="#1B" data-toggle="tab">Other</a>
@@ -18,45 +18,17 @@
 	<div class="tab-content">
 	  <div class="tab-pane active" id="1A">
 	    <ul class="nav nav-list">	
-	      {% if can_manage %}
-	      <li>
-		<a href="/team/{{team.id}}/editLines/">Edit Lines</a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/viewSchedule/">View Schedule</a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/tactics/">Tactics</a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/viewContracts/">Contracts</a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/messageTeam/">Message Team</a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/arena/">Arena</a>
-	      </li>
-	      <li>
-		<a href="/freeAgents/all/25/">View Free Agents </a>
-	      </li>
-	      <li>
-		<a href="/team/{{team.id}}/viewMessages/">View
-		Messages</a>
-	      </li>
-	      {% else %}
-	      <li>
-		<a href="/team/{{team.id}}/messageTeamManagement/">Message
-		{{team.name}}'s Management</a>
-	      </li>
-	      {% endif %}
 	      {% if owner %}
 	      <li>
-		<a href="/team/{{team.id}}/viewManagement/">Change
-		Management</a>
+		<a href="/users/{{user.id}}/viewMessages/received/10/">View Messages</a>
 	      </li>
-	      {% endif %}
-	      
+	      <li>
+		<a href="{% url auth_password_change %}">Change Password</a>
+	      </li>
+	      <li>
+		<a href="{% url auth_logout %}">Log Out</a>
+	      </li>
+	      {% endif %}	      
 	    </ul>
 	  </div>
 	  <div class="tab-pane" id="1B">
@@ -69,6 +41,9 @@
 	      </li>
 	      <li>
 		<a href="/allTeams/25/">All Teams </a>
+	      </li>
+	      <li>
+		<a href="/allUsers/25/">All Users </a>
 	      </li>
 	    </ul>
 	  </div>

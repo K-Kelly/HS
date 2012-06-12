@@ -24,7 +24,7 @@
       <tbody>
 	{% for team in all_team_list %}
 	<tr>
-	  <td><center>{{ team.name }}</center></td>
+	  <td><center><a href="/team/{{team.id}}/">{{ team.name }}</a></center></td>
 	  <td><center>{{ team.numLWNeed }}</center></td>
 	  <td><center>{{ team.numCNeed }}</center></td>
 	  <td><center>{{ team.numRWNeed }}</center></td>
@@ -33,18 +33,18 @@
 	  <td><center>{{ team.avgAge }}</center></td>
 	  <td> 
 	    <center>
-	      <a class="btn btn-primary" href="/team/{{ team.id }}">View</a>
+	      <a class="btn btn-primary" href="/team/{{ team.id }}/">View</a>
 	    </center>
 	  </td>
 	</tr>
 	{% endfor %}
-	{% if have_older_messages %}
+	{% if have_previous %}
 	<a class="btn btn-info"
-	href="/allTeams/{{previous_number}}/">Previous Players</a>
+	href="/allTeams/{{previous_number}}/">Previous Teams</a>
 	{% endif %}
-	{% if have_new_messages %}
+	{% if have_next %}
 	<a class="btn btn-info pull-right"
-	href="/allTeams/{{next_number}}/">Next Players</a>
+	href="/allTeams/{{next_number}}/">Next Teams</a>
 	{% endif %}
       </tbody>
     </table>  

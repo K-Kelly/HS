@@ -8,16 +8,19 @@ admin.autodiscover()
 urlpatterns = patterns('wuska.hockey.views',
                        (r'^$', 'index'),   
                        (r'^(?i)index/','index'),
-                       (r'^(?i)profile/','profile'),
-                       (r'^(?i)users/(?P<user_id>\d+)/$','publicProfile'),
+                       (r'^(?i)profile/','profileRedirect'),
+                       (r'^(?i)users/(?P<user_id>\d+)/$','profile'),
                        (r'^(?i)freeAgents/$','viewFreeAgentsRedirect'), 
                        (r'^(?i)freeAgents/(?P<position>\w+)/$','viewFreeAgentsRedirect2'), 
                        (r'^(?i)freeAgents/(?P<position>\w+)/(?P<number>\d+)/$','viewFreeAgents'),                      
                        (r'^(?i)allPlayers/$','viewAllPlayersRedirect'), 
                        (r'^(?i)allPlayers/(?P<position>\w+)/$','viewAllPlayersRedirect2'),       
                        (r'^(?i)allPlayers/(?P<position>\w+)/(?P<number>\d+)/$','viewAllPlayers'),         
-                       (r'^(?i)allTeams/(?P<number>\d+)/$','viewAllTeams'),       
-)
+                       (r'^(?i)allTeams/(?P<number>\d+)/$','viewAllTeams'), 
+                       (r'^(?i)allUsers/(?P<number>\d+)/$','viewAllUsers'), 
+                       (r'^(?i)users/(?P<user_id>\d+)/viewMessages/$', 'userViewMessagesRedirect'),
+                       (r'^(?i)users/(?P<user_id>\d+)/viewMessages/(?P<sent_or_rec>\w+)/(?P<last_message>\d+)/$', 'userViewMessages'),
+                       )
 
 urlpatterns += patterns('wuska.hockey.playerView',
                         (r'^(?i)player/(?P<player_id>\d+)/$', 'viewPlayer'),
@@ -29,7 +32,7 @@ urlpatterns += patterns('wuska.hockey.playerView',
                         (r'^(?i)createPlayer/','createPlayer'),
                         (r'^(?i)creatingPlayer/','creatingPlayer'),
                         (r'^(?i)player/(?P<player_id>\d+)/messagePlayer/$', 'messagePlayer'),
-)
+                        )
 
 urlpatterns += patterns('wuska.hockey.teamView',
                         (r'^(?i)team/(?P<team_id>\d+)/$', 'viewTeam'),
@@ -44,19 +47,19 @@ urlpatterns += patterns('wuska.hockey.teamView',
                         (r'^(?i)team/(?P<team_id>\d+)/viewMessages/$', 'teamViewMessagesRedirect'),
                         (r'^(?i)team/(?P<team_id>\d+)/viewMessages/(?P<sent_or_rec>\w+)/(?P<last_message>\d+)/$', 'teamViewMessages'),
                         (r'^(?i)team/(?P<team_id>\d+)/viewManagement/$', 'viewManagement'),
-)
+                        )
 
 urlpatterns += patterns('',
-     (r'^admin/', include(admin.site.urls)),
-     (r'^accounts/', include('registration.backends.simple.urls')),
+                        (r'^admin/', include(admin.site.urls)),
+                        (r'^accounts/', include('registration.backends.simple.urls')),
                         (r'^(?i)users/(?P<username>\w+)/$','wuska.hockey.views.registration_complete_simple'),
-)
+                        )
 if settings.DEBUG:
     urlpatterns += patterns('',
                             (r'^media/(?P<path>.*)$', 'django.views.static.serve',{'document_root':settings.MEDIA_ROOT}),
-)
+                            )
 
 #urlpatterns += patterns('',
-   #                     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT }),)
+#                     (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT }),)
 
 urlpatterns += staticfiles_urlpatterns()

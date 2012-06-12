@@ -89,6 +89,9 @@
 		<li>
 		  <a href="/allTeams/25/">{% trans "All Teams" %}</a>
 		</li>
+		<li>
+		  <a href="/allUsers/25/">{% trans "All Users" %}</a>
+		</li>
 	      </ul>
 	    </li>
 	    <li class="divider-vertical"></li>
@@ -102,7 +105,7 @@
 	    </a>
 	    <ul class="dropdown-menu">
 	      <li>
-		<a href="/profile/">Profile</a>
+		<a href="/users/{{user.id}}">Profile</a>
 	      </li>
 	      <li>
 		<a href="{% url auth_password_change %}">{% trans "Change Password" %}</a>

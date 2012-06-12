@@ -314,7 +314,7 @@ def teamViewMessages(request, team_id, last_message,sent_or_rec):
     if sent_or_rec == "sent":
         sent = True
     can_manage2 = can_manage(request.user.id,team.owner, team.general_manager1,team.general_manager2)
-    if can_manage:
+    if can_manage2:
         last_message = int(last_message)
         newer_message = last_message - 10
         older_message = last_message + 10
@@ -335,32 +335,33 @@ def teamViewMessages(request, team_id, last_message,sent_or_rec):
         for message in message_list:
             if sent:
                 if message.receiver_team_id != -1:
-                    t = get_object_or_404(Team,pk=message.sender_team_id)
+                    t = get_object_or_404(Team,pk=message.receiver_team_id)
                     from_list.append("Team: ")
                     href_list.append("/team/%d/"%(t.id))
                     name_list.append(t.name)
                 else:
                     from_list.append("Agent: ")
-                    href_list.append("/users/%d/"%(message.sender_user_id))
-                    name_list.append(request.user.username) 
+                    href_list.append("/users/%d/"%(message.receiver_user_id))
+                    rec_user = get_object_or_404(User,pk=message.receiver_user_id)
+                    name_list.append(rec_user.username) 
             else:
                 if message.sender_player_id != -1:
                     p = get_object_or_404(Player,pk=message.sender_player_id)
                     from_list.append("Player: ")
                     href_list.append("/player/%d/"%(p.id))
                     name_list.append(p.name)
-                elif message.sender_team_id != -1:
+                elif message.sender_team_id != -1 and message.sender_team_id != team.id:
                     t = get_object_or_404(Team,pk=message.sender_team_id)
                     from_list.append("Team: ")
                     href_list.append("/team/%d/"%(t.id))
                     name_list.append(t.name)
-                else:
+                elif message.sender_user_id != -1:
                     from_list.append("Agent: ")
                     href_list.append("/users/%d/"%(message.sender_user_id))
                     name_list.append(request.user.username)            
         m_list = zip(message_list,from_list,href_list,name_list)  
         return render_to_response('hockey/teamViewMessages.html', {'team': team, 'user':request.user, 'player_list':player_list, 'team_list':team_list,'can_manage':can_manage2,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':is_owner(team.owner,request.user.id)},context_instance=RequestContext(request))
-    return redirect('team/%s/'%(team_id))  #not a team manager
+    return redirect('/team/%s/'%(team_id))  #not a team manager
 
 
 @login_required
@@ -428,46 +429,52 @@ def viewManagement(request,team_id):
             cd = form.cleaned_data
             gm1_id = cd['gm1_username']
             gm2_id = cd['gm2_username']
-            if gm1_id != -1 and team.general_manager1 == -1:#if not already gm, send msg
-                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
-                title = "General Manager of %s"%(team.name)
-                user = get_object_or_404(User,pk=gm1_id)
-                send_message(title,message,team, user)
-                user.get_profile().teams_gmed.add(team)
-                user.get_profile().teams.add(team)
-            elif gm1_id != team.general_manager1:
+
+            if gm1_id != team.general_manager1 and team.general_manager1 != -1:
                 message_to_old = "You are no longer the General Manager of %s.\n\n This is an automated message"%(team.name)
                 title_to_old = "No Longer General Manager of %s"%(team.name)
                 user = get_object_or_404(User,pk=team.general_manager1)
-                send_message(title_to_old,message_to_old,user)
+                send_message(title_to_old,message_to_old,team,user)
                 user.get_profile().teams_gmed.remove(team)
                 user.get_profile().teams.remove(team)
+                if gm1_id != -1:
+                    message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                    title = "General Manager of %s"%(team.name)
+                    user = get_object_or_404(User,pk=gm1_id)
+                    send_message(title,message,team, user)
+                    user.get_profile().teams_gmed.add(team)
+                    user.get_profile().teams.add(team)
+            elif gm1_id != -1:#if not already gm, send msg
                 message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
                 title = "General Manager of %s"%(team.name)
                 user = get_object_or_404(User,pk=gm1_id)
                 send_message(title,message,team, user)
                 user.get_profile().teams_gmed.add(team)
                 user.get_profile().teams.add(team)
-            if gm2_id != -1 and team.general_manager2 == -1:#if not already gm, send msg
+            
+
+            if gm2_id != team.general_manager2 and team.general_manager2 != -1:
+                message_to_old = "You are no longer the General Manager of %s.\n\n This is an automated message"%(team.name)
+                title_to_old = "No Longer General Manager of %s"%(team.name)
+                user = get_object_or_404(User,pk=team.general_manager2)
+                send_message(title_to_old,message_to_old,team,user)
+                user.get_profile().teams_gmed.remove(team)
+                user.get_profile().teams.remove(team)
+                if gm2_id != -1:
+                    message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
+                    title = "General Manager of %s"%(team.name)
+                    user = get_object_or_404(User,pk=gm2_id)
+                    send_message(title,message,team, user)
+                    user.get_profile().teams_gmed.add(team)
+                    user.get_profile().teams.add(team)
+            elif gm2_id != -1:#if not already gm, send msg
                 message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
                 title = "General Manager of %s"%(team.name)
                 user = get_object_or_404(User,pk=gm2_id)
                 user.get_profile().teams_gmed.add(team)
                 user.get_profile().teams.add(team)                
                 send_message(title,message,team, user)
-            elif gm2_id != team.general_manager2:
-                message_to_old = "You are no longer the General Manager of %s.\n\n This is an automated message"%(team.name)
-                title_to_old = "No Longer General Manager of %s"%(team.name)
-                user = get_object_or_404(User,pk=team.general_manager2)
-                send_message(title_to_old,message_to_old,user)
-                user.get_profile().teams_gmed.remove(team)
-                user.get_profile().teams.remove(team)
-                message = "Congratulations! You are now the General Manager of %s.  \n\n This is an automated message"%(team.name)
-                title = "General Manager of %s"%(team.name)
-                user = get_object_or_404(User,pk=gm2_id)
-                send_message(title,message,team, user)
-                user.get_profile().teams_gmed.add(team)
-                user.get_profile().teams.add(team)
+           
 
             team.general_manager1 = gm1_id
             team.general_manager2 = gm2_id

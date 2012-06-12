@@ -12,39 +12,57 @@
       <thead>
 	<tr>
 	  <th><center>Name</center></th>
-	  <th><center># LW Needed</center></th>
-	  <th><center># C Needed</center></th>
-	  <th><center># RW Needed</center></th>
-	  <th><center># D Needed</center></th>
-	  <th><center># G Needed</center></th>
-	  <th><center>Average Age</center></th>
+	  <th><center>Players</center></th>
+	  <th><center>Teams Owned</center></th>
+	  <th><center>Teams Managed</center></th>
 	  <th><center>Select</center></th>
 	</tr>
       </thead>
       <tbody>
-	{% for team in all_team_list %}
+	{% for name,player_list,teams_owned,teams_gmed in all_user_list %}
 	<tr>
-	  <td><center>{{ team.name }}</center></td>
-	  <td><center>{{ team.numLWNeed }}</center></td>
-	  <td><center>{{ team.numCNeed }}</center></td>
-	  <td><center>{{ team.numRWNeed }}</center></td>
-	  <td><center>{{ team.numDNeed }}</center></td>
-	  <td><center>{{ team.numGNeed }}</center></td>
-	  <td><center>{{ team.avgAge }}</center></td>
+	  <td><center>{{ name }}</center></td>
+	  <td><center>
+	      <ul class="unstyled">
+		{% for player in player_list %}
+		<li>
+		<a href="/player/{{player.id}}/">{{player.name}}</a>
+		{% endfor %}
+		</li>
+	      </ul>
+	  </td></center>
+	  <td><center>
+	      <ul class="unstyled">
+		{% for team in teams_owned %}
+		<li>
+		<a href="/team/{{team.id}}/">{{team.name}}</a>
+		{% endfor %}
+		</li>
+	      </ul>
+	  </td></center>
+	  <td><center>
+	      <ul class="unstyled">
+		{% for team in teams_gmed %}
+		<li>
+		<a href="/team/{{team.id}}/">{{team.name}}</a>
+		{% endfor %}
+		</li>
+	      </ul>
+	  </td></center>
 	  <td> 
 	    <center>
-	      <a class="btn btn-primary" href="/team/{{ team.id }}">View</a>
+	      <a class="btn btn-primary" href="/users/{{ user.id }}/">View</a>
 	    </center>
 	  </td>
 	</tr>
 	{% endfor %}
-	{% if have_older_messages %}
+	{% if have_previous %}
 	<a class="btn btn-info"
-	href="/allTeams/{{previous_number}}/">Previous Players</a>
+	href="/allUsers/{{previous_number}}/">Previous Users</a>
 	{% endif %}
-	{% if have_new_messages %}
+	{% if have_next %}
 	<a class="btn btn-info pull-right"
-	href="/allTeams/{{next_number}}/">Next Players</a>
+	href="/allUsers/{{next_number}}/">Next Users</a>
 	{% endif %}
       </tbody>
     </table>  

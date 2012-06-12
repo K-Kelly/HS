@@ -7,10 +7,13 @@ from django.test.client import Client
 class PlayerTest(TestCase): 
     def setUp(self):
         self.client = Client()
-        self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)
-        self.client.post('/accounts/register/',{'username':'PlayerTest2', 'email':'test@localhosttestregister2.com','password1':'test','password2':'test'},follow=True)
+        self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)        
     
     def test_create_Player(self):
+        response = self.client.get('/allUsers/25/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'viewAllUsers.html')
+        self.assertContains(response,"PlayerTest1")
         #Create Player
         response = self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
         self.assertEqual(response.status_code,200)
@@ -96,7 +99,8 @@ class PlayerTest(TestCase):
         t = get_object_or_404(Team,pk=1)
         self.assertEqual(t.name, 'Team1')
         self.assertEqual(t.owner, 1)
-        self.assertEqual(t.general_manager,-1)
+        self.assertEqual(t.general_manager1,-1)
+        self.assertEqual(t.general_manager2,-1)
         self.assertEqual(t.league_id,-1)
         self.assertEqual(t.arena.name,'Arena1')
         self.assertEqual(t.funds,2000000)
@@ -108,6 +112,11 @@ class PlayerTest(TestCase):
         self.assertEqual(t.numDNeed,6)
         self.assertEqual(t.numGNeed,2)
         self.assertEqual(t.avgAge,0)
+        #Team should be on allTeams pag
+        response = self.client.get('/allTeams/25/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'hockey/viewAllTeams.html')
+        self.assertContains(response,t.name)
         #Team views free agents
         response = self.client.get('/freeAgents/all/25/')
         self.assertEqual(response.status_code,200)
