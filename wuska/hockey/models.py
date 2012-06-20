@@ -38,6 +38,8 @@ class Player(models.Model):
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     free_agent = models.BooleanField()
     messages = models.ManyToManyField('hockey.Message', related_name = 'player_messages')
+    new_message = models.BooleanField()
+    new_contract = models.BooleanField()
     def __unicode__(self):
         return self.name
     

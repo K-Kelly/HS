@@ -85,7 +85,7 @@ def creatingPlayer(request):
         skates = 0
         stick = 0
         free_agent = True
-        player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stick_handling = stick_handling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent)
+        player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stick_handling = stick_handling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent,new_message=False,new_contract=False)
         player.save()
         request.user.get_profile().players.add(player) 
         next = "/player/%s"%(player.pk)
@@ -129,11 +129,13 @@ def viewContracts(request, player_id):
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all() 
     player = get_object_or_404(Player, pk=player_id)
-    owner = False
+    owner = False   
     if player.user_id == request.user.id:
         owner = True
+        player.new_contract = False #owner is viewing contracts
+        player.save()
     contract_list = player.contracts.all() 
-    if request.method == 'POST':
+    if request.method == 'POST' and owner:
         if 'Reject' in request.POST:
             contract_id = request.POST['Reject']
             contract = get_object_or_404(Contract,pk=contract_id)
