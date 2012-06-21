@@ -52,6 +52,19 @@
     </div>
   </div>
   <div class="span9">
+
+  {% if owner %}
+    {% if profile.new_message %}
+  <div class="alert alert-info">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <h4 class="alert-heading">New Message!</h4>
+    You have a new message! <a class="btn btn-info"
+    href="/users/{{profile.id}}/viewMessages/">View Message</a>
+  </div>
+  {% endif %}
+  {% endif %}
+    
+
     {% block content_span9 %}
     
     {% endblock %}

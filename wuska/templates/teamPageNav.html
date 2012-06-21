@@ -32,7 +32,8 @@
 		<a href="/team/{{team.id}}/viewContracts/">Contracts</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/messageTeam/">Message Team</a>
+		<a href="/team/{{team.id}}/messagePlayersOnTeam/">Message
+		Players on Team</a>
 	      </li>
 	      <li>
 		<a href="/team/{{team.id}}/arena/">Arena</a>
@@ -77,6 +78,26 @@
     </div>
   </div>
   <div class="span9">
+  {% if can_manage %}
+    {% if new_message %}
+  <div class="alert alert-info">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <h4 class="alert-heading">New Message!</h4>
+    {{team.name}} has a new message! <a class="btn btn-info"
+    href="/team/{{team.id}}/viewMessages/">View Message</a>
+  </div>
+  {% endif %}
+  {% if contract_status_change %}
+  <div class="alert alert-info">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <h4 class="alert-heading">Contract Status Change!</h4>
+    A contract status has changed! <a class="btn btn-info"
+    href="/team/{{team.id}}/viewContracts/">View Contract</a>
+  </div>
+  {% endif %}
+{% endif %}
+    
+
     {% block content_span9 %}
     
     {% endblock %}

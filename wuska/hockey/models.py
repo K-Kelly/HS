@@ -1,6 +1,6 @@
 from django.db import models
 import datetime
-# Create your models here.
+
 class Player(models.Model):
     team_id = models.IntegerField()
     user_id = models.IntegerField()
@@ -180,6 +180,8 @@ class Team(models.Model):
     numDNeed = models.IntegerField(blank=True,default="-1")
     numGNeed = models.IntegerField(blank=True,default="-1")
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
+    new_message = models.BooleanField()
+    contract_status_change = models.BooleanField()
     def __unicode__(self):
         return self.name
 

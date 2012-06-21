@@ -32,7 +32,7 @@ def profile(request,user_id):
     owner = False
     if request.user.id == int(user_id):
         owner = True
-    return render_to_response('profile.html', {'user':request.user,'player_list':player_list, 'team_list':team_list,'owner':owner})
+    return render_to_response('profile.html', {'user':request.user,'player_list':player_list, 'team_list':team_list,'owner':owner,'profile':profile})
 
 @login_required
 def viewMessages(request, player_id):
@@ -124,6 +124,8 @@ def userViewMessages(request, user_id, last_message,sent_or_rec):
     if request.user.id == int(user_id):
         owner = True
     if owner:
+        profile.new_message = False
+        profile.save()
         last_message = int(last_message)
         newer_message = last_message - 10
         older_message = last_message + 10
@@ -173,9 +175,10 @@ def userViewMessages(request, user_id, last_message,sent_or_rec):
                 elif message.sender_user_id != -1 and message.sender_user_id != user_id:
                     from_list.append("Agent: ")
                     href_list.append("/users/%d/"%(message.sender_user_id))
-                    name_list.append(request.user.username)            
+                    send_user = get_object_or_404(User,pk=message.sender_user_id)
+                    name_list.append(send_user.username)            
         m_list = zip(message_list,from_list,href_list,name_list)  
-        return render_to_response('userViewMessages.html', {'user':request.user,'owner':owner, 'player_list':player_list, 'team_list':team_list,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent},context_instance=RequestContext(request))
+        return render_to_response('userViewMessages.html', {'user':request.user,'owner':owner, 'player_list':player_list, 'team_list':team_list,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'profile':profile},context_instance=RequestContext(request))
     return redirect('/users/%s/'%(user_id))  #user is attempting to access other user's messages
 
 

@@ -13,6 +13,7 @@ class UserProfile(models.Model):
     teams = models.ManyToManyField(Team, related_name='UserProfile_teams')
     pucks = models.IntegerField(default = 300)
     messages = models.ManyToManyField(Message, related_name='UserProfile_messages')
+    new_message = models.BooleanField()
     def __unicode__(self):
         return "%s's profile" % self.user
 

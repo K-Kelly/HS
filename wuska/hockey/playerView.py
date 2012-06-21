@@ -15,16 +15,15 @@ def index(request):
 
 @login_required
 def viewPlayer(request, player_id):
-    p = get_object_or_404(Player, pk=player_id)
+    player = get_object_or_404(Player, pk=player_id)
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
     can_upgrade = False
-    if p.upgrades > 0 :
+    if player.upgrades > 0 :
         can_upgrade = True
-    owner = False
-    if request.user.id == p.user_id:
-        owner = True
-    return render_to_response('hockey/viewPlayer.html', {'player': p, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner)},context_instance=RequestContext(request))
+    owner = True if request.user.id == player.user_id else False
+
+    return render_to_response('hockey/viewPlayer.html', {'player': player, 'user':request.user, 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner),'new_message':player.new_message, 'new_contract':player.new_contract},context_instance=RequestContext(request))
 
 
 @login_required
@@ -139,6 +138,9 @@ def viewContracts(request, player_id):
         if 'Reject' in request.POST:
             contract_id = request.POST['Reject']
             contract = get_object_or_404(Contract,pk=contract_id)
+            team = get_object_or_404(Team,pk=contract.team_id)
+            team.contract_status_change = True
+            team.save()
             if contract.player_id == player_id:
                 contract.delete()
         elif 'Accept' in request.POST:
@@ -166,6 +168,7 @@ def viewContracts(request, player_id):
             team_age_sum += player.age
             team.players.add(player)
             team.avgAge = team_age_sum / team.players.count() 
+            team.contract_status_change = True
             team.save()
             player.salary=contract.salary
             player.team_id = contract.team_id
@@ -177,7 +180,7 @@ def viewContracts(request, player_id):
             contract.is_accepted = True
             contract.save()
             return redirect('/player/%s' %(player_id))          
-    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner,'can_manage':can_manage_by_num_teams(team_list),'show_manage':False},context_instance=RequestContext(request))
+    return render_to_response('hockey/viewContractOffersPlayer.html',{'user':request.user,'player':player,'player_list':player_list, 'team_list':team_list, 'contract_list':contract_list, 'owner':owner,'can_manage':can_manage_by_num_teams(team_list),'show_manage':False,'new_message':player.new_message, 'new_contract':player.new_contract},context_instance=RequestContext(request))
 
 @login_required
 def viewMessagesRedirect(request, player_id):
@@ -190,8 +193,10 @@ def viewMessages(request, player_id, last_message,sent_or_rec):
     sent = False
     #if sent_or_rec == "sent":#Players don't currently "send" messages, so shouldn't show "Go To Sent Button"
     #    sent = True
-    owner = False
     if request.user.id == player.user_id:
+        if player.new_message:
+            player.new_message = False
+            player.save()
         last_message = int(last_message)
         newer_message = last_message - 10
         older_message = last_message + 10
@@ -225,7 +230,7 @@ def viewMessages(request, player_id, last_message,sent_or_rec):
                 href_list.append("/users/%d/"%(message.sender_user_id))
                 name_list.append(request.user.username)            
         m_list = zip(message_list,from_list,href_list,name_list)  
-        return render_to_response('hockey/playerViewMessages.html', {'player': player, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':False,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':True, 'not_owner':False},context_instance=RequestContext(request))
+        return render_to_response('hockey/playerViewMessages.html', {'player': player, 'user':request.user, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':False,'message_list':m_list,'older_message':older_message,'newer_message':newer_message,'have_new_messages':have_new_messages,'have_older_messages':have_older_messages,'sent':sent,'owner':True, 'not_owner':False,'new_message':player.new_message, 'new_contract':player.new_contract},context_instance=RequestContext(request))
     return redirect('player/%s/'%(player_id))  #not owner of player
 
 @login_required
@@ -239,6 +244,7 @@ def messagePlayer(request, player_id):
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
     player = get_object_or_404(Player, pk=player_id)
+    owner = True if player.user_id == request.user.id else False
     if request.method == 'POST':
         form_get = message_player(team_list)
         form = form_get(request.POST)
@@ -252,23 +258,20 @@ def messagePlayer(request, player_id):
             message.receiver_players.add(player)
             message.save()
             player.messages.add(message)
+            player.new_message = True
             player.save()
             can_upgrade = False
             if player.upgrades > 0 :
                 can_upgrade = True
-            owner = False
-            if player.id == request.user.id:
-                owner = True
             alert="Message sent to %s." %(player.name)
-            return render_to_response('hockey/viewPlayer.html', {'player':player, 'user':request.user,'owner':owner, 'not_owner':not(owner), 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':False, 'alert_success':True,'alert_message':alert},context_instance=RequestContext(request))
+            return render_to_response('hockey/viewPlayer.html', {'player':player, 'user':request.user,'owner':owner, 'not_owner':not(owner), 'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':True, 'alert_success':True,'alert_message':alert, 'new_message':player.new_message, 'new_contract':player.new_contract},context_instance=RequestContext(request))
         else:
             form = message_player(team_list)
             form = form(request.POST)
-            return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':False}, context_instance=RequestContext(request))
+            return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':True,'new_message':player.new_message, 'new_contract':player.new_contract,'owner':owner}, context_instance=RequestContext(request))
     else:
         form = message_player(team_list)
-        return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':False}, context_instance=RequestContext(request))
-
+        return render_to_response('hockey/messagePlayer.html',{'form':form, 'user':request.user, 'player':player,'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list),'show_manage':True,'new_message':player.new_message, 'new_contract':player.new_contract,'owner':owner}, context_instance=RequestContext(request))
 
 
 
@@ -277,6 +280,7 @@ def can_manage(request_user_id,team_owner, team_general_manager1, team_general_m
         return True
     return False 
 
+# a user is a team manager if the number of teams in their profile is > 0
 def can_manage_by_num_teams(team_list):
     if team_list.count() >0:
         return True
