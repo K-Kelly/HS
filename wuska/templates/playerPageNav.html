@@ -34,9 +34,6 @@
 		<a href="/player/{{player.id}}/viewContracts/">Contract Offers</a>
 	      </li>
 	      <li>
-		<a href="/player/{{player.id}}/viewMessages/">Messages</a>
-	      </li>
-	      <li>
 		<a href="/player/{{player.id}}/buyEquipment/">Buy
 		  Equipment</a>
 	      </li>
@@ -85,14 +82,6 @@
 
   <div class="span9">
 {% if owner %}
-  {% if new_message %}
-  <div class="alert alert-info">
-    <a class="close" data-dismiss="alert" href="#">x</a>
-    <h4 class="alert-heading">New Message!</h4>
-    {{player.name}} has a new message! <a class="btn btn-info"
-    href="/player/{{player.id}}/viewMessages/">View Message</a>
-  </div>
-  {% endif %}
   {% if new_contract %}
   <div class="alert alert-info">
     <a class="close" data-dismiss="alert" href="#">x</a>

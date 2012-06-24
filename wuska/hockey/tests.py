@@ -296,3 +296,29 @@ class PlayerTest(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,"hockey/viewAllUsers.html")
         """
+
+class MessageTest(TestCase): 
+    def setUp(self):
+        self.client = Client()
+        self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)      
+        self.client.post('/createTeam/',{'name':'Team1','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
+        self.client.post('/accounts/register/',{'username':'PlayerTest2', 'email':'test@localhosttestregister2.com','password1':'test','password2':'test'},follow=True)  
+        self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
+        self.client.post('/creatingPlayer/',{'name':'TestPlayer2','position':'R','height':'70','weight':'180'},follow=True)
+        self.client.post('/createTeam/',{'name':'Team2','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
+        
+    
+    def test_message(self):
+        title = "Test Title"
+        body = "Test Body"
+        
+
+
+        response = self.client.get('/allUsers/25/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'viewAllUsers.html')
+        self.assertContains(response,"PlayerTest1")
+        #Create Player
+        response = self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'hockey/viewPlayer.html')

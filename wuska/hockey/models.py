@@ -37,8 +37,6 @@ class Player(models.Model):
     stick = models.IntegerField()
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     free_agent = models.BooleanField()
-    messages = models.ManyToManyField('hockey.Message', related_name = 'player_messages')
-    new_message = models.BooleanField()
     new_contract = models.BooleanField()
     def __unicode__(self):
         return self.name
@@ -108,14 +106,16 @@ class Contract(models.Model):
 
 class Message(models.Model):
     sender_user_id = models.IntegerField()
+    sender_cc_users = models.ManyToManyField('accounts.UserProfile',related_name='sender_cc_users')
     sender_player_id = models.IntegerField(blank=True, default="-1")
     sender_team_id = models.IntegerField(blank=True, default="-1")
-    receiver_players = models.ManyToManyField(Player, related_name = 'receiver_players')
-    receiver_team_id = models.IntegerField(blank=True, default="-1")
-    receiver_user_id = models.IntegerField(blank=True, default="-1")
+    concerning_players = models.ManyToManyField(Player, related_name = 'concerning_players')
+    concerning_teams = models.ManyToManyField('hockey.Team', related_name = 'concerning_teams')
+    receiver_users = models.ManyToManyField('accounts.UserProfile',related_name = 'receiver_users')
     title = models.CharField(max_length = 100)
     body = models.CharField(max_length = 2000)
-    
+    is_automated = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.title
     
@@ -173,14 +173,12 @@ class Team(models.Model):
     salary_used = models.IntegerField()
     salary_left = models.IntegerField()
     contracts = models.ManyToManyField(Contract, related_name = 'team_contracts')
-    messages = models.ManyToManyField('hockey.Message', related_name = 'team_messages')
     numLWNeed = models.IntegerField(blank=True,default="-1")
     numCNeed = models.IntegerField(blank=True,default="-1")
     numRWNeed = models.IntegerField(blank=True,default="-1")
     numDNeed = models.IntegerField(blank=True,default="-1")
     numGNeed = models.IntegerField(blank=True,default="-1")
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
-    new_message = models.BooleanField()
     contract_status_change = models.BooleanField()
     def __unicode__(self):
         return self.name

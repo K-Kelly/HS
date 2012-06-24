@@ -96,7 +96,7 @@
 	    </li>
 	    <li class="divider-vertical"></li>
 	  </ul>
-	  <div class="btn-group pull-right">
+	  <div class="pull-right">
 	    <a class="btn dropdown-toggle" data-toggle="dropdown"
 	       href="#">
 	      <i class="icon-user"></i>
@@ -115,6 +115,17 @@
 		<a href="{% url auth_logout %}">{% trans "Log Out"%}</a>
 	      </li>	      
 	    </ul>
+	    <div class="btn-group pull-right">
+	    <a class="btn"
+	       href="/users/{{user.id}}/viewMessages/received/10/">
+	      &nbsp<i class="icon-envelope"></i>
+	      {% if profile.new_message %}
+	      !
+	      {% else %}
+	      &nbsp
+	      {% endif %}
+	    </a>
+	    </div>
 	  </div>
 	</div>
       </div>
@@ -168,11 +179,21 @@
 	
     </div>
   </div>
-
-    <div id="footer">
-        {% block footer %}
-        
-        {% endblock %}
+  <BR/><BR/>
+    <div class="container" id="footer">
+      <footer class="footer">
+	<p class="pull-right">
+	  <a href="#"><i class="icon-chevron-up"></i>
+	    Top
+	  </a>
+	</p>
+        <p>
+	  Icons are from
+	  <a href="http://glyphicons.com">Glyphicons Free</a>
+	  , licensed under
+	  <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
+	</p>
+      </footer>
     </div>
 
 <script src="http://code.jquery.com/jquery-1.5.2.min.js">

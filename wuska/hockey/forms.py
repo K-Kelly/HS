@@ -14,7 +14,7 @@ def get_management_form(gm1_name,gm2_name,owner_id):
         gm2_username = forms.CharField(max_length=50,label="Username of the Assistant General Manager",initial=gm2_name,required=False)
 
         def clean_gm1_username(self):
-            data = self.cleaned_data['gm1_username']
+            data = self.cleaned_data['gm1_username']           
             if data == "":
                 return -1
             else:
@@ -37,6 +37,14 @@ def get_management_form(gm1_name,gm2_name,owner_id):
                     return gm2.id
                 except ObjectDoesNotExist:
                     raise forms.ValidationError("Unable to find user %s"%(data))
+
+        def clean(self):
+            cleaned_data = super(TeamManagementForm,self).clean()
+            gm1 = cleaned_data.get("gm1_username")
+            gm2 = cleaned_data.get("gm2_username")
+            if gm1 == gm2 and gm1 != -1:
+                raise forms.ValidationError("Management Change Unsuccessful: The General Manager and Assistant General Manager can't be the same user!")
+            return cleaned_data
 
     return TeamManagementForm
 

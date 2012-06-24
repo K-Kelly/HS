@@ -10,14 +10,7 @@
   <strong>Success! </strong>{{alert_message}}
 </div>
 {% endif %}
-
-{% if not_owner %}
-<div class="alert alert-info">
-  <button class="close" data-dismiss="alert"
-	  type="button">x</button>
-  You are not the agent of this Player!
-</div>
-{% else %}
+{% if owner %}
  {% if can_upgrade %}
 <div class="alert alert-success">
   <button class="close" data-dismiss="alert"
