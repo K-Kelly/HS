@@ -6,11 +6,11 @@
 <div class="row-fluid">
   <div class="span3"></div>
   <div class="span9">
-    <h3>Create Your Player!</h3>
     {% if error %}
     <p style="color:red;">Please make sure all fields are filled out.</p>
     {% endif %}
     <form class="well" action="/creatingPlayer/" method="post">{% csrf_token %}
+          <h3>Create Your Player!</h3>
       <label for="name">Name:</label>
       <input type="text" name="name" id="name"/>
       <BR>

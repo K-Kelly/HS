@@ -60,12 +60,13 @@ def viewAllPlayersRedirect2(request,position):
     return redirect("/allPlayers/%s/25/"%(position))
 @login_required
 def viewAllPlayers(request, position, number):
-    number,have_previous,have_next,previous_number,next_number = pagination_vars(number,25,Player.objects.count())
+    number,have_previous,have_next,previous_number,next_number = pagination_vars(number,25,Player.objects.all().count())
 
     if position == "L" or position == "C" or position == "R" or position == "D" or position == "G":
         all_player_list = Player.objects.filter(position = position).order_by('-level','name')[(previous_number):number]
     else:
         all_player_list = Player.objects.order_by('-level','name')[(previous_number):number]
+
     profile = request.user.get_profile()
     player_list = profile.players.all()
     team_list = profile.teams.all()
@@ -134,7 +135,7 @@ def userViewMessages(request, user_id, last_message,sent_or_rec):
         is_automated_list = []
         if sent:
             message_list = profile.messages.filter(sender_user_id = profile.id).order_by('-id')[(newer_message):last_message]
-            num_messages = profilemessages.filter(sender_user_id = profile.id).count()
+            num_messages = profile.messages.filter(sender_user_id = profile.id).count()
         else:
             message_list = profile.messages.filter(receiver_users__id__exact=profile.id).order_by('-id')[(newer_message):last_message]
             num_messages = profile.messages.filter(receiver_users__id__exact=profile.id).order_by('-id').count()
@@ -179,16 +180,20 @@ def userViewMessages(request, user_id, last_message,sent_or_rec):
 def pagination_vars(number,per_page,max_number):
     number = int(number)
     have_previous = False
-    have_next = True
+    have_next = False
     next_number = number + per_page
     previous_number = number - per_page
-    if number > per_page:
-        have_previous = True
-    elif number > max_number:
+    if max_number > number:
+        have_next = True
+    if number >= max_number:
         have_next = False
+        have_previous = True
         number = max_number
     elif number < 0:
         number = 0
+        have_previous = False
+    if number <=25:
+        have_previous = False
     return number,have_previous,have_next,previous_number,next_number
 
 def send_message(title,body,sender_user_id,sender_cc_users,sender_player_id,sender_team_id,concerning_players,concerning_teams,receiver_users,is_automated):

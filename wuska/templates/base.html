@@ -14,6 +14,35 @@
 	.sidebar-nav {
         padding: 9px 0;
 	}
+	.sidebar-nav-fixed {
+        padding: 9px 0;
+	}
+	.sidebar-nav-fixed {
+	position:fixed;
+	top:60px;
+	width:21.97%;
+	}
+
+	@media (max-width: 767px) {
+	.sidebar-nav-fixed {
+        position:static;
+        width:auto;
+	}
+	body {
+        padding-top: 0px;
+        padding-bottom: 40px;
+	}
+	}
+
+	@media (max-width: 979px) {
+	.sidebar-nav-fixed {
+        top:70px;
+	}
+	body {
+        padding-top: 0px;
+        padding-bottom: 40px;
+	}
+	}
       </style>
       <script src="/media/less.min.js" type="text/javascript"></script>
       <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"type="text/javascript"></script>
@@ -116,13 +145,15 @@
 	      </li>	      
 	    </ul>
 	    <div class="btn-group pull-right">
-	    <a class="btn"
-	       href="/users/{{user.id}}/viewMessages/received/10/">
-	      &nbsp<i class="icon-envelope"></i>
+	    
 	      {% if profile.new_message %}
-	      !
+	      <a class="btn btn-warning"
+	       href="/users/{{user.id}}/viewMessages/received/10/">
+	      &nbsp<i class="icon-envelope"></i><i class="icon-exclamation-sign"></i>
 	      {% else %}
-	      &nbsp
+	      <a class="btn"
+	       href="/users/{{user.id}}/viewMessages/received/10/">
+	      &nbsp<i class="icon-envelope"></i>&nbsp
 	      {% endif %}
 	    </a>
 	    </div>

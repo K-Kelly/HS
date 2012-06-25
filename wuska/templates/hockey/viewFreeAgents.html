@@ -54,20 +54,20 @@
 	  <td><center>{{ player.age }}</center></td>
 	  <td><center>{{ player.level }}</center></td>
 	  <td> 
-	    <center><a class="btn btn-primary" href="/player/{{ player.id }}">View</a></center>
+	    <center><a class="btn btn-primary" href="/player/{{player.id }}">View {{player.name}}</a></center>
 	  </td>
 	</tr>
 	{% endfor %}
-	{% if have_older_messages %}
+      </tbody>
+    </table>  
+	{% if have_previous %}
 	<a class="btn btn-info"
 	   href="/freeAgents/{{position}}/{{previous_number}}/">Previous Players</a>
 	{% endif %}
-	{% if have_new_messages %}
+	{% if have_next %}
 	<a class="btn btn-info pull-right"
 	   href="/freeAgents/{{position}}/{{next_number}}/">Next Players</a>
 	{% endif %}
-      </tbody>
-    </table>  
   </div>
-</di>
+</div>
 {% endblock %}

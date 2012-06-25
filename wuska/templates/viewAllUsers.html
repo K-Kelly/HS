@@ -6,7 +6,6 @@
   <div class="span2">
    
   </div>
-  
   <div class="span9">
     <table class="table table-striped table-condensed">
       <thead>
@@ -56,16 +55,16 @@
 	  </td>
 	</tr>
 	{% endfor %}
-	{% if have_previous %}
-	<a class="btn btn-info"
-	href="/allUsers/{{previous_number}}/">Previous Users</a>
-	{% endif %}
-	{% if have_next %}
-	<a class="btn btn-info pull-right"
-	href="/allUsers/{{next_number}}/">Next Users</a>
-	{% endif %}
       </tbody>
     </table>  
+    {% if have_previous %}
+    <a class="btn btn-info"
+       href="/allUsers/{{previous_number}}/">Previous Users</a>
+    {% endif %}
+    {% if have_next %}
+    <a class="btn btn-info pull-right"
+       href="/allUsers/{{next_number}}/">Next Users</a>
+    {% endif %}
   </div>
-</di>
+</div>
 {% endblock %}

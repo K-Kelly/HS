@@ -33,11 +33,13 @@
 	  <td><center>{{ team.avgAge }}</center></td>
 	  <td> 
 	    <center>
-	      <a class="btn btn-primary" href="/team/{{ team.id }}/">View</a>
+	      <a class="btn btn-primary" href="/team/{{ team.id }}/">View {{team.name}}</a>
 	    </center>
 	  </td>
 	</tr>
 	{% endfor %}
+      </tbody>
+    </table>  
 	{% if have_previous %}
 	<a class="btn btn-info"
 	href="/allTeams/{{previous_number}}/">Previous Teams</a>
@@ -46,8 +48,6 @@
 	<a class="btn btn-info pull-right"
 	href="/allTeams/{{next_number}}/">Next Teams</a>
 	{% endif %}
-      </tbody>
-    </table>  
   </div>
-</di>
+</div>
 {% endblock %}
