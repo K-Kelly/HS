@@ -9,7 +9,7 @@
     {% if form.errors %}
     {{ form.errors|bootstrap }}
     {% endif %}
-    <form class="well" action ="" method="post">{% csrf_token %}
+    <form class="well" action="" method="post">{% csrf_token %}
       <legend>{% trans 'Create Team' %}</legend>
       {{ form|bootstrap }}
       <button class="btn btn-primary" type="submit"> {% trans 'Create Team' %}</button>

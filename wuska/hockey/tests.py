@@ -15,14 +15,17 @@ class PlayerTest(TestCase):
         self.assertTemplateUsed(response,'viewAllUsers.html')
         self.assertContains(response,"PlayerTest1")
         #Create Player
-        response = self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
+        response = self.client.post('/createPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'hockey/viewPlayer.html')
+        response = self.client.get('/Player/1/')
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
         p = get_object_or_404(Player,pk = 1)
         #Compare created player to itself after being retrieved
         self.assertEqual(p.name, "TestPlayer1")
         self.assertEqual(p.team_id, -1)
-        self.assertEqual(p.user_id, 1)
+        self.assertEqual(p.user_id, 2)
         self.assertEqual(p.upgrades, 10)
         self.assertEqual(p.level, 1)
         self.assertEqual(p.experience, 0)
@@ -96,9 +99,9 @@ class PlayerTest(TestCase):
         #Create Team
         response = self.client.post('/createTeam/',{'name':'Team1','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
         self.assertEqual(response.status_code,200)
-        t = get_object_or_404(Team,pk=1)
+        t = get_object_or_404(Team,name="Team1")
         self.assertEqual(t.name, 'Team1')
-        self.assertEqual(t.owner, 1)
+        self.assertEqual(t.owner, 2)
         self.assertEqual(t.general_manager1,-1)
         self.assertEqual(t.general_manager2,-1)
         self.assertEqual(t.league_id,-1)
@@ -131,12 +134,12 @@ class PlayerTest(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertContains(response,"Ensure this value is less than or equal to 10.")
         #offer valid contract
-        response = self.client.post('/player/1/offerContract/',{'team':'1','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
+        response = self.client.post('/player/1/offerContract/',{'team':'3','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewTeam.html')
         
         #contract should appear on team's contract page
-        response = self.client.get('/team/1/viewContracts/',follow=True)
+        response = self.client.get('/team/3/viewContracts/',follow=True)
         self.assertContains(response,"Offered")
         
         #Player rejects invalid contract
@@ -150,77 +153,56 @@ class PlayerTest(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
         p = get_object_or_404(Player,pk = 1)
-        self.assertEqual(p.team_id,1)
+        self.assertEqual(p.team_id,3)
         self.assertEqual(p.salary,1000000)
         self.assertEqual(p.contract_end,2)
         self.assertEqual(p.free_agent,False)
-        t = get_object_or_404(Team,pk=1)
+        t = get_object_or_404(Team,pk=3)
         self.assertEqual(t.salary_used,1000000)
         self.assertEqual(t.salary_left,(2000000-1000000))
         self.assertEqual(t.numLWNeed,3)
 
         #team contract page should should contract accepted
-        response = self.client.get('/team/1/viewContracts/',follow=True)
+        response = self.client.get('/team/3/viewContracts/',follow=True)
         self.assertContains(response,"Accepted")
         
         #Attempt to offer contract to non-Free agent player
-        response = self.client.post('/player/1/offerContract/',{'team':'1','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
+        response = self.client.post('/player/1/offerContract/',{'team':'3','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/offerPlayerContract.html')
-
 
         #message Players on Team
         title1="Message to Team"
         body1="Message Body to Team"
-        response = self.client.post('/team/1/messagePlayersOnTeam/',{'title':title1,'body':body1},follow=True)
+        response = self.client.post('/team/3/messagePlayersOnTeam/',{'title':title1,'body':body1},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewTeam.html')
         #check message correct
-        m = get_object_or_404(Message,pk=1)
-        self.assertEqual(m.sender_user_id,1)
+        m = get_object_or_404(Message,pk=3)
+        self.assertEqual(m.sender_user_id,2)
         self.assertEquals(title1,m.title)
         self.assertEquals(body1,m.body)
-        p = get_object_or_404(Player,pk = 1)
-        p1_message = p.messages.all()[0]
-        self.assertEquals(p1_message,m)
         
         #Team messages one player
         title2="Message to Player"
         body2="Message Body to Player"
-        response = self.client.post('/player/1/messagePlayer/',{'team_field':'1','title':title2,'body':body2},follow=True)
+        response = self.client.post('/player/1/messagePlayer/',{'team_field':'3','title':title2,'body':body2},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
-        m = get_object_or_404(Message,pk=2)
-        self.assertEqual(m.sender_user_id,1)
+        m = get_object_or_404(Message,pk=4)
+        self.assertEqual(m.sender_user_id,2)
         self.assertEquals(title2,m.title)
         self.assertEquals(body2,m.body)
-        p = get_object_or_404(Player,pk = 1)
-        p1_message = p.messages.all()[1]
-        self.assertEquals(p1_message,m)
 
         #No Team messages one player
         response = self.client.post('/player/1/messagePlayer/',{'team_field':'-1','title':title2,'body':body2},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
-        m = get_object_or_404(Message,pk=3)
-        self.assertEqual(m.sender_user_id,1)
+        m = get_object_or_404(Message,pk=5)
+        self.assertEqual(m.sender_user_id,2)
         self.assertEquals(title2,m.title)
         self.assertEquals(body2,m.body)
-        p = get_object_or_404(Player,pk = 1)
-        p1_message = p.messages.all()[2]
-        self.assertEquals(p1_message,m)
-
-        #player views messages
-        response = self.client.get('/player/1/viewMessages/received/10/')
-        self.assertEqual(response.status_code,200)
-        self.assertTemplateUsed(response,'hockey/playerViewMessages.html')
-        self.assertContains(response,title1)
-        self.assertContains(response,body1)
-        self.assertContains(response,title2)
-        self.assertContains(response,body2,count=2)
         
-        #team adds general manager
-        #response = self.client.post('/team/1/management/',{'username':title1},follow=True)
 
     def test_view_free_agents_all_players(self):       
         response = self.client.post('/freeAgents/',follow=True)
@@ -300,25 +282,15 @@ class PlayerTest(TestCase):
 class MessageTest(TestCase): 
     def setUp(self):
         self.client = Client()
-        self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)      
-        self.client.post('/createTeam/',{'name':'Team1','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
-        self.client.post('/accounts/register/',{'username':'PlayerTest2', 'email':'test@localhosttestregister2.com','password1':'test','password2':'test'},follow=True)  
-        self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
-        self.client.post('/creatingPlayer/',{'name':'TestPlayer2','position':'R','height':'70','weight':'180'},follow=True)
-        self.client.post('/createTeam/',{'name':'Team2','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
+        self.client.post('/accounts/register/',{'username':'UserTest2', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)      
+        self.client.post('/createTeam/',{'name':'TeamTest1','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
+        self.client.post('/accounts/register/',{'username':'UserTest2', 'email':'test@localhosttestregister2.com','password1':'test','password2':'test'},follow=True)  
+        self.client.post('/creatingPlayer/',{'name':'PlayerTest1','position':'L','height':'70','weight':'180'},follow=True)
+        self.client.post('/creatingPlayer/',{'name':'PlayerTest2','position':'R','height':'70','weight':'180'},follow=True)
+        self.client.post('/createTeam/',{'name':'TeamTest2','abbreviation':'TEA','arena_name':'Arena1'},follow=True)
         
     
     def test_message(self):
         title = "Test Title"
         body = "Test Body"
-        
 
-
-        response = self.client.get('/allUsers/25/')
-        self.assertEqual(response.status_code,200)
-        self.assertTemplateUsed(response,'viewAllUsers.html')
-        self.assertContains(response,"PlayerTest1")
-        #Create Player
-        response = self.client.post('/creatingPlayer/',{'name':'TestPlayer1','position':'L','height':'70','weight':'180'},follow=True)
-        self.assertEqual(response.status_code,200)
-        self.assertTemplateUsed(response,'hockey/viewPlayer.html')

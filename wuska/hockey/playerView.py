@@ -24,12 +24,59 @@ def viewPlayer(request, player_id):
 
     return render_to_response('hockey/viewPlayer.html', {'player': player, 'user':request.user, 'profile':request.user.get_profile(),'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner), 'new_contract':player.new_contract},context_instance=RequestContext(request))
 
-
 @login_required
 def createPlayer(request):
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
-    return render_to_response('hockey/createPlayer.html', {'user':request.user, 'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
+    if request.method == 'POST':
+        form = CreatePlayerForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            name = cd['name']
+            position = cd['position']
+            height = cd['height']
+            weight = cd['weight']
+            team_id = -1 #free agent
+            user_id = request.user.id 
+            upgrades = 10
+            level = 1
+            experience = 0
+            age = 18
+            retired = False
+            salary = 0
+            contract_end = 0
+            no_trade = False
+            style = 1 # need to make user choose this
+            shooting = 1
+            passing = 1
+            stick_handling = 1
+            checking = 1
+            positioning = 1
+            endurance = 1
+            skating = 1
+            strength = 1
+            faceoff = 1
+            fighting = 1
+            awareness = 1
+            leadership = 1
+            helmet = 0
+            gloves = 0
+            shoulder_pads = 0
+            pants = 0
+            skates = 0
+            stick = 0
+            free_agent = True
+            player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stick_handling = stick_handling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent,new_contract=False)
+            player.save()
+            request.user.get_profile().players.add(player) 
+            request.user.get_profile().save()
+            next = "/player/%s/"%(player.pk)
+            return redirect(next)
+        else:
+            form = CreatePlayerForm(request.POST)
+    else:
+        form = CreatePlayerForm()
+    return render_to_response('hockey/createPlayer.html', {'user':request.user, 'profile':request.user.get_profile(),'form':form,'player_list':player_list, 'team_list':team_list},context_instance=RequestContext(request))
 
 @login_required
 def upgradeSkill(request, player_id):
@@ -43,53 +90,6 @@ def upgradeSkill(request, player_id):
             return render_to_response('hockey/no_upgrades.html',)
     else:
         return render_to_response('hockey/no_upgrades.html',)  
-
-@login_required
-def creatingPlayer(request):
-    player_list = request.user.get_profile().players.all()
-    team_list = request.user.get_profile().teams.all()
-    if request.method == 'POST' and 'name' in request.POST and request.POST['name']!="" and 'position' in request.POST and request.POST['position'] and 'height' in request.POST and request.POST['height'] and 'weight' in request.POST and request.POST['weight']:
-        name = request.POST['name']
-        position = request.POST['position']
-        height = request.POST['height']
-        weight = request.POST['weight']  
-        team_id = -1 #free agent
-        user_id = request.user.id 
-        upgrades = 10
-        level = 1
-        experience = 0
-        age = 18
-        retired = False
-        salary = 0
-        contract_end = 0
-        no_trade = False
-        style = 1 # need to make user choose this
-        shooting = 1
-        passing = 1
-        stick_handling = 1
-        checking = 1
-        positioning = 1
-        endurance = 1
-        skating = 1
-        strength = 1
-        faceoff = 1
-        fighting = 1
-        awareness = 1
-        leadership = 1
-        helmet = 0
-        gloves = 0
-        shoulder_pads = 0
-        pants = 0
-        skates = 0
-        stick = 0
-        free_agent = True
-        player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stick_handling = stick_handling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent,new_contract=False)
-        player.save()
-        request.user.get_profile().players.add(player) 
-        next = "/player/%s"%(player.pk)
-        return redirect(next)
-    else:
-        return render_to_response('hockey/createPlayer.html', {'error': True, 'user':request.user, 'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list}, context_instance=RequestContext(request))
 
 def doUpgradeSkill(skill,player):
     if player.upgrades >0:

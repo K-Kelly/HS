@@ -1,4 +1,5 @@
 from django import forms
+from wuska.hockey.models import Player,Team
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from itertools import chain
@@ -7,6 +8,18 @@ class TeamForm(forms.Form):
     name = forms.CharField(max_length=40)
     abbreviation = forms.CharField(max_length=3, min_length=2)
     arena_name = forms.CharField(max_length=40)
+    
+    def clean_name(self):
+        data = self.cleaned_data['name']
+        if data.strip() == "":
+            raise forms.ValidationError("A name consisting of only space(s) is not a valid Team name. Please try again with a different name.")
+        else:
+            num_team = Team.objects.filter(name__iexact=data).count()
+            if num_team == 0:
+                return data
+            else:
+                raise forms.ValidationError("A team named '%s' already exists. Please try again with a different name."%(data))
+        return data
 
 def get_management_form(gm1_name,gm2_name,owner_id):
     class TeamManagementForm(forms.Form):
@@ -177,5 +190,29 @@ def make_edit_lines_form(player_list):
         pk2rd_field = forms.ChoiceField(choices=pp_defense_choices,label='PK2 Right Defense')    
     return EditLinesForm
 
+class CreatePlayerForm(forms.Form):
+    position_list = ["L","C","R","D","G"]
+    height_in = [66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83]
+    height_ft = ["5'6","5'7","5'8","5'9","5'10","5'11","6'0","6'1","6'2","6'3","6'4","6'5","6'6","6'7","6'8","6'9","6'10","6'11"]
+    weight = []
+    i = 165
+    while (i <= 265):
+        weight.append(i)
+        i += 5
 
-
+    name = forms.CharField(max_length=40)
+    position = forms.ChoiceField(choices=zip(position_list,position_list),label='Position')
+    height = forms.ChoiceField(choices=zip(height_in,height_ft),label='Height')
+    weight = forms.ChoiceField(choices=zip(weight,weight),label='Weight')
+   
+    def clean_name(self):
+        data = self.cleaned_data['name']
+        if data.strip() == "":
+            raise forms.ValidationError("A name consisting of only space(s) is not a valid Player name. Please try again with a different name.")
+        else:
+            num_player = Player.objects.filter(name__iexact=data).count()
+            if num_player == 0:
+                return data
+            else:
+                raise forms.ValidationError("A player named '%s' already exists. Please try again with a different name."%(data))
+        return data
