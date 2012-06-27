@@ -104,7 +104,7 @@ class PlayerTest(TestCase):
         self.assertEqual(t.owner, 2)
         self.assertEqual(t.general_manager1,-1)
         self.assertEqual(t.general_manager2,-1)
-        self.assertEqual(t.league_id,-1)
+        #self.assertEqual(t.league_id,-1)
         self.assertEqual(t.arena.name,'Arena1')
         self.assertEqual(t.funds,2000000)
         self.assertEqual(t.salary_used,0)
@@ -137,15 +137,22 @@ class PlayerTest(TestCase):
         response = self.client.post('/player/1/offerContract/',{'team':'3','salary':'1000000','length':'2','no_trade':'True','message':'Message Works'},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewTeam.html')
+
+        #user should receive message notifying them of contract offer
+        response = self.client.get('/users/2/viewMessages/received/10/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'userViewMessages.html')
+        self.assertContains(response,"Team Team1 has offered TestPlayer1 a contract worth 1000000 per season for 2 season(s)" )
         
         #contract should appear on team's contract page
         response = self.client.get('/team/3/viewContracts/',follow=True)
         self.assertContains(response,"Offered")
         
-        #Player rejects invalid contract
+        #Player rejects nonexistant contract
         response = self.client.post('/player/1/viewContracts/',{'Reject':'2'},follow=True)
         self.assertEqual(response.status_code,404)
-        #Player accepts invalid contract
+
+        #Player accepts nonexistant contract
         response = self.client.post('/player/1/viewContracts/',{'Accept':'2'},follow=True)
         self.assertEqual(response.status_code,404)
         #Player accepts valid contract
@@ -161,6 +168,12 @@ class PlayerTest(TestCase):
         self.assertEqual(t.salary_used,1000000)
         self.assertEqual(t.salary_left,(2000000-1000000))
         self.assertEqual(t.numLWNeed,3)
+
+        #user of should send  message notifying the team of accepted offer
+        response = self.client.get('/users/2/viewMessages/received/10/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'userViewMessages.html')
+        self.assertContains(response,"Player TestPlayer1 has accepted your contract offer of 1000000 for 2 season(s)!" )
 
         #team contract page should should contract accepted
         response = self.client.get('/team/3/viewContracts/',follow=True)
@@ -182,10 +195,17 @@ class PlayerTest(TestCase):
         self.assertEqual(m.sender_user_id,2)
         self.assertEquals(title1,m.title)
         self.assertEquals(body1,m.body)
+
+        #user should receive message
+        response = self.client.get('/users/2/viewMessages/received/10/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'userViewMessages.html')
+        self.assertContains(response,"Message Body to Team" )
+
         
         #Team messages one player
         title2="Message to Player"
-        body2="Message Body to Player"
+        body2="Team messages one player"
         response = self.client.post('/player/1/messagePlayer/',{'team_field':'3','title':title2,'body':body2},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
@@ -194,7 +214,14 @@ class PlayerTest(TestCase):
         self.assertEquals(title2,m.title)
         self.assertEquals(body2,m.body)
 
+        #user should receive message
+        response = self.client.get('/users/2/viewMessages/received/10/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'userViewMessages.html')
+        self.assertContains(response,"Team messages one player" )
+
         #No Team messages one player
+        body2 = "No team messages one player"
         response = self.client.post('/player/1/messagePlayer/',{'team_field':'-1','title':title2,'body':body2},follow=True)
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'hockey/viewPlayer.html')
@@ -203,6 +230,11 @@ class PlayerTest(TestCase):
         self.assertEquals(title2,m.title)
         self.assertEquals(body2,m.body)
         
+        #user should receive message notifying them of contract offer
+        response = self.client.get('/users/2/viewMessages/received/10/')
+        self.assertEqual(response.status_code,200)
+        self.assertTemplateUsed(response,'userViewMessages.html')
+        self.assertContains(response,body2 )
 
     def test_view_free_agents_all_players(self):       
         response = self.client.post('/freeAgents/',follow=True)
@@ -294,3 +326,12 @@ class MessageTest(TestCase):
         title = "Test Title"
         body = "Test Body"
 
+
+class TeamTest(TestCase):
+    def setup(self):
+        self.client = Client()
+        self.client.post('/accounts/register/',{'username':'teamTest1','password':'test'},follow=True)      
+
+    def test_team_creation_creates_league(self):
+        response = self.client.get('/index/')
+        print response.content

@@ -17,18 +17,18 @@ class Player(models.Model):
     no_trade = models.BooleanField()
     position = models.CharField(max_length=1)
     style = models.IntegerField()
-    shooting = models.IntegerField()
-    passing = models.IntegerField()
-    stick_handling = models.IntegerField()
-    checking = models.IntegerField()
-    positioning = models.IntegerField()
-    endurance = models.IntegerField()
-    skating = models.IntegerField()
-    strength = models.IntegerField()
-    faceoff = models.IntegerField()
-    fighting = models.IntegerField()
-    awareness = models.IntegerField()
-    leadership = models.IntegerField()
+    shooting = models.DecimalField(max_digits=5,decimal_places=3)
+    passing = models.DecimalField(max_digits=5,decimal_places=3)
+    stick_handling = models.DecimalField(max_digits=5,decimal_places=3)
+    checking = models.DecimalField(max_digits=5,decimal_places=3)
+    positioning = models.DecimalField(max_digits=5,decimal_places=3)
+    endurance = models.DecimalField(max_digits=5,decimal_places=3)
+    skating = models.DecimalField(max_digits=5,decimal_places=3)
+    strength = models.DecimalField(max_digits=5,decimal_places=3)
+    faceoff = models.DecimalField(max_digits=5,decimal_places=3)
+    fighting = models.DecimalField(max_digits=5,decimal_places=3)
+    awareness = models.DecimalField(max_digits=5,decimal_places=3)
+    leadership = models.DecimalField(max_digits=5,decimal_places=3)
     helmet = models.IntegerField()
     gloves = models.IntegerField()
     shoulder_pads = models.IntegerField()
@@ -38,6 +38,7 @@ class Player(models.Model):
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     free_agent = models.BooleanField()
     new_contract = models.BooleanField()
+    datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.name
     
@@ -97,7 +98,7 @@ class Contract(models.Model):
     no_trade = models.BooleanField()
     message = models.CharField(max_length = 2000)
     is_accepted = models.BooleanField()
-    
+    datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return str(self.id)
     
@@ -180,6 +181,7 @@ class Team(models.Model):
     numGNeed = models.IntegerField(blank=True,default="-1")
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
     contract_status_change = models.BooleanField()
+    datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.name
 
@@ -197,11 +199,14 @@ class Team(models.Model):
 class League(models.Model):
     name = models.CharField(max_length=50)
     teams = models.ManyToManyField(Team, related_name = 'league_teams')
-    conference1 = models.ManyToManyField(Team, related_name = 'league_conference1')
-    conference2 = models.ManyToManyField(Team, related_name = 'league_conference2')
-    conference3 = models.ManyToManyField(Team, related_name = 'league_conference3')
-    conference4 = models.ManyToManyField(Team, related_name = 'league_conference4')
+    division1 = models.ManyToManyField(Team, related_name = 'league_division1')
+    division2 = models.ManyToManyField(Team, related_name = 'league_division2')
+    division3 = models.ManyToManyField(Team, related_name = 'league_division3')
+    division4 = models.ManyToManyField(Team, related_name = 'league_division4')
+    division5 = models.ManyToManyField(Team, related_name = 'league_division5')
+    division6 = models.ManyToManyField(Team, related_name = 'league_division6')
     salary_cap = models.IntegerField()
+    datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.name
     
