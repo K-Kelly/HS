@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="row-fluid">
+  <div class="span3">
+    <div class="well sidebar-nav-fixed">
+      <div class="tabbable tabs-left">
+	<ul class="nav nav-tabs">
+	  <li class="active">
+	    <a href="#1A" data-toggle="tab">{{league.name}}</a>
+	  </li>
+	  <li class>
+	    <a href="#1B" data-toggle="tab">Other</a>
+	  </li>
+	</ul>
+	<div class="tab-content">
+	  <div class="tab-pane active" id="1A">
+	    <ul class="nav nav-list">	
+	      <li>
+		<a href="{{ league.get_absolute_url }}">{{league.name}}</a>
+	      </li>
+	      <li>
+		<a href="{{ league.get_absolute_url }}viewSchedule/">Schedule</a>
+	      </li>
+	      <li>
+		<a href="{{ league.get_absolute_url }}standings/">Standings</a>
+	      </li>
+	      <li>
+		<a href="{{ league.get_absolute_url }}statistics/">Statistics</a>
+	      </li>
+	      <li>
+		<a href="{{ league.get_absolute_url }}messageLeague/">Message
+		Teams in League</a>
+	      </li>	      
+	    </ul>
+	  </div>
+	  <div class="tab-pane" id="1B">
+	    <ul class="nav nav-list">	    
+	      <li>
+		<a href="/allPlayers/All/25/">All Players </a>
+	      </li>
+	      <li>
+		<a href="/freeAgents/All/25/">Free Agents </a>
+	      </li>
+	      <li>
+		<a href="/allTeams/25/">All Teams </a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div class="span9">
+    {% block content_span9 %}
+    
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}  

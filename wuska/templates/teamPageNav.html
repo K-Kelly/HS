@@ -23,36 +23,36 @@
 	      </li>
 	      {% if can_manage %}
 	      <li>
-		<a href="/team/{{team.id}}/editLines/">Edit Lines</a>
+		<a href="{{ team.get_absolute_url }}editLines/">Edit Lines</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/viewSchedule/">View Schedule</a>
+		<a href="{{ team.get_absolute_url }}viewSchedule/">View Schedule</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/tactics/">Tactics</a>
+		<a href="{{ team.get_absolute_url }}tactics/">Tactics</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/viewContracts/">Contracts</a>
+		<a href="{{ team.get_absolute_url }}viewContracts/">Contracts</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/messagePlayersOnTeam/">Message
+		<a href="{{ team.get_absolute_url }}messagePlayersOnTeam/">Message
 		Players on Team</a>
 	      </li>
 	      <li>
-		<a href="/team/{{team.id}}/arena/">Arena</a>
+		<a href="{{ team.get_absolute_url }}arena/">Arena</a>
 	      </li>
 	      <li>
 		<a href="/freeAgents/all/25/">View Free Agents </a>
 	      </li>
 	      {% else %}
 	      <li>
-		<a href="/team/{{team.id}}/messageTeamManagement/">Message
+		<a href="{{ team.get_absolute_url }}messageTeamManagement/">Message
 		{{team.name}}'s Management</a>
 	      </li>
 	      {% endif %}
 	      {% if owner %}
 	      <li>
-		<a href="/team/{{team.id}}/viewManagement/">Change
+		<a href="{{ team.get_absolute_url }}viewManagement/">Change
 		Management</a>
 	      </li>
 	      {% endif %}
@@ -83,7 +83,7 @@
     <a class="close" data-dismiss="alert" href="#">x</a>
     <h4 class="alert-heading">Contract Status Change!</h4>
     A contract status has changed! <a class="btn btn-info"
-    href="/team/{{team.id}}/viewContracts/">View Contract</a>
+    href="{{ team.get_absolute_url }}viewContracts/">View Contract</a>
   </div>
   {% endif %}
 {% endif %}

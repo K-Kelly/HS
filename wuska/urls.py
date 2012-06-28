@@ -44,6 +44,10 @@ urlpatterns += patterns('wuska.hockey.teamView',
                         (r'^(?i)team/(?P<team_id>\d+)/viewManagement/$', 'viewManagement'),
                         )
 
+urlpatterns += patterns('wuska.hockey.leagueView',
+                        (r'^(?i)league/(?P<league_id>\d+)/$', 'viewLeague'),
+                        )
+
 urlpatterns += patterns('',
                         (r'^admin/', include(admin.site.urls)),
                         (r'^accounts/', include('registration.backends.simple.urls')),

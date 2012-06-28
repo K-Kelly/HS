@@ -39,6 +39,9 @@ class Player(models.Model):
     free_agent = models.BooleanField()
     new_contract = models.BooleanField()
     datetime = models.DateTimeField(auto_now_add=True)
+    goals = models.ManyToManyField('hockey.Goal',related_name = 'player_goals')
+    assists = models.ManyToManyField('hockey.Goal',related_name = 'player_assists')
+    penalties = models.ManyToManyField('hockey.Penalty',related_name = 'player_penalties')
     def __unicode__(self):
         return self.name
     
@@ -68,7 +71,7 @@ class Arena(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return "/arena/%i" % self.id
+        return "/arena/%i/" % self.id
 
     class Meta:
         ordering = ['name']
@@ -84,7 +87,7 @@ class team_statistics(models.Model):
         return self.year
 
     def get_absolute_url(self):
-        return "/team/%i/statistics/%i" % (self.team_id, self.year)
+        return "/team/%i/statistics/%i/" % (self.team_id, self.year)
 
     class Meta:
         ordering = ['year']
@@ -217,3 +220,44 @@ class League(models.Model):
         ordering = ['name']
 
 
+class Game(models.Model):
+    home_team = models.OneToOneField(Team, related_name = 'game_home_team')
+    away_team = models.OneToOneField(Team, related_name = 'game_away_team')
+    datetime = models.DateTimeField()
+    has_started = models.BooleanField()
+    is_completed = models.BooleanField()
+    winning_team_id = models.IntegerField(default=-1)
+    goals = models.ManyToManyField('hockey.Goal',related_name = 'game_goals')
+    penalty = models.ManyToManyField('hockey.Penalty',related_name = 'game_penalties')
+    
+    def __unicode__(self):
+        return u'%s at %s' % (self.away_team.name,self.home_team.name)
+
+    def get_absolute_url(self):
+        return "/game/%i/" % self.id
+
+class Goal(models.Model):
+    scorer_id = models.IntegerField(default=-1)
+    primary_assist_id = models.IntegerField(default=-1,blank=True)
+    secondary_assist_id = models.IntegerField(default=-1,blank=True)
+    team_id = models.IntegerField(default=-1)
+    time = models.IntegerField(default=-1)
+    period = models.IntegerField(default=-1)
+    game = models.OneToOneField(Game)
+
+    def __unicode__(self):
+        return u'%s(%s,%s) at %s of period %s' % (self.scorer_id,self.primary_assist_id,self.secondary_assist_id, self.time,self.period)
+
+class Penalty(models.Model):
+    player_id = models.IntegerField(default=-1)
+    team_id = models.IntegerField(default=-1)
+    time = models.IntegerField(default=-1)
+    period = models.IntegerField(default=-1)
+    game = models.OneToOneField(Game,related_name = "penalty_game")
+    is_minor = models.BooleanField()
+    is_double_minor = models.BooleanField()
+    is_major = models.BooleanField()
+    description = models.CharField(max_length=35)
+
+    def __unicode__(self):
+        return u'Penalty committed by %s' % (self.player_id)

@@ -24,23 +24,23 @@
 	  <div class="tab-pane active" id="1A">
 	    <ul class="nav nav-list">
 	      <li>
-		<a href="/player/{{player.id}}/">View {{player.name}}</a>
+		<a href="{{ player.get_absolute_url }}">View {{player.name}}</a>
 	      </li>
 	      <li>
 		<a href="/team/{{player.team_id}}/">{{player.name}}'s Team</a>
 	      </li>
 	      {% if owner %}
 	      <li>
-		<a href="/player/{{player.id}}/viewContracts/">Contract Offers</a>
+		<a href="{{ player.get_absolute_url }}viewContracts/">Contract Offers</a>
 	      </li>
 	      <li>
-		<a href="/player/{{player.id}}/buyEquipment/">Buy
+		<a href="{{ player.get_absolute_url }}buyEquipment/">Buy
 		  Equipment</a>
 	      </li>
 	      {% elif can_manage  %}
 	      {% else %}
 	      <li>
-		<a href="/player/{{player.id}}/messagePlayer/">Message
+		<a href="{{ player.get_absolute_url }}messagePlayer/">Message
 		Player</a>
 	      </li>
 	      {% endif %}
@@ -50,10 +50,10 @@
 	    <ul class="nav nav-list">	    
 	      {% if can_manage %}
 	      <li>
-		<a href="/player/{{player.id}}/offerContract/">Offer Contract</a>
+		<a href="{{ player.get_absolute_url }}offerContract/">Offer Contract</a>
 	      </li>		
 	      <li>
-		<a href="/player/{{player.id}}/messagePlayer/">Message Player</a>
+		<a href="{{ player.get_absolute_url }}messagePlayer/">Message Player</a>
 	      </li>
 	      {% else %}
 	      <p> You are not the owner or general manager of any
@@ -87,7 +87,7 @@
     <a class="close" data-dismiss="alert" href="#">x</a>
     <h4 class="alert-heading">New Contract!</h4>
     {{player.name}} has a new contract offer! <a class="btn btn-info"
-    href="/player/{{player.id}}/viewContracts/">View Contract</a>
+    href="{{ player.get_absolute_url }}viewContracts/">View Contract</a>
   </div>
   {% endif %}
 {% endif %}
