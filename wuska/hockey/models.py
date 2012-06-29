@@ -5,18 +5,18 @@ class Player(models.Model):
     team_id = models.IntegerField()
     user_id = models.IntegerField()
     name = models.CharField(max_length = 35)
-    upgrades = models.IntegerField()
-    level = models.IntegerField()
+    upgrades = models.SmallIntegerField()
+    level = models.SmallIntegerField()
     experience = models.IntegerField()
-    age = models.IntegerField()
+    age = models.SmallIntegerField()
     retired = models.BooleanField()
-    height = models.IntegerField()
-    weight = models.IntegerField()
+    height = models.SmallIntegerField()
+    weight = models.SmallIntegerField()
     salary = models.IntegerField()
-    contract_end = models.IntegerField()
+    contract_end = models.SmallIntegerField()
     no_trade = models.BooleanField()
     position = models.CharField(max_length=1)
-    style = models.IntegerField()
+    style = models.SmallIntegerField()
     shooting = models.DecimalField(max_digits=5,decimal_places=3)
     passing = models.DecimalField(max_digits=5,decimal_places=3)
     stick_handling = models.DecimalField(max_digits=5,decimal_places=3)
@@ -29,12 +29,12 @@ class Player(models.Model):
     fighting = models.DecimalField(max_digits=5,decimal_places=3)
     awareness = models.DecimalField(max_digits=5,decimal_places=3)
     leadership = models.DecimalField(max_digits=5,decimal_places=3)
-    helmet = models.IntegerField()
-    gloves = models.IntegerField()
-    shoulder_pads = models.IntegerField()
-    pants = models.IntegerField()
-    skates = models.IntegerField()
-    stick = models.IntegerField()
+    helmet = models.SmallIntegerField()
+    gloves = models.SmallIntegerField()
+    shoulder_pads = models.SmallIntegerField()
+    pants = models.SmallIntegerField()
+    skates = models.SmallIntegerField()
+    stick = models.SmallIntegerField()
     contracts = models.ManyToManyField('hockey.Contract', related_name = 'player_contracts')
     free_agent = models.BooleanField()
     new_contract = models.BooleanField()
@@ -54,19 +54,19 @@ class Player(models.Model):
 class Arena(models.Model):
     name = models.CharField(max_length=50)
     occupancy = models.IntegerField()
-    practice_Facility = models.IntegerField()
-    locker_Room = models.IntegerField()
-    equipment = models.IntegerField()
-    rink = models.IntegerField()
-    concessions = models.IntegerField()
-    lower_bowl = models.IntegerField()
-    mid_bowl = models.IntegerField()
-    upper_bowl = models.IntegerField()
-    box = models.IntegerField()
-    ticket_lower = models.IntegerField()
-    ticket_mid = models.IntegerField()
-    ticket_upper = models.IntegerField()
-    ticket_box = models.IntegerField()
+    practice_Facility = models.SmallIntegerField()
+    locker_Room = models.SmallIntegerField()
+    equipment = models.SmallIntegerField()
+    rink = models.SmallIntegerField()
+    concessions = models.SmallIntegerField()
+    lower_bowl = models.SmallIntegerField()
+    mid_bowl = models.SmallIntegerField()
+    upper_bowl = models.SmallIntegerField()
+    box = models.SmallIntegerField()
+    ticket_lower = models.SmallIntegerField()
+    ticket_mid = models.SmallIntegerField()
+    ticket_upper = models.SmallIntegerField()
+    ticket_box = models.SmallIntegerField()
     def __unicode__(self):
         return self.name
 
@@ -76,28 +76,12 @@ class Arena(models.Model):
     class Meta:
         ordering = ['name']
 
-class team_statistics(models.Model):
-    year = models.IntegerField()
-    team_id = models.ForeignKey('hockey.Team')
-    wins = models.IntegerField()
-    losses = models.IntegerField()
-    points = models.IntegerField()
-    
-    def __unicode__(self):
-        return self.year
-
-    def get_absolute_url(self):
-        return "/team/%i/statistics/%i/" % (self.team_id, self.year)
-
-    class Meta:
-        ordering = ['year']
-
 class Contract(models.Model):
     player_id = models.IntegerField()
     team_id = models.IntegerField()
     team_name = models.CharField(max_length = 35)
     salary = models.IntegerField()
-    length = models.IntegerField()
+    length = models.SmallIntegerField()
     no_trade = models.BooleanField()
     message = models.CharField(max_length = 2000)
     is_accepted = models.BooleanField()
@@ -172,16 +156,15 @@ class Team(models.Model):
     pk2w = models.IntegerField(blank=True, default="-1")
     pk2ld = models.IntegerField(blank=True, default="-1")
     pk2rd = models.IntegerField(blank=True, default="-1")    
-    statistics = models.IntegerField(blank=True,default="-1")
     funds = models.IntegerField()
     salary_used = models.IntegerField()
     salary_left = models.IntegerField()
     contracts = models.ManyToManyField(Contract, related_name = 'team_contracts')
-    numLWNeed = models.IntegerField(blank=True,default="-1")
-    numCNeed = models.IntegerField(blank=True,default="-1")
-    numRWNeed = models.IntegerField(blank=True,default="-1")
-    numDNeed = models.IntegerField(blank=True,default="-1")
-    numGNeed = models.IntegerField(blank=True,default="-1")
+    numLWNeed = models.SmallIntegerField(blank=True,default="-1")
+    numCNeed = models.SmallIntegerField(blank=True,default="-1")
+    numRWNeed = models.SmallIntegerField(blank=True,default="-1")
+    numDNeed = models.SmallIntegerField(blank=True,default="-1")
+    numGNeed = models.SmallIntegerField(blank=True,default="-1")
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
     contract_status_change = models.BooleanField()
     datetime = models.DateTimeField(auto_now_add=True)
@@ -219,16 +202,54 @@ class League(models.Model):
     class Meta:
         ordering = ['name']
 
+class Statistics(models.Model):
+    player_id = models.IntegerField()
+    #To get goals, goal in points.all() if goal.scorer_id = player ...Similar for assists
+    points = models.ManyToManyField('hockey.Goal',related_name = "statistics_goals")
+    penalties = models.ManyToManyField('hockey.Penalty',related_name = "statistics_penalties")
+    
+
+class Season(models.Model):
+    #reg stands for Regular Season, po stands for Playoff
+    team_id = models.IntegerField()
+    league_id = models.IntegerField()
+    reg_games = models.ManyToManyField('hockey.Game',related_name = 'season_reg_games')
+    po_games = models.ManyToManyField('hockey.Game',related_name = 'season_po_games')
+    reg_wins = models.SmallIntegerField()
+    reg_losses = models.SmallIntegerField()
+    over_wins = models.SmallIntegerField()
+    over_losses = models.SmallIntegerField()
+    so_wins = models.SmallIntegerField()
+    so_losses = models.SmallIntegerField()
+    po_wins = models.SmallIntegerField()
+    po_losses = models.SmallIntegerField()
+    datetime = models.DateField(auto_now_add=True)
+    statistics = models.ManyToManyField(Statistics,related_name='season_player_statistics')
+    
+    def get_points(self):
+        return (reg_wins + over_wins + so_wins) * 2 + over_losses + so_losses
+
+    def __unicode__(self):
+        return u'%s at %s' % (self.away_team.name,self.home_team.name)
+
+    def get_absolute_url(self):
+        return "/season/%i/" % self.id
 
 class Game(models.Model):
     home_team = models.OneToOneField(Team, related_name = 'game_home_team')
     away_team = models.OneToOneField(Team, related_name = 'game_away_team')
+    is_playoff = models.BooleanField(default=False)
     datetime = models.DateTimeField()
     has_started = models.BooleanField()
     is_completed = models.BooleanField()
     winning_team_id = models.IntegerField(default=-1)
     goals = models.ManyToManyField('hockey.Goal',related_name = 'game_goals')
     penalty = models.ManyToManyField('hockey.Penalty',related_name = 'game_penalties')
+    home_win = models.BooleanField()
+    overtime = models.BooleanField()
+    shootout = models.BooleanField()
+    summary = models.TextField()
+    
     
     def __unicode__(self):
         return u'%s at %s' % (self.away_team.name,self.home_team.name)
@@ -241,8 +262,8 @@ class Goal(models.Model):
     primary_assist_id = models.IntegerField(default=-1,blank=True)
     secondary_assist_id = models.IntegerField(default=-1,blank=True)
     team_id = models.IntegerField(default=-1)
-    time = models.IntegerField(default=-1)
-    period = models.IntegerField(default=-1)
+    time = models.SmallIntegerField(default=-1)
+    period = models.SmallIntegerField(default=-1)
     game = models.OneToOneField(Game)
 
     def __unicode__(self):
@@ -251,8 +272,8 @@ class Goal(models.Model):
 class Penalty(models.Model):
     player_id = models.IntegerField(default=-1)
     team_id = models.IntegerField(default=-1)
-    time = models.IntegerField(default=-1)
-    period = models.IntegerField(default=-1)
+    time = models.SmallIntegerField(default=-1)
+    period = models.SmallIntegerField(default=-1)
     game = models.OneToOneField(Game,related_name = "penalty_game")
     is_minor = models.BooleanField()
     is_double_minor = models.BooleanField()
