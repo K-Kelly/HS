@@ -39,9 +39,7 @@ class Player(models.Model):
     free_agent = models.BooleanField()
     new_contract = models.BooleanField()
     datetime = models.DateTimeField(auto_now_add=True)
-    goals = models.ManyToManyField('hockey.Goal',related_name = 'player_goals')
-    assists = models.ManyToManyField('hockey.Goal',related_name = 'player_assists')
-    penalties = models.ManyToManyField('hockey.Penalty',related_name = 'player_penalties')
+    seasons = models.ManyToManyField('hockey.PlayerSeason',related_name = 'player_seasons')
     def __unicode__(self):
         return self.name
     
@@ -54,8 +52,8 @@ class Player(models.Model):
 class Arena(models.Model):
     name = models.CharField(max_length=50)
     occupancy = models.IntegerField()
-    practice_Facility = models.SmallIntegerField()
-    locker_Room = models.SmallIntegerField()
+    practice_facility = models.SmallIntegerField()
+    locker_room = models.SmallIntegerField()
     equipment = models.SmallIntegerField()
     rink = models.SmallIntegerField()
     concessions = models.SmallIntegerField()
@@ -167,16 +165,13 @@ class Team(models.Model):
     numGNeed = models.SmallIntegerField(blank=True,default="-1")
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
     contract_status_change = models.BooleanField()
+    seasons = models.ManyToManyField('hockey.TeamSeason',related_name = 'team_teamseason')
     datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.name
 
     def get_absolute_url(self):
         return "/team/%i/" % self.id
-
-    def tempPlayer():
-        p = Player.objects.create(team_id = -1, user_id = -1, upgrades = 0, level = 0, experience = 0, name = "Computer", age = 18, retired = False, height = 60, weight = 175, salary =0, contract_end = 0, no_trade = True, position = "C", style = 0, shooting = 1, passing = 1, stickHandling = 1, checking =1, positioning = 1, endurance = 1, skating = 1, strength = 1, faceoff = 1, fighting = 1, awareness = 1, leadership = 1, helmet = 1, gloves = 1, shoulder_pads = 1, pants = 1, skates = 1, stick = 1)
-        return p
     
     class Meta:
         ordering = ['name']
@@ -202,14 +197,14 @@ class League(models.Model):
     class Meta:
         ordering = ['name']
 
-class Statistics(models.Model):
+class PlayerSeason(models.Model):
     player_id = models.IntegerField()
-    #To get goals, goal in points.all() if goal.scorer_id = player ...Similar for assists
-    points = models.ManyToManyField('hockey.Goal',related_name = "statistics_goals")
-    penalties = models.ManyToManyField('hockey.Penalty',related_name = "statistics_penalties")
-    
+    team_id = models.IntegerField() #player's team at start of season
+    games = models.ManyToManyField('hockey.PlayerGame',related_name='playerseason_playergames')
+    season = models.SmallIntegerField()
 
-class Season(models.Model):
+
+class TeamSeason(models.Model):
     #reg stands for Regular Season, po stands for Playoff
     team_id = models.IntegerField()
     league_id = models.IntegerField()
@@ -224,7 +219,8 @@ class Season(models.Model):
     po_wins = models.SmallIntegerField()
     po_losses = models.SmallIntegerField()
     datetime = models.DateField(auto_now_add=True)
-    statistics = models.ManyToManyField(Statistics,related_name='season_player_statistics')
+    is_over = models.BooleanField()
+    statistics = models.ManyToManyField(PlayerSeason,related_name='season_playerseason')
     
     def get_points(self):
         return (reg_wins + over_wins + so_wins) * 2 + over_losses + so_losses
@@ -249,18 +245,40 @@ class Game(models.Model):
     overtime = models.BooleanField()
     shootout = models.BooleanField()
     summary = models.TextField()
-    
-    
+       
     def __unicode__(self):
         return u'%s at %s' % (self.away_team.name,self.home_team.name)
 
     def get_absolute_url(self):
         return "/game/%i/" % self.id
 
+class PlayerGame(models.Model):
+    player_id = models.IntegerField()
+    game = models.ForeignKey('hockey.Game',related_name = 'playergame_game')
+    points = models.ManyToManyField('hockey.Goal',related_name = 'playergame_points')
+    penalty = models.ManyToManyField('hockey.Penalty',related_name = 'playergame_penalties')
+    plus_minus = models.SmallIntegerField(default=0)
+    shots = models.SmallIntegerField(default=0)
+    faceoffs_taken = models.SmallIntegerField(default=0)
+    faceoffs_won = models.SmallIntegerField(default=0)
+    checks = models.SmallIntegerField(default=0)
+    shots_blocked = models.SmallIntegerField(default=0)
+         
+    def __unicode__(self):
+        return u'%s' % (self.player_id)
+
+    def get_absolute_url(self):
+        return "/playerGame/%i/" % self.id
+
+
 class Goal(models.Model):
     scorer_id = models.IntegerField(default=-1)
     primary_assist_id = models.IntegerField(default=-1,blank=True)
     secondary_assist_id = models.IntegerField(default=-1,blank=True)
+    powerplay = models.BooleanField()
+    shorthanded = models.BooleanField()
+    empty_net = models.BooleanField()
+    game_winner = models.BooleanField()
     team_id = models.IntegerField(default=-1)
     time = models.SmallIntegerField(default=-1)
     period = models.SmallIntegerField(default=-1)
