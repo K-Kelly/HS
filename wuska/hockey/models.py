@@ -187,7 +187,9 @@ class League(models.Model):
     division5 = models.ManyToManyField(Team, related_name = 'league_division5')
     division6 = models.ManyToManyField(Team, related_name = 'league_division6')
     salary_cap = models.IntegerField()
+    standings = models.ManyToManyField('hockey.TeamSeason', related_name = 'league_standings')
     datetime = models.DateTimeField(auto_now_add=True)
+    is_full = models.BooleanField(default=False)
     def __unicode__(self):
         return self.name
     
@@ -206,21 +208,22 @@ class PlayerSeason(models.Model):
 
 class TeamSeason(models.Model):
     #reg stands for Regular Season, po stands for Playoff
-    team_id = models.IntegerField()
-    league_id = models.IntegerField()
+    team = models.OneToOneField(Team, related_name = 'teamseason_team')
+    league = models.OneToOneField(League, related_name = 'teamseason_league')
     reg_games = models.ManyToManyField('hockey.Game',related_name = 'season_reg_games')
     po_games = models.ManyToManyField('hockey.Game',related_name = 'season_po_games')
-    reg_wins = models.SmallIntegerField()
-    reg_losses = models.SmallIntegerField()
-    over_wins = models.SmallIntegerField()
-    over_losses = models.SmallIntegerField()
-    so_wins = models.SmallIntegerField()
-    so_losses = models.SmallIntegerField()
-    po_wins = models.SmallIntegerField()
-    po_losses = models.SmallIntegerField()
-    datetime = models.DateField(auto_now_add=True)
-    is_over = models.BooleanField()
+    reg_wins = models.SmallIntegerField(default=0)
+    reg_losses = models.SmallIntegerField(default=0)
+    over_wins = models.SmallIntegerField(default=0)
+    over_losses = models.SmallIntegerField(default=0)
+    so_wins = models.SmallIntegerField(default=0)
+    so_losses = models.SmallIntegerField(default=0)
+    po_wins = models.SmallIntegerField(default=0)
+    po_losses = models.SmallIntegerField(default=0)
+    is_over = models.BooleanField(default=False)
     statistics = models.ManyToManyField(PlayerSeason,related_name='season_playerseason')
+    datetime = models.DateField(auto_now_add=True)
+    season_number = models.SmallIntegerField()
     
     def get_points(self):
         return (reg_wins + over_wins + so_wins) * 2 + over_losses + so_losses
@@ -241,10 +244,10 @@ class Game(models.Model):
     winning_team_id = models.IntegerField(default=-1)
     goals = models.ManyToManyField('hockey.Goal',related_name = 'game_goals')
     penalty = models.ManyToManyField('hockey.Penalty',related_name = 'game_penalties')
-    home_win = models.BooleanField()
-    overtime = models.BooleanField()
-    shootout = models.BooleanField()
-    summary = models.TextField()
+    home_win = models.BooleanField(blank=True)
+    overtime = models.BooleanField(blank=True)
+    shootout = models.BooleanField(blank=True)
+    summary = models.TextField(default="-1")
        
     def __unicode__(self):
         return u'%s at %s' % (self.away_team.name,self.home_team.name)

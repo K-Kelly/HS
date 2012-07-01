@@ -44,7 +44,7 @@ urlpatterns += patterns('wuska.hockey.teamView',
                         (r'^(?i)team/(?P<team_id>\d+)/viewManagement/$', 'viewManagement'),
                         )
 
-urlpatterns += patterns('wuska.hockey.leagueView',
+urlpatterns += patterns('wuska.league.views',
                         (r'^(?i)league/(?P<league_id>\d+)/$', 'viewLeague'),
                         )
 

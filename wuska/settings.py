@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'wuska.hockey',
+    'wuska.league',
     'registration',
     'wuska.accounts',
     'bootstrap',

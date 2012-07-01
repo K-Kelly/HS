@@ -42,13 +42,11 @@ def createTeam(request):
             request.user.get_profile().teams_owned.add(team)
             request.user.get_profile().teams.add(team)   
             #find out how many teams in game after creating this team
-            num_teams = Team.objects.all().count()
-            if num_teams % 30 == 1:#then team just added will not fit into existing leagues, so create a new league
-                num_leagues = League.objects.all().count()
-                league = League(name='League %s'%(num_leagues + 1),salary_cap = 8000000)
-                league.save()
-            #get the last created League and add team to it
             league = League.objects.order_by('-pk')[0]
+            if not league.is_full:#If last created league is full, make new one
+                num_leagues = League.objects.all().count()
+                league = League(name='League %s'%(num_leagues + 1),salary_cap = 8000000,is_full=False)
+                league.save()
             league.teams.add(team)
             if league.division1.count() < 5:
                 league.division1.add(team)
@@ -62,6 +60,8 @@ def createTeam(request):
                 league.division5.add(team)
             elif league.division6.count() < 5:
                 league.division6.add(team)
+                if league.division6.count() == 5:
+                    league.is_full = True
             else:
                 raise Exception("League is full when it shouldn't be. Please post on the support page about this issue or notify an admin so that we can quickly fix this issue for you!")
             league.save()
