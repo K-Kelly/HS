@@ -1,16 +1,15 @@
 from wuska.hockey.models import *
-from datetime import datetime
+from wuska.accounts.models import UserProfile
+from wuska.league.forms import *
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.context_processors import csrf
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from wuska.league.forms import *
-from django.db.models import Q
-from django.contrib.auth.models import User
-from wuska.accounts.models import UserProfile
 from django.core.exceptions import ObjectDoesNotExist
 from random import randrange
+from datetime import datetime
+from itertools import chain
 
 @login_required
 def viewLeague(request, league_id):
@@ -34,14 +33,17 @@ def scheduleNewSeason(request):
                 cd = form.cleaned_data
                 start_datetime = cd['start_datetime']
                 league_list = League.objects.all()
-                season_length = 70
-                season_number = 1 ###Increment for each new season
+                season_length = int(cd['season_length'])
+                season_number = get_object_or_404(Team,pk=1).seasons.all().count()###Increment for each new season
                 #season will last for 70 days
                 #4 games (2 home, 2 away) against divisional teams
                 #2 games (1 home, 1 away) against teams within conference
                 #divison1,2,3 = conference1, divison4,5,6 = conference2
                 #1 game against teams outside of conference.
                 #if 10 teams out of conference then 5 home, 5 away
+                #if odd number of outside of conference games, add game
+                #i.e. if 15 teams out of conference, then 16 (8h,8a)games
+
                 for league in league_list:
                     div1 = league.division1.all()
                     div2 = league.division2.all()
@@ -56,22 +58,46 @@ def scheduleNewSeason(request):
                         league.save()
                         team.seasons.add(team_season)
                         team.save()
+
+                    #schedule games outside of conference
+                    schedule_games_outside_conference(div1,div2,div3,div4,div5,div6,season_number,start_datetime)
+                    #schedule games within conference
                     for team in div1:
                         team_season1 = team.seasons.filter(season_number=season_number)
-                        for team2 in div1:
-                            team_season2 = team2.seasons.filter(season_number=season_number)
-                            game1h =        
-
+                        div1.remove(team)
+                        schedule_games_within_conference(team_season1,div1,div2,div3,season_number,start_datetime)
+                    for team in div2:
+                        team_season1 = team.seasons.filter(season_number=season_number)
+                        div2.remove(team)
+                        schedule_games_within_conference(team_season1,div2,div3,div1,season_number,start_datetime)
+                    for team in div3:
+                        team_season1 = team.seasons.filter(season_number=season_number)
+                        div3.remove(team)
+                        schedule_games_within_conference(team_season1,div3,div1,div2,season_number,start_datetime)
+                    for team in div4:
+                        team_season1 = team.seasons.filter(season_number=season_number)
+                        div4.remove(team)
+                        schedule_games_within_conference(team_season1,div4,div5,div6,season_number,start_datetime)
+                    for team in div5:
+                        team_season1 = team.seasons.filter(season_number=season_number)
+                        div5.remove(team)
+                        schedule_games_within_conference(team_season1,div5,div6,div4,season_number,start_datetime)
+                    for team in div6:
+                        team_season1 = team.seasons.filter(season_number=season_number)
+                        div6.remove(team)
+                        schedule_games_within_conference(team_season1,div6,div4,div5,season_number,start_datetime)
+                alert = "Season successfully scheduled with startdatetime of %s and season length of %s." % (start_datetime,season_length)
+                return render_to_response('league/scheduleNewSeason.html',{'form':form,'user':request.user,'profile':request.user.get_profile(),'player_list':request.user.get_profile().players.all(),'team_list':request.user.get_profile().teams.all(),'alert':alert},context_instance=RequestContext(request))
         else:
             form = ScheduleNewSeasonForm()
-        return render_to_response('league/scheduleNewSeason.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':request.user.get_profile().players.all(),'team_list':request.user.get_profile().teams.all()},context_instance=RequestContext(request))
+        return render_to_response('league/scheduleNewSeason.html',{'form':form,'user':request.user,'profile':request.user.get_profile(),'player_list':request.user.get_profile().players.all(),'team_list':request.user.get_profile().teams.all()},context_instance=RequestContext(request))
                 
     else:
         return render_to_response('404.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':request.user.get_profile().players.all(),'team_list':request.user.get_profile().teams.all()},context_instance=RequestContext(request))
 
 
 #@is_home : if team_season1's team is the home team for this game
-def find_valid_date(team_season1,team_season2,season_length,start_datetime,is_home):
+def schedule_game(team_season1,team_season2,season_length,start_datetime,is_home):
     #calculate the day of a game
     daytime = start_datetime + datetime.timedelta(randrange(0,season_length))
     check_team1 = check_valid_day_team(team_season1,daytime)
@@ -82,14 +108,14 @@ def find_valid_date(team_season1,team_season2,season_length,start_datetime,is_ho
         check_team2 = check_valid_day_team(team_season2,daytime)
     game_datetime = datetime(daytime.year,daytime.month,daytime.day,randrange(11,22),10*randrange(0,6))
     if is_home:
-        game = Game(home_team=team_season1.team.id,away_team=team_season2.team.id,is_playoff=False,game_datetime,has_started=False,is_completed=False)
+        game = Game(home_team=team_season1.team,away_team=team_season2.team,is_playoff=False,game_datetime=game_datetime,has_started=False,is_completed=False)
         game.save()
         team_season1.reg_games.add(game)
         team_season1.save()
         team_season2.reg_games.add(game)
         team_season2.save()
     else:
-        game = Game(home_team=team_season2.team.id,away_team=team_season1.team.id,is_playoff=False,game_datetime,has_started=False,is_completed=False)
+        game = Game(home_team=team_season2.team,away_team=team_season1.team,is_playoff=False,game_datetime=game_datetime,has_started=False,is_completed=False)
         game.save()
         team_season1.reg_games.add(game)
         team_season1.save()
@@ -102,3 +128,32 @@ def check_valid_day_team(team_season,check_datetime):
                 return False
     return True
     
+
+def schedule_games_within_conference(team_season1,division,in_conf1,in_conf2,season_number,start_datetime):
+    for team2 in division:
+        team_season2 = team2.seasons.filter(season_number=season_number)
+        game1h = schedule_game(team_season1,team_season2,season_length,start_datetime,True)
+        game2h = schedule_game(team_season1,team_season2,season_length,start_datetime,True)
+        game3a = schedule_game(team_season1,team_season2,season_length,start_datetime,False)
+        game4a = schedule_game(team_season1,team_season2,season_length,start_datetime,False)
+    for team2 in in_conf1:
+        team_season2 = team2.seasons.filter(season_number=season_number)
+        game1h = schedule_game(team_season1,team_season2,season_length,start_datetime,True)
+        game2a = schedule_game(team_season1,team_season2,season_length,start_datetime,False)
+    for team2 in in_conf2:
+        team_season2 = team2.seasons.filter(season_number=season_number)
+        game1h = schedule_game(team_season1,team_season2,season_length,start_datetime,True)
+        game2a = schedule_game(team_season1,team_season2,season_length,start_datetime,False)
+        
+def schedule_games_outside_conference(div1,div2,div3,div4,div5,div6,season_number,start_datetime):
+    conf1 = list(chain(div1,div2,div3))
+    conf2 = list(chain(div4,div5,div6))
+    for team in conf1:
+        team_season1 = team.seasons.filter(season_number=season_number)
+        is_home=True
+        for team2 in conf2:
+            team_season2 = team2.seasons.filter(season_number=season_number)
+            game1 = schedule_game(team_season1,team_season2,season_length,start_datetime,is_home)
+            is_home=not(is_home)
+        #schedule the 16th out of conference game for team
+        game2 = schedule_game(team_season1,team_season2,season_length,start_datetime,not(is_home))

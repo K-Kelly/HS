@@ -46,6 +46,7 @@ urlpatterns += patterns('wuska.hockey.teamView',
 
 urlpatterns += patterns('wuska.league.views',
                         (r'^(?i)league/(?P<league_id>\d+)/$', 'viewLeague'),
+                        (r'^(?i)adminActions/scheduleNewSeason/$', 'scheduleNewSeason'),
                         )
 
 urlpatterns += patterns('',

@@ -40,11 +40,14 @@ def createTeam(request):
             team = Team(name=name, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id=-1,arena=arena,funds=2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000, contract_status_change=False)
             team.save()
             request.user.get_profile().teams_owned.add(team)
-            request.user.get_profile().teams.add(team)   
-            #find out how many teams in game after creating this team
-            league = League.objects.order_by('-pk')[0]
-            if not league.is_full:#If last created league is full, make new one
-                num_leagues = League.objects.all().count()
+            request.user.get_profile().teams.add(team) 
+            num_leagues = League.objects.all().count()
+            if num_leagues == 0:
+                league = League(name='League 1',salary_cap = 8000000,is_full=False)
+                league.save()
+            else:
+                league = League.objects.order_by('-pk')[0]
+            if league.is_full:#If last created league is full, make new one
                 league = League(name='League %s'%(num_leagues + 1),salary_cap = 8000000,is_full=False)
                 league.save()
             league.teams.add(team)
