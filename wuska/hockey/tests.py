@@ -9,7 +9,7 @@ class PlayerTest(TestCase):
         self.client = Client()
         self.client.post('/accounts/register/',{'username':'PlayerTest1', 'email':'test@localhosttestregister.com','password1':'test','password2':'test'},follow=True)        
     
-    def test_create_Player(self):
+    def test_create_player(self):
         response = self.client.get('/allUsers/25/')
         self.assertEqual(response.status_code,200)
         self.assertTemplateUsed(response,'viewAllUsers.html')

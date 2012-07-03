@@ -229,7 +229,7 @@ class TeamSeason(models.Model):
         return (reg_wins + over_wins + so_wins) * 2 + over_losses + so_losses
     points = property(get_points)
     def __unicode__(self):
-        return u'%s at %s' % (self.away_team.name,self.home_team.name)
+        return u'%s season: %s' % (self.team.name,self.season_number)
 
     def get_absolute_url(self):
         return "/season/%i/" % self.id
