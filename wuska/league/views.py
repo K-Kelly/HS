@@ -7,6 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http500
 from random import randrange
 from datetime import datetime,timedelta
 from itertools import chain
@@ -16,31 +17,90 @@ def viewLeague(request, league_id):
     league = get_object_or_404(League, pk=league_id)
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
-    division1 = league.division1.all()
-    division2 = league.division2.all()
-    division3 = league.division3.all()
-    division4 = league.division4.all()
-    division5 = league.division5.all()
-    division6 = league.division6.all()
+    division1 = []
+    division2 = []
+    division3 = []
+    division4 = []
+    division5 = []
+    division6 = []
+    for team in team_list:
+        if team.division == 1:
+            division1.append(team)
+        elif team.division == 2:
+            division2.append(team)
+        elif team.division == 3:
+            division3.append(team)
+        elif team.division == 4:
+            division4.append(team)
+        elif team.division == 5:
+            division5.append(team)
+        elif team.division == 6:
+            division6.append(team)
+        else:
+            raise Http500
+            
     return render_to_response('league/viewLeague.html', {'league':league, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list,'division1':division1,'division2':division2,'division3':division3,'division4':division4,'division5':division5,'division6':division6}, context_instance=RequestContext(request))
 
 @login_required
-def viewSchedule(request, league_id,division,number):
+def viewSchedule(request, league_id):
     league = get_object_or_404(League, pk=league_id)
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
-    games_all = []
     games_div1 = []
     games_div2 = []
     games_div3 = []
     games_div4 = []
     games_div5 = []
     games_div6 = []
-    #only append game if team is 'home' team
+    games_div1_completed = []
+    games_div2_completed = []
+    games_div3_completed = []
+    games_div4_completed = []
+    games_div5_completed = []
+    games_div6_completed = []
 
-    #pagination
-    for team in league.division1.all():
-        for game in team.season
+    for teamseason in league.standings.all():
+        for game in teamseason.reg_games.order_by('datetime'):
+            if game.home_team.division == 1:
+                if game.is_completed:
+                    games_div1_completed.append(game)
+                else:
+                    games_div1.append(game)
+            elif game.home_team.division == 2:
+                if game.is_completed:
+                    games_div2_completed.append(game)
+                else:
+                    games_div2.append(game)
+            elif game.home_team.division == 3:
+                if game.is_completed:
+                    games_div3_completed.append(game)
+                else:
+                    games_div3.append(game)
+            elif game.home_team.division == 4:
+                if game.is_completed:
+                    games_div4_completed.append(game)
+                else:
+                    games_div4.append(game)
+            elif game.home_team.division == 5:
+                if game.is_completed:
+                    games_div5_completed.append(game)
+                else:
+                    games_div5.append(game)
+            elif game.home_team.division == 6:
+                if game.is_completed:
+                    games_div6_completed.append(game)
+                else:
+                    games_div6.append(game)
+            else:
+                raise Http500
+        games_all = games_div1 + games_div2 + games_div3 + games_div4 + games_div5 + games_div6
+        games_all_completed = games_div1_completed + games_div2_completed + games_div3_completed + games_div4_completed + games_div5_completed + games_div6_completed            
+            
+        return render_to_response('league/schedule.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':player_list,'team_list':team_list,'games_all':games_all,'games_all_completed':games_all_completed,'games_div1':games_div1,'games_div1_completed':games_div1_completed,'games_div2':games_div2,'games_div2_completed':games_div2_completed,'games_div3':games_div3,'games_div3_completed':games_div3_completed,'games_div4':games_div4,'games_div4_completed':games_div4_completed,'games_div5':games_div5,'games_div5_completed':games_div5_completed,'games_div6':games_div6,'games_div6_completed':games_div6_completed},context_instance=RequestContext(request))
+
+        
+
+
 @login_required
 def scheduleNewSeason(request):
     if request.user.is_superuser:
@@ -179,3 +239,24 @@ def schedule_games_outside_conference(div1,div2,div3,div4,div5,div6,season_numbe
             is_home=not(is_home)
         #schedule the 16th out of conference game for team
         game2 = schedule_game(team_season1,team_season2,season_length,start_datetime,not(is_home))
+
+
+#Sets up the variables needed for pagination
+def pagination_vars(number,per_page,max_number):
+    number = int(number)
+    have_previous = False
+    have_next = False
+    next_number = number + per_page
+    previous_number = number - per_page
+    if max_number > number:
+        have_next = True
+    if number >= max_number:
+        have_next = False
+        have_previous = True
+        number = max_number
+    elif number < 0:
+        number = 0
+        have_previous = False
+    if number <=25:
+        have_previous = False
+    return number,have_previous,have_next,previous_number,next_number
