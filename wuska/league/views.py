@@ -25,6 +25,23 @@ def viewLeague(request, league_id):
     return render_to_response('league/viewLeague.html', {'league':league, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list,'division1':division1,'division2':division2,'division3':division3,'division4':division4,'division5':division5,'division6':division6}, context_instance=RequestContext(request))
 
 @login_required
+def viewSchedule(request, league_id,division,number):
+    league = get_object_or_404(League, pk=league_id)
+    player_list = request.user.get_profile().players.all()
+    team_list = request.user.get_profile().teams.all()
+    games_all = []
+    games_div1 = []
+    games_div2 = []
+    games_div3 = []
+    games_div4 = []
+    games_div5 = []
+    games_div6 = []
+    #only append game if team is 'home' team
+
+    #pagination
+    for team in league.division1.all():
+        for game in team.season
+@login_required
 def scheduleNewSeason(request):
     if request.user.is_superuser:
         if request.method == 'POST':
@@ -46,6 +63,8 @@ def scheduleNewSeason(request):
                 #i.e. if 15 teams out of conference, then 16 (8h,8a)games
 
                 for league in league_list:
+                    if not(league.is_full):
+                        break
                     div1 = list(league.division1.all())
                     div2 = list(league.division2.all())
                     div3 = list(league.division3.all())
@@ -153,6 +172,7 @@ def schedule_games_outside_conference(div1,div2,div3,div4,div5,div6,season_numbe
         team_season1 = team.seasons.get(season_number=season_number)
         is_home=True
         team2 = 0
+        team_season2 = ""
         for team2 in conf2:
             team_season2 = team2.seasons.get(season_number=season_number)
             game1 = schedule_game(team_season1,team_season2,season_length,start_datetime,is_home)
