@@ -37,36 +37,53 @@ def createTeam(request):
             arena_name = cd['arena_name']           
             arena = Arena(name=arena_name, occupancy=5000, practice_facility=0,locker_room=0, equipment=0, rink=0, concessions=0, lower_bowl=1, mid_bowl=0, upper_bowl=0, box=0, ticket_lower=5, ticket_mid=2, ticket_upper=1, ticket_box=10)
             arena.save()
-            team = Team(name=name, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id=-1,arena=arena,funds=2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000, contract_status_change=False)
+            team = Team(name=name,abbreviation=abbreviation, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id=-1,arena=arena,funds=2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000, contract_status_change=False,division = -1)
             team.save()
             request.user.get_profile().teams_owned.add(team)
             request.user.get_profile().teams.add(team) 
             num_leagues = League.objects.all().count()
             if num_leagues == 0:
-                league = League(name='League 1',salary_cap = 8000000,is_full=False)
+                league = League(name='League 1',salary_cap = 8000000,is_full=False,season_number=-1)
                 league.save()
             else:
                 league = League.objects.order_by('-pk')[0]
             if league.is_full:#If last created league is full, make new one
-                league = League(name='League %s'%(num_leagues + 1),salary_cap = 8000000,is_full=False)
+                league = League(name='League %s'%(num_leagues + 1),salary_cap = 8000000,is_full=False,season_number=-1)
                 league.save()
-            league.teams.add(team)
-            if league.division1.count() < 5:
-                league.division1.add(team)
-            elif league.division2.count() < 5:
-                league.division2.add(team)
-            elif league.division3.count() < 5:
-                league.division3.add(team)
-            elif league.division4.count() < 5:
-                league.division4.add(team)
-            elif league.division5.count() < 5:
-                league.division5.add(team)
-            elif league.division6.count() < 5:
-                league.division6.add(team)
-                if league.division6.count() == 5:
+
+            num_div1,num_div2,num_div3,num_div4,num_div5,num_div6 = 0,0,0,0,0,0
+            for team2 in league.teams.all():
+                if team2.division == 1:
+                    num_div1 += 1
+                elif team2.division == 2:
+                    num_div2 += 1
+                elif team2.division == 3:
+                    num_div3 += 1
+                elif team2.division == 4:
+                    num_div4 += 1
+                elif team2.division == 5:
+                    num_div5 += 1
+                elif team2.division == 6:
+                    num_div6 += 1
+
+            if num_div1 < 5:
+                team.division = 1
+            elif num_div2 < 5:
+                team.division = 2
+            elif num_div3 < 5:
+                team.division = 3
+            elif num_div4 < 5:
+                team.division = 4
+            elif num_div5 < 5:
+                team.division = 5
+            elif num_div6 < 5:
+                team.division = 6
+                num_div6 += 1
+                if num_div6  == 5:
                     league.is_full = True
             else:
-                raise Exception("League is full when it shouldn't be. Please post on the support page about this issue or notify an admin so that we can quickly fix this issue for you!")
+                raise Exception("League is full when it shouldn't be. Please post on the support page about this issue or notify an admin so that we can quickly fix this issue for you!")                                           
+            league.teams.add(team)
             league.save()
             team.league_id = league.id
             team.save()

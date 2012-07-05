@@ -110,6 +110,7 @@ class Message(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=35)
+    abbreviation = models.CharField(max_length=3)
     owner = models.IntegerField()
     general_manager1 = models.IntegerField(blank=True, default="-1")
     general_manager2 = models.IntegerField(blank=True, default="-1")
