@@ -1,95 +1,632 @@
 {% extends "leaguePageNav.html" %}
 {% load i18n %}
+{% load tz %}
 {% block content_span9 %}
 <div class="well">
-<div class="tabbable">
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#taball" data-toggle="tab">League</a></li>
-    <li><a href="#tab1" data-toggle="tab">Division 1</a></li>
-    <li><a href="#tab2" data-toggle="tab">Division 2</a></li>
-    <li><a href="#tab3" data-toggle="tab">Division 3</a></li>
-    <li><a href="#tab4" data-toggle="tab">Division 4</a></li>
-    <li><a href="#tab5" data-toggle="tab">Division 5</a></li>
-    <li><a href="#tab6" data-toggle="tab">Division 6</a></li>
-  </ul>
-  <div class="tab-content">
-    <div class="tab-pane active" id="taball">
-      <table class="table table-striped table-condensed">
-	<thead>
-	  <tr>
-	    <th><center>Date Time<center></th>
-	    <th><center>In Progress<center></th>
-	    <th><center>Home Team</center></th>
-	    <th><center>Home Goals</center></th>
-	    <th><center>Away Team</center></th>
-	    <th><center>Away Goals</center></th>
-	    <th><center>Penalties</center></th>
-	    <th><center>Overtime</center></th>
-	    <th><center>Shootout</center></th>
-	    <th><center>Details</center></th>
-	  </tr>
-	</thead>
-	<tbody>
-	  {% for game in games_all %}
-	  <tr>
-	    <td><center>{{ game.datetime }}</center></td>
-	    {% if game.has_started %}
-	    <td><center>Yes</center></td>
-	    {% else %}
-	    <td><center>No</center></td>
-	    {% endif %}
-	    <td><center>{{ game.home_team.abbreviation }}</center></td>
-	    <td><center> game.home_goals.count() </center></td>
-	    <td><center>{{ game.away_team.abbreviation }}</center></td>
-	    <td><center> game.away_goals.count() </center></td>
-	    <td><center> game.penalty.count() </center></td>
-	    {% if game.overtime %}
-	    <td><center>Yes</center></td>
-	    {% else %}
-	    <td><center>No</center></td>
-	    {% endif %}
-	    {% if game.shootout %}
-	    <td><center>Yes</center></td>
-	    {% else %}
-	    <td><center>No</center></td>
-	    {% endif %}
-	    <td><center>
-		<a class="btn btn-primary" href="/game/{{ game.id }}/">View</a>
-	    </center></td>
-	  </tr>
-	  {% endfor %}
-	</tbody>
-      </table>
-    </div>
-    <div class="tab-pane" id="tab1">
-      <p>I'm in Section 1.</p>
-    </div>
-    <div class="tab-pane" id="tab2">
-      <p>Howdy, I'm in Section 2.</p>
-    </div>
-    <div class="tab-pane" id="tab3">
-      <p>I'm in Section 3.</p>
-    </div>
-    <div class="tab-pane" id="tab4">
-      <p>Howdy, I'm in Section 4.</p>
-    </div>
-    <div class="tab-pane" id="tab5">
-      <p>I'm in Section 5.</p>
-    </div>
-    <div class="tab-pane" id="tab6">
-      <p>Howdy, I'm in Section 6.</p>
+  <div class="tabbable">
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#taball" data-toggle="tab">League</a></li>
+      <li><a href="#tab1" data-toggle="tab">Division 1</a></li>
+      <li><a href="#tab2" data-toggle="tab">Division 2</a></li>
+      <li><a href="#tab3" data-toggle="tab">Division 3</a></li>
+      <li><a href="#tab4" data-toggle="tab">Division 4</a></li>
+      <li><a href="#tab5" data-toggle="tab">Division 5</a></li>
+      <li><a href="#tab6" data-toggle="tab">Division 6</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="taball">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#taballup" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#taballcom" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="taballup">
+	      {% if games_all %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_all %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="taballcom">
+	      {% if games_all_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_all_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab1">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab1up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab1com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab1up">
+	      {% if games_div1 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div1 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab1com">
+	      {% if games_div1_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div1_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab2">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab2up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab2com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab2up">
+	      {% if games_div2 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div2 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab2com">
+	      {% if games_div2_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div2_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab3">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab3up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab3com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab3up">
+	      {% if games_div3 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div3 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab3com">
+	      {% if games_div3_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div3_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab4">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab4up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab4com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab4up">
+	      {% if games_div4 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div4 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab4com">
+	      {% if games_div4_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div4_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab5">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab5up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab5com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab5up">
+	      {% if games_div5 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div5 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab5com">
+	      {% if games_div5_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div5_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="tab-pane" id="tab6">
+	<div class="tabbable">
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#tab6up" data-toggle="tab">Upcoming</a></li>
+	    <li><a href="#tab6com" data-toggle="tab">Completed</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="tab6up">
+	      {% if games_div6 %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div6 %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center>
+			<a class="btn btn-primary"
+			   href="{{game.get_absolute_url }}/">View</a>
+		    </center></td>
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      There are no upcoming games!
+	      {% endif %}
+	    </div>
+	    <div class="tab-pane" id="tab6com">
+	      {% if games_div6_completed %}
+	      <table class="table table-striped table-condensed">
+		<thead>
+		  <tr>
+		    <th><center>Date Time<center></th>
+		    <th><center>In Progress<center></th>
+		    <th><center>Home Team</center></th>
+		    <th><center>Home Goals</center></th>
+		    <th><center>Away Team</center></th>
+		    <th><center>Away Goals</center></th>
+		    <th><center>Penalties</center></th>
+		    <th><center>Overtime</center></th>
+		    <th><center>Shootout</center></th>
+		    <th><center>Details</center></th>
+		  </tr>
+		</thead>
+		<tbody>
+		  {% for game in games_div6_completed %}
+		  <tr>
+		    <td><center> {{ game.datetime|localtime }} ({{game.datetime|timeuntil}})</center></td>
+		    <td><center> {{ game.has_started|yesno:"Yes,No" }}</center></td>
+		    <td><center>
+			<a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.home_goals|length }} </center></td>
+		    <td><center> 
+			<a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
+		    </center></td>
+		    <td><center> {{ game.away_goals|length }} </center></td>
+		    <td><center> {{ game.penalty|length }} </center></td>
+		    <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
+		    <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>		    
+		  </tr>
+		  {% endfor %}
+		</tbody>
+	      </table>
+	      {% else %}
+	      No Games have been completed yet!
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+      </div>
     </div>
   </div>
 </div>
+{% if have_previous %}
+<a class="btn btn-info"
+   href="/allUsers/{{previous_number}}/">Previous Users</a>
+{% endif %}
+{% if have_next %}
+<a class="btn btn-info pull-right"
+   href="/allUsers/{{next_number}}/">Next Users</a>
+{% endif %}
 </div>
-    {% if have_previous %}
-    <a class="btn btn-info"
-       href="/allUsers/{{previous_number}}/">Previous Users</a>
-    {% endif %}
-    {% if have_next %}
-    <a class="btn btn-info pull-right"
-       href="/allUsers/{{next_number}}/">Next Users</a>
-    {% endif %}
-  </div>
 </div>
 {% endblock %}

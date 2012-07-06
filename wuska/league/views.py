@@ -59,43 +59,66 @@ def viewSchedule(request, league_id):
     games_div4_completed = []
     games_div5_completed = []
     games_div6_completed = []
-
-    for teamseason in league.standings.all():
-        for game in teamseason.reg_games.order_by('datetime'):
-            if game.home_team.division == 1:
+    games_all = []
+    games_all_completed = []
+    league_standings = league.standings.all()
+    for teamseason in league_standings:
+        game_list = teamseason.reg_games.all()
+        #FIX: doesn't iterate over all teamseasons
+        for game in game_list:
+            if game.home_team.division == 1 or game.away_team.division == 1:
                 if game.is_completed:
                     games_div1_completed.append(game)
                 else:
                     games_div1.append(game)
-            elif game.home_team.division == 2:
+            elif game.home_team.division == 2 or game.away_team.division == 2:
                 if game.is_completed:
                     games_div2_completed.append(game)
                 else:
                     games_div2.append(game)
-            elif game.home_team.division == 3:
+            elif game.home_team.division == 3 or game.away_team.division == 3:
                 if game.is_completed:
                     games_div3_completed.append(game)
                 else:
                     games_div3.append(game)
-            elif game.home_team.division == 4:
+            elif game.home_team.division == 4 or game.away_team.division == 4:
                 if game.is_completed:
                     games_div4_completed.append(game)
                 else:
                     games_div4.append(game)
-            elif game.home_team.division == 5:
+            elif game.home_team.division == 5 or game.away_team.division == 5:
                 if game.is_completed:
                     games_div5_completed.append(game)
                 else:
                     games_div5.append(game)
-            elif game.home_team.division == 6:
+            elif game.home_team.division == 6 or game.away_team.division == 6:
                 if game.is_completed:
                     games_div6_completed.append(game)
                 else:
                     games_div6.append(game)
             else:
-                raise Http404
-        games_all = games_div1 + games_div2 + games_div3 + games_div4 + games_div5 + games_div6
-        games_all_completed = games_div1_completed + games_div2_completed + games_div3_completed + games_div4_completed + games_div5_completed + games_div6_completed                        
+                raise Http404 
+            if game.is_completed:
+                games_all_completed.append(game)
+            else:
+                games_all.append(game)
+            print "Here"
+        print "Here2"
+
+        games_div1.sort(key=lambda g:g.datetime)
+        games_div2.sort(key=lambda g:g.datetime)
+        games_div3.sort(key=lambda g:g.datetime)
+        games_div4.sort(key=lambda g:g.datetime)
+        games_div5.sort(key=lambda g:g.datetime)
+        games_div6.sort(key=lambda g:g.datetime)
+        games_div1_completed.sort(key=lambda g:g.datetime)
+        games_div2_completed.sort(key=lambda g:g.datetime)
+        games_div3_completed.sort(key=lambda g:g.datetime)
+        games_div4_completed.sort(key=lambda g:g.datetime)
+        games_div5_completed.sort(key=lambda g:g.datetime)
+        games_div6_completed.sort(key=lambda g:g.datetime)
+        games_all.sort(key=lambda g:g.datetime)
+        games_all_completed.sort(key=lambda g:g.datetime)
         return render_to_response('league/schedule.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':player_list,'team_list':team_list,'league':league,'games_all':games_all,'games_all_completed':games_all_completed,'games_div1':games_div1,'games_div1_completed':games_div1_completed,'games_div2':games_div2,'games_div2_completed':games_div2_completed,'games_div3':games_div3,'games_div3_completed':games_div3_completed,'games_div4':games_div4,'games_div4_completed':games_div4_completed,'games_div5':games_div5,'games_div5_completed':games_div5_completed,'games_div6':games_div6,'games_div6_completed':games_div6_completed},context_instance=RequestContext(request))
 
      
@@ -177,7 +200,7 @@ def schedule_game(team_season1,team_season2,season_length,start_datetime,is_home
         daytime = start_datetime + timedelta(randrange(0,season_length))
         check_team1 = check_valid_day_team(team_season1,daytime)
         check_team2 = check_valid_day_team(team_season2,daytime)
-    game_datetime = datetime(daytime.year,daytime.month,daytime.day,randrange(11,22),10*randrange(0,6)).replace(tzinfo=utc)
+    game_datetime = datetime(daytime.year,daytime.month,daytime.day,randrange(14,24),10*randrange(0,6)).replace(tzinfo=utc)
     if is_home:
         game = Game(home_team=team_season1.team,away_team=team_season2.team,is_playoff=False,datetime=game_datetime,has_started=False,is_completed=False)
         game.save()

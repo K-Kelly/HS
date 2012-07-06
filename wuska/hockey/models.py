@@ -183,12 +183,6 @@ class League(models.Model):
     name = models.CharField(max_length=50)
     teams = models.ManyToManyField(Team, related_name = 'league_teams')
     season_number = models.SmallIntegerField(blank=True)
-    #division1 = models.ManyToManyField(Team,blank=True,related_name = 'league_division1')
-    #division2 = models.ManyToManyField(Team,blank=True, related_name = 'league_division2')
-    #division3 = models.ManyToManyField(Team,blank=True,related_name = 'league_division3')
-    #division4 = models.ManyToManyField(Team,blank=True, related_name = 'league_division4')
-    #division5 = models.ManyToManyField(Team,blank=True, related_name = 'league_division5')
-    #division6 = models.ManyToManyField(Team,blank=True, related_name = 'league_division6')
     salary_cap = models.IntegerField()
     standings = models.ManyToManyField('hockey.TeamSeason',blank=True, related_name = 'league_standings')
     datetime = models.DateTimeField(auto_now_add=True)
@@ -258,6 +252,8 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         return "/game/%i/" % self.id
+    class Meta:
+        ordering = ['datetime']
 
 class PlayerGame(models.Model):
     player_id = models.IntegerField()

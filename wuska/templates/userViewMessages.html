@@ -1,5 +1,6 @@
 {% extends "userPageNav.html" %}
 {% load i18n %}
+{% load tz %}
 {% block content_span9 %}
 
 {% if sent %}
@@ -19,7 +20,7 @@
 	  type="button">x</button>
   <strong>
     <div class="pull-right">
-      {{message.datetime}}
+      {{message.datetime|localtime}} ({{message.datetime|timesince}} ago)
     </div>
     To Agent(s):
     {% for r_user in receiver_users %}
