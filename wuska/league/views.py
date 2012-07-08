@@ -63,63 +63,58 @@ def viewSchedule(request, league_id):
     games_all_completed = []
     league_standings = league.standings.all()
     for teamseason in league_standings:
-        game_list = teamseason.reg_games.all()
-        #FIX: doesn't iterate over all teamseasons
+        game_list = teamseason.reg_games.order_by('datetime')[:1]
         for game in game_list:
-            if game.home_team.division == 1 or game.away_team.division == 1:
+            if game not in games_all and game not in games_all_completed:
+                if game.home_team.division == 1 or game.away_team.division == 1:
+                    if game.is_completed:
+                        games_div1_completed.append(game)
+                    else:
+                        games_div1.append(game)
+                if game.home_team.division == 2 or game.away_team.division == 2:
+                    if game.is_completed:
+                        games_div2_completed.append(game)
+                    else:
+                        games_div2.append(game)
+                if game.home_team.division == 3 or game.away_team.division == 3:
+                    if game.is_completed:
+                        games_div3_completed.append(game)
+                    else:
+                        games_div3.append(game)
+                if game.home_team.division == 4 or game.away_team.division == 4:
+                    if game.is_completed:
+                        games_div4_completed.append(game)
+                    else:
+                        games_div4.append(game)
+                if game.home_team.division == 5 or game.away_team.division == 5:
+                    if game.is_completed:
+                        games_div5_completed.append(game)
+                    else:
+                        games_div5.append(game)
+                if game.home_team.division == 6 or game.away_team.division == 6:
+                    if game.is_completed:
+                        games_div6_completed.append(game)
+                    else:
+                        games_div6.append(game)
                 if game.is_completed:
-                    games_div1_completed.append(game)
+                    games_all_completed.append(game)
                 else:
-                    games_div1.append(game)
-            elif game.home_team.division == 2 or game.away_team.division == 2:
-                if game.is_completed:
-                    games_div2_completed.append(game)
-                else:
-                    games_div2.append(game)
-            elif game.home_team.division == 3 or game.away_team.division == 3:
-                if game.is_completed:
-                    games_div3_completed.append(game)
-                else:
-                    games_div3.append(game)
-            elif game.home_team.division == 4 or game.away_team.division == 4:
-                if game.is_completed:
-                    games_div4_completed.append(game)
-                else:
-                    games_div4.append(game)
-            elif game.home_team.division == 5 or game.away_team.division == 5:
-                if game.is_completed:
-                    games_div5_completed.append(game)
-                else:
-                    games_div5.append(game)
-            elif game.home_team.division == 6 or game.away_team.division == 6:
-                if game.is_completed:
-                    games_div6_completed.append(game)
-                else:
-                    games_div6.append(game)
-            else:
-                raise Http404 
-            if game.is_completed:
-                games_all_completed.append(game)
-            else:
-                games_all.append(game)
-            print "Here"
-        print "Here2"
-
-        games_div1.sort(key=lambda g:g.datetime)
-        games_div2.sort(key=lambda g:g.datetime)
-        games_div3.sort(key=lambda g:g.datetime)
-        games_div4.sort(key=lambda g:g.datetime)
-        games_div5.sort(key=lambda g:g.datetime)
-        games_div6.sort(key=lambda g:g.datetime)
-        games_div1_completed.sort(key=lambda g:g.datetime)
-        games_div2_completed.sort(key=lambda g:g.datetime)
-        games_div3_completed.sort(key=lambda g:g.datetime)
-        games_div4_completed.sort(key=lambda g:g.datetime)
-        games_div5_completed.sort(key=lambda g:g.datetime)
-        games_div6_completed.sort(key=lambda g:g.datetime)
-        games_all.sort(key=lambda g:g.datetime)
-        games_all_completed.sort(key=lambda g:g.datetime)
-        return render_to_response('league/schedule.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':player_list,'team_list':team_list,'league':league,'games_all':games_all,'games_all_completed':games_all_completed,'games_div1':games_div1,'games_div1_completed':games_div1_completed,'games_div2':games_div2,'games_div2_completed':games_div2_completed,'games_div3':games_div3,'games_div3_completed':games_div3_completed,'games_div4':games_div4,'games_div4_completed':games_div4_completed,'games_div5':games_div5,'games_div5_completed':games_div5_completed,'games_div6':games_div6,'games_div6_completed':games_div6_completed},context_instance=RequestContext(request))
+                    games_all.append(game)
+    games_div1.sort(key=lambda g:g.datetime)
+    games_div2.sort(key=lambda g:g.datetime)
+    games_div3.sort(key=lambda g:g.datetime)
+    games_div4.sort(key=lambda g:g.datetime)
+    games_div5.sort(key=lambda g:g.datetime)
+    games_div6.sort(key=lambda g:g.datetime)
+    games_div1_completed.sort(key=lambda g:g.datetime)
+    games_div2_completed.sort(key=lambda g:g.datetime)
+    games_div3_completed.sort(key=lambda g:g.datetime)
+    games_div4_completed.sort(key=lambda g:g.datetime)
+    games_div5_completed.sort(key=lambda g:g.datetime)
+    games_div6_completed.sort(key=lambda g:g.datetime)
+    games_all.sort(key=lambda g:g.datetime)
+    games_all_completed.sort(key=lambda g:g.datetime)
+    return render_to_response('league/schedule.html',{'user':request.user,'profile':request.user.get_profile(),'player_list':player_list,'team_list':team_list,'league':league,'games_all':games_all,'games_all_completed':games_all_completed,'games_div1':games_div1,'games_div1_completed':games_div1_completed,'games_div2':games_div2,'games_div2_completed':games_div2_completed,'games_div3':games_div3,'games_div3_completed':games_div3_completed,'games_div4':games_div4,'games_div4_completed':games_div4_completed,'games_div5':games_div5,'games_div5_completed':games_div5_completed,'games_div6':games_div6,'games_div6_completed':games_div6_completed},context_instance=RequestContext(request))
 
      
 @login_required

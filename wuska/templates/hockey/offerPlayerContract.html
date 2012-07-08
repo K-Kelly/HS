@@ -3,6 +3,13 @@
 {% load bootstrap %}
 {% block content_span9 %}
 
+{% if alert_success %}
+<div class="alert alert-success">
+  <a class="close" data-dismiss="alert" href="#">x</a>
+  <h4 class="alert-heading">Success!</h4>
+  {{ alert_message }}
+</div>
+{% else %}
 {% if is_free_agent %}
 {% if not_valid %}
 <div class="alert alert-error">
@@ -40,5 +47,6 @@
   <strong>Unable to offer contract! </strong>
   {{player_name}} has <strong>{{contract_end}}</strong> season(s) left before becoming a free agent.
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}

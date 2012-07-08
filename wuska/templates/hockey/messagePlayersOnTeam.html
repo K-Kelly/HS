@@ -3,6 +3,14 @@
 {% load bootstrap %}
 {% block content_span9 %}
 
+{% if alert_success %}
+<div class="alert alert-success">
+  <a class="close" data-dismiss="alert" href="#">x</a>
+  <h4 class="alert-heading">Success!</h4>
+  {{ alert_message }}
+</div>
+{% endif %}
+
 {% if can_manage %}
 <form class="well" action="" method="post">{% csrf_token %}
   <fieldset>

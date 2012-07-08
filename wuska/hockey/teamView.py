@@ -16,7 +16,10 @@ def viewTeam(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
     player_list = request.user.get_profile().players.all()
     team_list = request.user.get_profile().teams.all()
-    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'contract_status_change':team.contract_status_change}, context_instance=RequestContext(request))
+    owner_profile = get_object_or_404(UserProfile,pk=team.owner)
+    gm1_profile = get_object_or_404(UserProfile,pk=team.general_manager1) if team.general_manager1 != -1 else ""
+    gm2_profile = get_object_or_404(UserProfile,pk=team.general_manager2) if team.general_manager2 != -1 else ""   
+    return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'contract_status_change':team.contract_status_change,'owner_profile':owner_profile,'gm1_profile':gm1_profile,'gm2_profile':gm2_profile}, context_instance=RequestContext(request))
 
 def getPlayer(p_id):
     if p_id == -1:
@@ -137,10 +140,8 @@ def offerPlayerContract(request, player_id):
             concerning_players = [player]
             receiver_users = [get_object_or_404(UserProfile,pk=player.user_id)]
             send_message(title,body,team.owner,sender_cc_users,-1,team.id,concerning_players,[],receiver_users,True)
-
-            owner = True if request.user.id == team.owner else False
             alert = "You have offered a contract to %s" % (player.name)
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list,'player':player,'team_list':team_list,'alert_success':True,'alert_message':alert,'can_manage':True,'owner':owner}, context_instance=RequestContext(request))
+            return render_to_response('hockey/offerPlayerContract.html',{'form':form, 'user':request.user, 'profile':request.user.get_profile(),'player_list':player_list,'player':player,'player_name':player.name,'team_list':team_list,'can_manage':can_manage,'show_manage':True,'owner':owner,'is_free_agent':player.free_agent,'contract_end':player.contract_end,'player_id':player.id,'alert_success':True,'alert':alert}, context_instance=RequestContext(request))
         else:
             form = OfferPlayerContractForm(request.POST)
     else:
@@ -183,7 +184,7 @@ def message_players_on_team(request,team_id):
             send_message(title,body,request.user.id,sender_cc_users,-1,team.id,concerning_players,[],receiver_users,False)
 
             alert="Message sent to all players on the team."
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage2,'alert_success':True,'alert_message':alert,'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
+            return render_to_response('hockey/messagePlayersOnTeam.html',{'form':form, 'user':request.user, 'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list,'team':team, 'can_manage':can_manage2,'owner':is_owner(team.owner,request.user.id),'alert_success':True,'alert':alert}, context_instance=RequestContext(request))
         else:
             form = MessageForm(request.POST)
     else:
@@ -198,7 +199,7 @@ def editLines(request, team_id):
     t = get_object_or_404(Team, pk=team_id)
     t_players = t.players
     if request.method == 'POST':
-        form_get = make_edit_lines_form(t_players)
+        form_get = make_edit_lines_form(t)
         form = form_get(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
@@ -240,7 +241,6 @@ def editLines(request, team_id):
             pk2w = cd['pk2w_field']
             pk2ld = cd['pk2ld_field']
             pk2rd = cd['pk2rd_field']
-
 
             if player_id_in_team(lw1,t_players):
                 t.lw1 = lw1
@@ -311,7 +311,7 @@ def editLines(request, team_id):
             pp_players = t.players
             if player_id_in_team(pp1l,pp_players):
                 t.pp1lw = pp1l
-                pp_players = pp_players.exclude(pk = pp1w)
+                pp_players = pp_players.exclude(pk = pp1l)
             if player_id_in_team(pp1c,pp_players):
                 t.pp1c = pp1c
                 pp_players = pp_players.exclude(pk = pp1c)
@@ -373,7 +373,7 @@ def editLines(request, team_id):
             next = "/team/%s"%(t.pk)
             return redirect(next)
     else:
-        form = make_edit_lines_form(t_players)
+        form = make_edit_lines_form(t)
     return render_to_response('hockey/editLines.html',{'form':form, 'team':t,'user':request.user, 'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,t.owner,t.general_manager1,t.general_manager2),'owner':is_owner(t.owner,request.user.id)}, context_instance=RequestContext(request))
 
 @login_required
@@ -584,6 +584,25 @@ def viewManagement(request,team_id):
         form = get_management_form(gm1_name,gm2_name,team.owner)
     return render_to_response('hockey/viewManagement.html',{'form':form, 'team':team,'user':request.user,'profile':request.user.get_profile(), 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
             
+@login_required
+def viewSchedule(request, team_id):
+    profile = request.user.get_profile()
+    team = get_object_or_404(Team, pk=team_id)
+    season = team.seasons.order_by('-season_number')[0]
+    games = []
+    games_completed = []
+    for game in season.reg_games.order_by('datetime'):
+        if game.is_completed:
+            games_completed.append(game)
+        else:
+            games.append(game)
+    for game in season.po_games.order_by('datetime'):
+        if game.is_completed:
+            games_completed.append(game)
+        else:
+            games.append(game)    
+    return render_to_response('hockey/teamSchedule.html', {'team':team, 'user':request.user,'profile':profile,'player_list':profile.players.all(), 'team_list':profile.teams.all(), 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'contract_status_change':team.contract_status_change,'games':games,'games_completed':games_completed}, context_instance=RequestContext(request))
+
 
 def can_manage(request_user_id,team_owner,team_general_manager1,team_general_manager2):
     if request_user_id == team_owner or request_user_id == team_general_manager1 or request_user_id == team_general_manager2:

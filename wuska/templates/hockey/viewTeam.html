@@ -9,62 +9,21 @@
   {{ alert_message }}
 </div>
 {% endif %}
-<div class="well">
+<div class="hero-unit">
+  <center><legend><h2>{{team.name}}</h2></legend></center>
   <div class="row-fluid">
     <div class="span4">
-      <h2>Left Wing</h2>
-      <ul class="unstyled">
-	<li><a href="/player/{{team.lw1.id}}/">{{team.lw1.name}}</a></li>
-	<li><a href="/player/{{team.lw2.id}}/">{{team.lw2.name}}</a></li>
-	<li><a href="/player/{{team.lw3.id}}/">{{team.lw3.name}}</a></li>
-	<li><a href="/player/{{team.lw4.id}}/">{{team.lw4.name}}</a></li>
-      </ul>
+      Owner: <a href="{{owner_profile.get_absolute_url}}">{{owner_profile.user.username}}</a>
     </div>
     <div class="span4">
-      <h2>Center</h2>
-      <ul class="unstyled">
-	<li><a href="/player/{{team.c1.id}}/">{{team.c1.name}}</a></li>
-	<li><a href="/player/{{team.c2.id}}/">{{team.c2.name}}</a></li>
-	<li><a href="/player/{{team.c3.id}}/">{{team.c3.name}}</a></li>
-	<li><a href="/player/{{team.c4.id}}/">{{team.c4.name}}</a></li>
-      </ul>
+      {% if gm1_profile %}
+      General Manager: <a href="{{gm1_profile.get_absolute_url}}">{{gm1_profile.user.username}}</a>
+      {% endif %}
     </div>
     <div class="span4">
-      <h2>Right Wing</h2>
-      <ul class="unstyled">
-	<li><a href="/player/{{team.rw1.id}}/">{{team.rw1.name}}</a></li>
-	<li><a href="/player/{{team.rw2.id}}/">{{team.rw2.name}}</a></li>
-	<li><a href="/player/{{team.rw3.id}}/">{{team.rw3.name}}</a></li>
-	<li><a href="/player/{{team.rw4.id}}/">{{team.rw4.name}}</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="row-flud">
-    <div class="span5"><center>
-	<h2>Left Defense</h2>
-	<ul class="unstyled">
-	  <li><a href="/player/{{team.defense1.id}}/">{{team.defense1.name}}</a></li>
-	  <li><a href="/player/{{team.defense3.id}}/">{{team.defense3.name}}</a></li>
-	  <li><a href="/player/{{team.defense5.id}}/">{{team.defense5.name}}</a></li>
-      </ul></center>
-    </div>
-    <div class="span4"><center>
-	<h2>Right Defense</h2>
-	<ul class="unstyled">
-	  <li><a href="/player/{{team.defense2.id}}/">{{team.defense2.name}}</a></li>
-	  <li><a href="/player/{{team.defense4.id}}/">{{team.defense4.name}}</a></li>
-	  <li><a href="/player/{{team.defense6.id}}/">{{team.defense6.name}}</a></li>
-      </ul></center>
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span4"></div>
-    <div class="span4">
-      <h2>Goalie</h2>
-      <ul class="unstyled">
-	<li><a href="/player/{{team.goalie1.id}}/">{{team.goalie1.name}}</a></li>
-	<li><a href="/player/{{team.goalie2.id}}/">{{team.goalie2.name}}</a></li>
-      </ul>
+      {% if gm2_profile %}
+      Assistant General Manager: <a href="{{gm2_profile.get_absolute_url}}">{{gm2_profile.user.username}}</a>
+      {% endif %}
     </div>
   </div>
 </div>

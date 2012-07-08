@@ -17,17 +17,20 @@
 	</ul>
 	<div class="tab-content">
 	  <div class="tab-pane active" id="1A">
-	    <ul class="nav nav-list">	
+	    <ul class="nav nav-list">
+	      <li>
+		<a href="{{ team.get_absolute_url }}">{{team.name}} Home</a>
+	      </li>
 	      <li>
 		<a href="/league/{{team.league_id}}/">View League</a>
+	      </li>
+	      <li>
+		<a href="{{ team.get_absolute_url }}schedule/">Schedule</a>
 	      </li>
 	      {% if can_manage %}
 	      <li>
 		<a href="{{ team.get_absolute_url }}editLines/">Edit Lines</a>
-	      </li>
-	      <li>
-		<a href="{{ team.get_absolute_url }}viewSchedule/">View Schedule</a>
-	      </li>
+	      </li>	      
 	      <li>
 		<a href="{{ team.get_absolute_url }}tactics/">Tactics</a>
 	      </li>

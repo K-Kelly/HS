@@ -14,6 +14,7 @@
   Messages</a> 
 <h2> Received Messages </h2>
 {% endif %}
+{% if message_list %}
 {% for message,sender_user,has_sender_player,sender_player,has_sender_team,sender_team,has_sender_cc,sender_cc,has_concerning_players,concerning_players,has_concerning_teams,concerning_teams,receiver_users,is_automated in message_list %}
 <div class="alert alert-information">
   <button class="close" data-dismiss="alert"
@@ -56,9 +57,7 @@
         <a href="/users/{{s_user.id}}/"> {{s_user.user.username}}</a>&nbsp
        {% endfor %}
     {% endif %}
-
   </strong>
-   <!--- {{from}}</strong> <a href="{{href}}"> {{name}}</a> --->
   <BR/><BR>
   <pre>
   <strong>Title:  </strong>{{message.title}}
@@ -70,7 +69,9 @@
 {% endif %}
 </div>
 {% endfor %}
-
+{% else %}
+No messages!
+{% endif %}
 {% if have_older_messages %}
 {% if sent %}
 <a class="btn btn-primary"

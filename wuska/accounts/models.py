@@ -16,6 +16,8 @@ class UserProfile(models.Model):
     new_message = models.BooleanField()
     def __unicode__(self):
         return "%s's profile" % self.user
+    def get_absolute_url(self):
+        return "/users/%i/" %self.id
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
