@@ -241,135 +241,234 @@ def editLines(request, team_id):
             pk2w = cd['pk2w_field']
             pk2ld = cd['pk2ld_field']
             pk2rd = cd['pk2rd_field']
-
-            if player_id_in_team(lw1,t_players):
-                t.lw1 = lw1
-                t_players = t_players.exclude(pk = lw1)
+            
+            t_players = []
+            t.lw1 = lw1
+            t_players.append(lw1)
             if player_id_in_team(lw2,t_players):
                 t.lw2 = lw2
-                t_players = t_players.exclude(pk = lw2)
+                t_players.append(lw2)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 2 Left Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(lw3,t_players):
                 t.lw3 = lw3
-                t_players = t_players.exclude(pk = lw3)
+                t_players.append(lw3)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 3 Left Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(lw4,t_players):
                 t.lw4 = lw4
-                t_players = t_players.exclude(pk = lw4)
-
+                t_players.append(lw4)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 4 Left Wing."
+                return edit_lines_error_message(request,form,t,alert)
+            #Validate centers
             if player_id_in_team(c1,t_players):
                 t.c1 = c1
-                t_players = t_players.exclude(pk = c1)
+                t_players.append(c1)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 1 Center."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(c2,t_players):
                 t.c2 = c2
-                t_players = t_players.exclude(pk = c2)
+                t_players.append(c2)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 2 Center."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(c3,t_players):
                 t.c3 = c3
-                t_players = t_players.exclude(pk = c3)
+                t_players.append(c3)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 3 Center."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(c4,t_players):
                 t.c4 = c4
-                t_players = t_players.exclude(pk = c4)
-
+                t_players.append(c4)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 4 Center."
+                return edit_lines_error_message(request,form,t,alert)
+            #Validate Right Wing
             if player_id_in_team(rw1,t_players):
                 t.rw1 = rw1
-                t_players = t_players.exclude(pk = rw1)
+                t_players.append(rw1)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 1 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(rw2,t_players):
                 t.rw2 = rw2
-                t_players = t_players.exclude(pk = rw2)
+                t_players.append(rw2)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 2 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(rw3,t_players):
                 t.rw3 = rw3
-                t_players = t_players.exclude(pk = rw3)
+                t_players.append(rw3)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 3 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(rw4,t_players):
                 t.rw4 = rw4
-                t_players = t_players.exclude(pk = rw4)
-
+                t_players.append(rw4)
+            else:
+                alert = "A player is on more than one even strength line. Check Line 4 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
+            #Validate Defense
             if player_id_in_team(d1,t_players):
                 t.defense1 = d1
-                t_players = t_players.exclude(pk = d1)
+                t_players.append(d1)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 1 Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(d2,t_players):
                 t.defense2 = d2
-                t_players = t_players.exclude(pk = d2)
+                t_players.append(d2)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 1 Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(d3,t_players):
                 t.defense3 = d3
-                t_players = t_players.exclude(pk = d3)
+                t_players.append(d3)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 2 Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(d4,t_players):
                 t.defense4 = d4
-                t_players = t_players.exclude(pk = d4)
+                t_players.append(d4)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 2 Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(d5,t_players):
                 t.defense5 = d5
-                t_players = t_players.exclude(pk = d5)
+                t_players.append(d5)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 3 Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(d6,t_players):
                 t.defense6 = d6
-                t_players = t_players.exclude(pk = d6)
-
-            if player_id_in_team(g1,t_players):
+                t_players.append(d6)
+            else:
+                alert ="A player is on more than one even strength Pairing. Check Pairing 3 Defense."
+                return edit_lines_error_message(request,form,t,alert)
+            #Validate Goalies
+            if g1 != g2:
                 t.goalie1 = g1
-                t_players = t_players.exclude(pk = g1)
-            if player_id_in_team(g2,t_players):
+                t_players.append(g1)
                 t.goalie2 = g2
-                t_players = t_players.exclude(pk = g2)
-
-                #special teams
-            pp_players = t.players
-            if player_id_in_team(pp1l,pp_players):
-                t.pp1lw = pp1l
-                pp_players = pp_players.exclude(pk = pp1l)
+                t_players.append(g2)
+            else:
+                alert = "A player is on more than one even strength Pairing. Check Goaltending."
+                return edit_lines_error_message(request,form,t,alert)
+            
+            #Validate Special Teams
+            pp_players = []
+            t.pp1lw = pp1l
+            pp_players.append(pp1l)
             if player_id_in_team(pp1c,pp_players):
                 t.pp1c = pp1c
-                pp_players = pp_players.exclude(pk = pp1c)
+                pp_players.append(pp1c)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 1 Center."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp1r,pp_players):
                 t.pp1rw = pp1r
-                pp_players = pp_players.exclude(pk = pp1r)
+                pp_players.append(pp1r)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 1 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp1ld,pp_players):
                 t.pp1ld = pp1ld
-                pp_players = pp_players.exclude(pk = pp1ld)
+                pp_players.append(pp1ld)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 1 Left Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp1rd,pp_players):
                 t.pp1rd = pp1rd
-                pp_players = pp_players.exclude(pk = pp1rd)
-                
+                pp_players.append(pp1rd)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 1 Right Defense."
+                return edit_lines_error_message(request,form,t,alert)
+
             if player_id_in_team(pp2l,pp_players):
                 t.pp2lw = pp2l
-                pp_players = pp_players.exclude(pk = pp2l)
+                pp_players.append(pp2l)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 2 Left Wing."
             if player_id_in_team(pp2c,pp_players):
                 t.pp2c = pp2c
-                pp_players = pp_players.exclude(pk = pp2c)
+                pp_players.append(pp2c)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 2 Center."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp2r,pp_players):
                 t.pp2rw = pp2r
-                pp_players = pp_players.exclude(pk = pp2r)
+                pp_players.append(pp2r)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 2 Right Wing."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp2ld,pp_players):
                 t.pp2ld = pp2ld
-                pp_players = pp_players.exclude(pk = pp2ld)
+                pp_players.append(pp2ld)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 2 Left Defense."
+                return edit_lines_error_message(request,form,t,alert)
             if player_id_in_team(pp2rd,pp_players):
                 t.pp2rd = pp2rd
-                pp_players = pp_players.exclude(pk = pp2rd)
-
-                #Penalty Kill
-            pp_players = t.players
-            if player_id_in_team(pk1w,pp_players):
-                t.pk1w = pk1w
-                pp_players = pp_players.exclude(pk = pk1w)
-            if player_id_in_team(pk1c,pp_players):
+                pp_players.append(pp2rd)
+            else:
+                alert ="A player is on more than one Power Play Line or in more than one position per powerplay. Check PP 2 Right Defense."
+                return edit_lines_error_message(request,form,t,alert)
+            #Validate Penalty Kill
+            pk_players = []
+            t.pk1w = pk1w
+            pk_players.append(pk1w)
+            if player_id_in_team(pk1c,pk_players):
                 t.pk1c = pk1c
-                pp_players = pp_players.exclude(pk = pk1c)
-            if player_id_in_team(pk1ld,pp_players):
+                pk_players.append(pk1c)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check pk 1 Center."
+                return edit_lines_error_message(request,form,t,alert)
+            if player_id_in_team(pk1ld,pk_players):
                 t.pk1ld = pk1ld
-                pp_players = pp_players.exclude(pk = pk1ld)
-            if player_id_in_team(pk1rd,pp_players):
+                pk_players.append(pk1ld)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check pk 1 Left Defense."
+                return edit_lines_error_message(request,form,t,alert)
+            if player_id_in_team(pk1rd,pk_players):
                 t.pk1rd = pk1rd
-                pp_players = pp_players.exclude(pk = pk1rd)
+                pk_players.append(pk1rd)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check pk 1 Right Defense."
+                return edit_lines_error_message(request,form,t,alert)
 
-            if player_id_in_team(pk2w,pp_players):
+            if player_id_in_team(pk2w,pk_players):
                 t.pk2w = pk2w
-                pp_players = pp_players.exclude(pk = pk2w)
-            if player_id_in_team(pk2c,pp_players):
+                pk_players.append(pk2w)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check PK 2 Center."
+                return edit_lines_error_message(request,form,t,alert)
+
+            if player_id_in_team(pk2c,pk_players):
                 t.pk2c = pk2c
-                pp_players = pp_players.exclude(pk = pk2c)
-            if player_id_in_team(pk2ld,pp_players):
+                pk_players.append(pk2c)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check PK 2 Center."
+                return edit_lines_error_message(request,form,t,alert)
+            if player_id_in_team(pk2ld,pk_players):
                 t.pk2ld = pk2ld
-                pp_players = pp_players.exclude(pk = pk2ld)
-            if player_id_in_team(pk2rd,pp_players):
+                pk_players.append(pk2ld)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check PK 2 Left Defense."
+                return edit_lines_error_message(request,form,t,alert)
+            if player_id_in_team(pk2rd,pk_players):
                 t.pk2rd = pk2rd
-                pp_players = pp_players.exclude(pk = pk2rd)
+                pk_players.append(pk2rd)
+            else:
+                alert ="A player is on more than one Penalty Kill Line or in more than one position per penalty kill. Check PK 2 Right Defense."
+                return edit_lines_error_message(request,form,t,alert)
 
             t.save()
+
             next = "/team/%s"%(t.pk)
             return redirect(next)
     else:
@@ -378,7 +477,7 @@ def editLines(request, team_id):
 
 @login_required
 def teamViewMessagesRedirect(request, team_id):
-    return redirect('/team/%s/viewMessages/received/10'%(team_id))
+    return redirect('/team/%s/viewMessages/received/10/'%(team_id))
 @login_required
 def teamViewMessages(request, team_id, last_message,sent_or_rec):
     player_list = request.user.get_profile().players.all()
@@ -610,9 +709,11 @@ def can_manage(request_user_id,team_owner,team_general_manager1,team_general_man
     return False
         
 def player_id_in_team(p_id,playerlist):
-    if playerlist.filter(pk=p_id).count() == 1:
-        return True
-    return False
+    if p_id in playerlist:
+        return False
+    return True
+def edit_lines_error_message(request,form,team,message):
+    return render_to_response('hockey/editLines.html',{'form':form, 'team':team,'user':request.user, 'profile':request.user.get_profile(),'player_list':request.user.get_profile().players.all(), 'team_list':request.user.get_profile().teams.all(), 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'alert_invalid_lines':True,'alert':message}, context_instance=RequestContext(request))
 
 def send_message(title,body,sender_user_id,sender_cc_users,sender_player_id,sender_team_id,concerning_players,concerning_teams,receiver_users,is_automated):
     message = Message(sender_user_id=sender_user_id,sender_player_id = sender_player_id,sender_team_id = sender_team_id,title = title, body = body,is_automated=is_automated)
