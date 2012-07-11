@@ -97,7 +97,43 @@ def message_player(team_list):
             raise forms.ValidationError("You don't have access to this team.")  
     return MessagePlayerForm 
         
+def get_tactics_form(team):
+    class Tactics form(forms.Form):
+        title = forms.CharField(max_length=100,label="Title:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'4'}))
+        body = forms.CharField(max_length=3000,label="Body:",widget=forms.Textarea(attrs={'class':'input-xlarge','rows':'17'}))
+        line1_time = forms.IntegerField(label="Minutes Line 1 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25)
+        line2_time = forms.IntegerField(label="Minutes Line 2 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25)
+        line3_time = forms.IntegerField(label="Minutes Line 3 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25)
+        line4_time = forms.IntegerField(label="Minutes Line 4 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25)
+        home_match_line1 = forms.IntegerField(label="Line Used Against Opponent's Line 1",help_text="An integer between 1 and 4 please." ,max_value=1,min_value=4)
+        home_match_line2 = forms.IntegerField(label="Line Used Against Opponent's Line 2",help_text="An integer between 1 and 4 please." ,max_value=1,min_value=4)
+        home_match_line3 = forms.IntegerField(label="Line Used Against Opponent's Line 3",help_text="An integer between 1 and 4 please." ,max_value=1,min_value=4)
+        home_match_line4 = forms.IntegerField(label="Line Used Against Opponent's Line 4",help_text="An integer between 1 and 4 please." ,max_value=1,min_value=4)
+        home_match_pp1 = forms.IntegerField(label="Penatly Kill Used Against Opponent's Powerplay Unit 1",help_text="An integer between 1 and 2 please." ,max_value=1,min_value=2)
+        home_match_pp2 = forms.IntegerField(label="Penatly Kill Used Against Opponent's Powerplay Unit 2",help_text="An integer between 1 and 2 please." ,max_value=1,min_value=2)
+        home_match_pk1 = forms.IntegerField(label="Powerplay Used Against Opponent's Penalty Kill Unit 1",help_text="An integer between 1 and 2 please." ,max_value=1,min_value=2)
+        home_match_pk2 = forms.IntegerField(label="Powerplay Used Against Opponent's Penalty Kill Unit 2",help_text="An integer between 1 and 2 please." ,max_value=1,min_value=2)
         
+
+        for team in team_list:
+            list_id.append(team.id)
+            list_name.append(team.name)      
+        team_choices = zip(list_id,list_name)
+        team_field = forms.ChoiceField(choices=team_choices,label='Choose your team:',initial=-1)
+    
+        def clean_team_field(self):
+            data = self.cleaned_data['team_field']
+            data = int(data)
+            if data == -1:
+                return data
+            for team in team_list:
+                if team.id == data:
+                    return data
+            raise forms.ValidationError("You don't have access to this team.")  
+    return MessagePlayerForm   
+
+
+      
 def make_edit_lines_form(team):
     class EditLinesForm(forms.Form):
         player_list = team.players

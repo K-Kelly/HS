@@ -107,6 +107,28 @@ class Message(models.Model):
     
     class Meta:
         ordering = ['sender_user_id']
+        
+class Tactics(models.Model):
+    line1_time = models.SmallIntegerField(blank=True)
+    line2_time = models.SmallIntegerField(blank=True)
+    line3_time = models.SmallIntegerField(blank=True)
+    line4_time = models.SmallIntegerField(blank=True)
+    up_3 = models.SmallIntegerField(blank=True)
+    up_2 = models.SmallIntegerField(blank=True)
+    up_1 = models.SmallIntegerField(blank=True)
+    tie = models.SmallIntegerField(blank=True)
+    down_3 = models.SmallIntegerField(blank=True)
+    down_2 = models.SmallIntegerField(blank=True)
+    down_1 = models.SmallIntegerField(blank=True)
+    match_line1 = models.SmallIntegerField(blank=True)
+    match_line2 = models.SmallIntegerField(blank=True)
+    match_line3 = models.SmallIntegerField(blank=True)
+    match_line4 = models.SmallIntegerField(blank=True)
+    match_pp1 = models.SmallIntegerField(blank=True)
+    match_pp2 = models.SmallIntegerField(blank=True)
+    match_pk1 = models.SmallIntegerField(blank=True)
+    match_pk2 = models.SmallIntegerField(blank=True)
+
 
 class Team(models.Model):
     name = models.CharField(max_length=35)

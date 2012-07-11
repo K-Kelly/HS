@@ -145,4 +145,28 @@ def get_line_leadership(line_list):
         temp_sum += p.leadership
     return temp_sum / len(line_list)
 
+def get_line_offense(line_list):
+    #shooting should be individual player, so don't include
+    #weighted average of skills
+    passing = .25 * get_line_passing(line_list)
+    stick_handling = .18 * get_line_stick_handling(line_list)
+    positioning = .05 * get_line_positioning(line_list)
+    skating = .14 * get_line_skating(line_list)
+    strength = .14 * get_line_skating(line_list)
+    awareness = .20 * get_line_awareness(line_list)
+    leadership = .04 * get_line_leadership(line_list)
+    return passing + stick_handling + positioning + skating + strength + awareness +leadership
 
+def get_line_defense(line_list):
+    stick_handling = .05 * get_line_stick_handling(line_list)
+    checking = .21 * get_line_checking(line_list)
+    positioning = .22 * get_line_positioning(line_list)
+    skating= .14* get_line_skating(line_list)
+    strength = .14 * get_line_strength(line_list)
+    awareness = .20 * get_line_awareness(line_list)
+    leadership = .04 * get_line_leadership(line_list)
+    return stick_handling + checking + positioning + skating + strength + awareness + leadership
+
+
+                                             
+                                            
