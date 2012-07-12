@@ -109,10 +109,13 @@ class Message(models.Model):
         ordering = ['sender_user_id']
         
 class Tactics(models.Model):
-    line1_time = models.SmallIntegerField(blank=True)
-    line2_time = models.SmallIntegerField(blank=True)
-    line3_time = models.SmallIntegerField(blank=True)
-    line4_time = models.SmallIntegerField(blank=True)
+    line1_time = models.SmallIntegerField(blank=True,default=24)
+    line2_time = models.SmallIntegerField(blank=True,default=16)
+    line3_time = models.SmallIntegerField(blank=True,default=12)
+    line4_time = models.SmallIntegerField(blank=True,default=8)
+    pairing1_time = models.SmallIntegerField(blank=True,default=25)
+    pairing2_time = models.SmallIntegerField(blank=True,default=20)
+    pairing3_time = models.SmallIntegerField(blank=True,default=15)
     up_3 = models.SmallIntegerField(blank=True)
     up_2 = models.SmallIntegerField(blank=True)
     up_1 = models.SmallIntegerField(blank=True)
@@ -190,6 +193,7 @@ class Team(models.Model):
     avgAge = models.DecimalField(max_digits=5,decimal_places=3,blank=True,default=-1)
     contract_status_change = models.BooleanField()
     seasons = models.ManyToManyField('hockey.TeamSeason',blank=True,related_name = 'team_teamseason')
+    tactics = models.ForeignKey(Tactics, related_name = 'team_tactics')
     datetime = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return self.name

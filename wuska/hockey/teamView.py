@@ -40,7 +40,9 @@ def createTeam(request):
             arena_name = cd['arena_name']           
             arena = Arena(name=arena_name, occupancy=5000, practice_facility=0,locker_room=0, equipment=0, rink=0, concessions=0, lower_bowl=1, mid_bowl=0, upper_bowl=0, box=0, ticket_lower=5, ticket_mid=2, ticket_upper=1, ticket_box=10)
             arena.save()
-            team = Team(name=name,abbreviation=abbreviation, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id=-1,arena=arena,funds=2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000, contract_status_change=False,division = -1)
+            tactics = Tactics()
+            tactics.save()
+            team = Team(name=name,abbreviation=abbreviation, owner=request.user.id, general_manager1=-1,general_manager2=-1, league_id=-1,arena=arena,funds=2000000, salary_used=0, salary_left=2000000,numLWNeed=4,numCNeed=4,numRWNeed=4,numDNeed=6,numGNeed=2,avgAge=00.000, contract_status_change=False,division = -1,tactics=tactics)
             team.save()
             request.user.get_profile().teams_owned.add(team)
             request.user.get_profile().teams.add(team) 
@@ -701,6 +703,62 @@ def viewSchedule(request, team_id):
         else:
             games.append(game)    
     return render_to_response('hockey/teamSchedule.html', {'team':team, 'user':request.user,'profile':profile,'player_list':profile.players.all(), 'team_list':profile.teams.all(), 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'contract_status_change':team.contract_status_change,'games':games,'games_completed':games_completed}, context_instance=RequestContext(request))
+
+
+@login_required
+def viewTactics(request,team_id):
+    team = get_object_or_404(Team, pk=team_id)
+    can_manage_team = can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2)
+    if request.method == 'POST' and can_manage_team:
+        form_get = get_tactics_form(team.tactics)
+        form = form_get(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            line1_time = cd['line1_time']
+            line2_time = cd['line2_time']
+            line3_time = cd['line3_time']
+            line4_time = cd['line4_time']
+            pairing1_time = cd['pairing1_time']
+            pairing2_time = cd['pairing2_time']
+            pairing3_time = cd['pairing3_time']
+            home_match_line1 = cd['home_match_line1']
+            home_match_line2 = cd['home_match_line2']
+            home_match_line3 = cd['home_match_line3']
+            home_match_line4 = cd['home_match_line4']
+            home_match_pp1 = cd['home_match_pp1']
+            home_match_pp2 = cd['home_match_pp2']
+            home_match_pk1 = cd['home_match_pk1']
+            home_match_pk2 = cd['home_match_pk2']
+
+            team.tactics.line1_time = line1_time
+            team.tactics.line2_time = line2_time
+            team.tactics.line3_time = line3_time
+            team.tactics.line4_time = line4_time
+            team.tactics.pairing1_time = pairing1_time
+            team.tactics.pairing2_time = pairing2_time
+            team.tactics.pairing3_time = pairing3_time
+            team.tactics.home_match_line1 = home_match_line1
+            team.tactics.home_match_line2 = home_match_line2
+            team.tactics.home_match_line3 = home_match_line3
+            team.tactics.home_match_line4 = home_match_line4
+            team.tactics.home_match_pp1 = home_match_pp1
+            team.tactics.home_match_pp2 = home_match_pp2
+            team.tactics.home_match_pk1 = home_match_pk1
+            team.tactics.home_match_pk2 = home_match_pk2
+            team.tactics.save()
+            team.save()
+          
+            alert="Tactics successfully changed."
+            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':True,'alert_success':True,'alert_message':alert,'owner':True}, context_instance=RequestContext(request))    
+        else:
+            form = get_management_form(gm1_name,gm2_name,team.owner)
+            form = form(request.POST)
+    else:
+        form = get_management_form(gm1_name,gm2_name,team.owner)
+    return render_to_response('hockey/viewManagement.html',{'form':form, 'team':team,'user':request.user,'profile':request.user.get_profile(), 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
+
+
+
 
 
 def can_manage(request_user_id,team_owner,team_general_manager1,team_general_manager2):
