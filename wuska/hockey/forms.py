@@ -99,64 +99,77 @@ def message_player(team_list):
         
 def get_tactics_form(tactics):
     class TacticsForm(forms.Form):
-        line1_time = forms.IntegerField(label="Minutes Line 1 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25,initial=tactics.line1_time)
-        line2_time = forms.IntegerField(label="Minutes Line 2 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25,initial=tactics.line2_time)
-        line3_time = forms.IntegerField(label="Minutes Line 3 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25,initial=tactics.line3_time)
-        line4_time = forms.IntegerField(label="Minutes Line 4 Plays",help_text="An integer between 3 and 25 please." ,max_value=3,min_value=25,initial=tactics.line4_time)
-        pairing1_time = forms.IntegerField(label="Minutes Pairing 1 Plays",help_text="An integer between 10 and 32 please." ,max_value=10,min_value=32,initial=tactics.pairing1_time)
-        pairing2_time = forms.IntegerField(label="Minutes Pairing 2 Plays",help_text="An integer between 10 and 32 please." ,max_value=10,min_value=32,initial=tactics.pairing2_time)
-        pairing3_time = forms.IntegerField(label="Minutes Pairing 3 Plays",help_text="An integer between 10 and 32 please." ,max_value=10,min_value=32,initial=tactics.pairing3_time)
-
-        match_choices = ((1,1),(2,2),(3,3),(4,4))
+        line1_time = forms.IntegerField(max_value=25,min_value=3,label="Minutes Line 1 Plays",initial=tactics.line1_time)
+        line2_time = forms.IntegerField(max_value=25,min_value=3,label="Minutes Line 2 Plays",initial=tactics.line2_time)
+        line3_time = forms.IntegerField(max_value=25,min_value=3,label="Minutes Line 3 Plays",initial=tactics.line3_time)
+        line4_time = forms.IntegerField(max_value=25,min_value=3,label="Minutes Line 4 Plays",initial=tactics.line4_time)
+        pairing1_time = forms.IntegerField(max_value=32,min_value=10,label="Minutes Pairing 1 Plays",initial=tactics.pairing1_time)
+        pairing2_time = forms.IntegerField(max_value=32,min_value=10,label="Minutes Pairing 2 Plays",initial=tactics.pairing2_time)
+        pairing3_time = forms.IntegerField(max_value=32,min_value=10,label="Minutes Pairing 3 Plays",initial=tactics.pairing3_time)
+        match_choices = ((1,'Line 1'),(2,'Line 2'),(3,'Line 3'),(4,'Line 4'))
         home_match_line1 = forms.ChoiceField(label="Line to Use Against Opponent's Line 1",choices=match_choices,initial=tactics.match_line1)
         home_match_line2 = forms.ChoiceField(label="Line to Use Against Opponent's Line 2",choices=match_choices,initial=tactics.match_line2)
         home_match_line3 = forms.ChoiceField(label="Line to Use Against Opponent's Line 3",choices=match_choices,initial=tactics.match_line3)
         home_match_line4 = forms.ChoiceField(label="Line to Use Against Opponent's Line 4",choices=match_choices,initial=tactics.match_line4)
-        match_choices = ((1,1),(2,2))
+        match_choices = ((1,'Penalty Kill 1'),(2,'Penalty Kill 2'))
         home_match_pp1 = forms.ChoiceField(label="Penalty Kill to Use Against Opponent's Powerplay 1",choices=match_choices,initial=tactics.match_pp1)
         home_match_pp2 = forms.ChoiceField(label="Penalty Kill to Use Against Opponent's Powerplay 2",choices=match_choices,initial=tactics.match_pp2)
+        match_choices = ((1,'Powerplay 1'),(2,'Powerplay 2'))
         home_match_pk1 = forms.ChoiceField(label="Powerplay to Use Against Opponent's Penalty Kill 1",choices=match_choices,initial=tactics.match_pk1)
         home_match_pk2 = forms.ChoiceField(label="Powerplay to Use Against Opponent's Penalty Kill 2",choices=match_choices,initial=tactics.match_pk2)
         
         def clean(self):
             cleaned_data = super(TacticsForm,self).clean()
-            line1_time = int(cleaned_data.get('line1_time'))
-            line2_time = int(cleaned_data.get('line2_time'))
-            line3_time = int(cleaned_data.get('line3_time'))
-            line4_time = int(cleaned_data.get('line4_time'))
-            temp = line1_time + line2_time + line3_time + line4_time
-            if temp != 60:
-                raise forms.ValidationError("Line 1 icetime, Line 2 icetime, Line3 icetime, and line4 icetime must add up to exactly 60. Line 1 icetime + Line 2 icetime + Line 3 icetime + Line 4 icetime currently equals %s, which does not equal 60." %(temp))
-            pairing1_time = int(cleaned_data.get('pairing1_time'))
-            pairing2_time = int(cleaned_data.get('pairing2_time'))
-            pairing3_time = int(cleaned_data.get('pairing3_time'))
-            temp = pairing1_time + pairing2_time + pairing3_time 
-            if temp != 60:
-                raise forms.ValidationError("Pairing 1 icetime,Pairing 2 icetime, and Pairing 3 icetime must add up to exactly 60. Pairing 1 icetime + Pairing 2 icetime + Pairing 3 icetime currently equals %s, which does not equal 60." % (temp))          
-            lines_matched = []
-            home_match1 =int(cleaned_data.get('home_match_line2'))
-            home_match2 =int(cleaned_data.get('home_match_line3'))
-            home_match3 =int(cleaned_data.get('home_match_line4'))
-            home_match4 =int(cleaned_data.get('home_match_line4'))
-            lines_matched.append(home_match1)
-            if home_match2 in lines_match:
-                raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match2))
-            lines_matched.append(home_match2)
-            if home_match3 in lines_match:
-                raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match3))
-            lines_matched.append(home_match3)
-            if home_match4 in lines_match:
-                raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match4))
-
-            home_matchpp1 =int(cleaned_data.get('home_match_pp1'))
-            home_matchpp2 =int(cleaned_data.get('home_match_pp2'))
-            if home_matchpp1 == home_matchpp2:
-                raise forms.ValidationError("Penalty kill unit %s is used to match both of the opponent's powerplays. Please use your other penalty kill unit to match one of the opponent's powerplays.")
-            
-            home_matchpk1 =int(cleaned_data.get('home_match_pk1'))
-            home_matchpk2 =int(cleaned_data.get('home_match_pk2'))
-            if home_matchpk1 == home_matchpk2:
-                raise forms.ValidationError("Powerplay unit %s is used to match both of the opponent's penalty kills. Please use your other powerplay unit to match one of the opponent's penalty kills.")       
+            try:
+                line4_time = int(self.cleaned_data.get('line4_time'))
+                line1_time = int(self.cleaned_data.get('line1_time'))
+                line2_time = int(self.cleaned_data.get('line2_time'))
+                line3_time = int(self.cleaned_data.get('line3_time'))
+                temp = line1_time + line2_time + line3_time + line4_time
+                if temp != 60:
+                    raise forms.ValidationError("Line 1 icetime, Line 2 icetime, Line 3 icetime, and line 4 icetime must add up to exactly 60. Line 1 icetime + Line 2 icetime + Line 3 icetime + Line 4 icetime currently equals %s, which does not equal 60." %(temp))
+            except (NameError,TypeError):
+                pass
+            try:
+                pairing1_time = int(cleaned_data.get('pairing1_time'))
+                pairing2_time = int(cleaned_data.get('pairing2_time'))
+                pairing3_time = int(cleaned_data.get('pairing3_time'))
+                temp = pairing1_time + pairing2_time + pairing3_time 
+                if temp != 60:
+                    raise forms.ValidationError("Pairing 1 icetime,Pairing 2 icetime, and Pairing 3 icetime must add up to exactly 60. Pairing 1 icetime + Pairing 2 icetime + Pairing 3 icetime currently equals %s, which does not equal 60." % (temp))          
+            except (NameError,TypeError):
+                pass
+            try:
+                lines_matched = []
+                home_match1 =int(cleaned_data.get('home_match_line1'))
+                home_match2 =int(cleaned_data.get('home_match_line2'))
+                home_match3 =int(cleaned_data.get('home_match_line3'))
+                home_match4 =int(cleaned_data.get('home_match_line4'))
+                lines_matched.append(home_match1)
+                if home_match2 in lines_matched:
+                    raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match2))
+                lines_matched.append(home_match2)
+                if home_match3 in lines_matched:
+                    raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match3))
+                lines_matched.append(home_match3)
+                if home_match4 in lines_matched:
+                    raise forms.ValidationError("Line %s is used to match more than one of the opponent's lines" % (home_match4))
+            except (NameError,TypeError):
+                pass
+            try:
+                home_matchpp1 =int(cleaned_data.get('home_match_pp1'))
+                home_matchpp2 =int(cleaned_data.get('home_match_pp2'))
+                if home_matchpp1 == home_matchpp2:
+                    raise forms.ValidationError("Penalty kill unit %s is used to match both of the opponent's powerplays. Please use your other penalty kill unit to match one of the opponent's powerplays." % (home_matchpp1))
+            except (NameError,TypeError):
+                pass
+            try:
+                home_matchpk1 =int(cleaned_data.get('home_match_pk1'))
+                home_matchpk2 =int(cleaned_data.get('home_match_pk2'))
+                if home_matchpk1 == home_matchpk2:
+                    raise forms.ValidationError("Powerplay unit %s is used to match both of the opponent's penalty kills. Please use your other powerplay unit to match one of the opponent's penalty kills." % (home_matchpk1))       
+            except (NameError,TypeError):
+                pass
             return cleaned_data
     return TacticsForm
 

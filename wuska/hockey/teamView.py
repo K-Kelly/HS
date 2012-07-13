@@ -709,6 +709,7 @@ def viewSchedule(request, team_id):
 def viewTactics(request,team_id):
     team = get_object_or_404(Team, pk=team_id)
     can_manage_team = can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2)
+    profile = request.user.get_profile()
     if request.method == 'POST' and can_manage_team:
         form_get = get_tactics_form(team.tactics)
         form = form_get(request.POST)
@@ -749,13 +750,14 @@ def viewTactics(request,team_id):
             team.save()
           
             alert="Tactics successfully changed."
-            return render_to_response('hockey/viewTeam.html', {'team':team, 'user':request.user,'profile':request.user.get_profile(),'player_list':player_list, 'team_list':team_list, 'can_manage':True,'alert_success':True,'alert_message':alert,'owner':True}, context_instance=RequestContext(request))    
+            return render_to_response('hockey/tactics.html',{'form':form, 'team':team,'user':request.user,'profile':profile, 'player_list':profile.players.all(), 'team_list':profile.teams.all(), 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id),'alert_succes':True,'alert':alert}, context_instance=RequestContext(request))    
         else:
-            form = get_management_form(gm1_name,gm2_name,team.owner)
-            form = form(request.POST)
+            form_get = get_tactics_form(team.tactics)
+            form = form_get(request.POST)
     else:
-        form = get_management_form(gm1_name,gm2_name,team.owner)
-    return render_to_response('hockey/viewManagement.html',{'form':form, 'team':team,'user':request.user,'profile':request.user.get_profile(), 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
+        form_get = get_tactics_form(team.tactics)
+        form = form_get()
+    return render_to_response('hockey/tactics.html',{'form':form, 'team':team,'user':request.user,'profile':profile, 'player_list':profile.players.all(), 'team_list':profile.teams.all(), 'can_manage':can_manage(request.user.id,team.owner,team.general_manager1,team.general_manager2),'owner':is_owner(team.owner,request.user.id)}, context_instance=RequestContext(request))
 
 
 
