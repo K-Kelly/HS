@@ -5,7 +5,7 @@ from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.utils.timezone import utc
-from random import randrange
+from random import randrange,uniform
 from datetime import datetime,timedelta
 from itertools import chain
 from math import trunc
@@ -120,19 +120,73 @@ def start_game(game):
         no_stoppage = True
         while no_stoppage:
             if home_possession:
-                no_stoppage = do_possession_even_strength(player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone)
             else:
-                no_stoppage = do_possession_even_strength(player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone)
         
             
 
    # @ zone: 0 = defensive zone, 1 = neutral zone, 2 = offensive zone
-def do_possession_even_strength(player_w_puck,off_line,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone):
+def do_possession_even_strength(player_w_puck,primary_assist,second_assist,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone):
     off_penalty = get_line_penalty(off_line)
     def_penalty = get_line_penalty(def_line)
     
+    off_line_pair_no_puck = off_line + off_pairing
+    off_line_pair_no_puck.remove(player_w_puck)
+    def_line_pair = def_line + def_pairing
+    
     if zone == 0:
-        if player_w_puck.passing
+        #options: 1: pass in zone (15 %), 2: pass to neutral zone(40%), 3: stickhandle & skate to skate to neutral zone(40%), 4: penalty(5%)
+        
+        option_odds = get_line_offense(off_line) - get_line_defense(def_line) + 60
+        if option_odds > 90:
+            option_odds = 90
+        elif option_odds < 10:
+            option_odds = 10
+         
+        option = randrange(1,101)
+        if option <= 15:
+            #pass in the same zone (15% chance of happening)
+            pass_to = off_line_pair_no_puck[randrange(0,4)]
+            log += "<BR> %s attempts to pass the puck to %s." %(player_w_puck.name,pass_to.name)
+            if randrange(1,101) > option_odds:
+                #option was unsuccessful
+                pass_to = def_line_pair[randrange(0,4)]
+                log +="<BR> %s intercepts the puck." % (pass_to.name)
+                home_pg = player_games_off[player_w_puck]
+                home_pg.exp_passing -= 0.001
+                home_pg.save()
+                home_pg = player_games_off[pass_to]
+                temp = randrange(0,3)
+                if temp == 0:
+                    home_pg.exp_positioning += 0.001
+                elif temp == 1:
+                    home_pg.exp_skating += 0.001
+                else:
+                    home_pg.exp_awareness += 0.001                  
+                home_pg.save()
+                #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
+                #zone should now be 2 (offensive zone)
+                return False,False,pass_to,None,None,False,False,2,log
+            else:
+                #option was successful
+                home_pg = player_games_off[player_w_puck]
+                home_pg.exp_passing += 0.001
+                home_pg.save()
+                home_pg = player_games_off[pass_to]
+                temp = randrange(0,3)
+                if temp == 0:
+                    home_pg.exp_positioning += 0.001
+                elif temp == 1:
+                    home_pg.exp_skating += 0.001
+                else:
+                    home_pg.exp_awareness += 0.001                  
+                home_pg.save()
+                second_assist = primary_assist
+                primary_assist = player_w_puck
+                return False,True,pass_to,primary_assist,second_assist,False,False,0,log
+            
+
     
     
 
@@ -140,8 +194,8 @@ def do_possession_even_strength(player_w_puck,off_line,off_pairing,player_games_
 
 def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,player_games_away,log):
     #calculate who wins the faceoff
-    #chance of home center getting kicked out of faceoff circle:10%
     home_center = home_line[1]
+    #chance of home center getting kicked out of faceoff circle:10%
     if randrange(1,11) == 1:
         if home_line[0].faceoff > home_line[2].faceoff:
             home_center = home_line[0]
@@ -166,6 +220,7 @@ def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,p
         home_pg = player_games_home[home_center.id]
         home_pg.faceoffs_taken += 1
         home_pg.faceoffs_won += 1
+        home_pg.exp_faceoff += .001
         home_pg.save()
         away_pg = player_games_away[away_center.id]
         away_pg.faceoffs_taken += 1
@@ -182,6 +237,7 @@ def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,p
         away_pg = player_games_away[away_center.id]
         away_pg.faceoffs_taken += 1
         away_pg.faceoffs_won += 1
+        away_pg.exp_faceoff += .001
         away_pg.save()
         log+= "<BR> %s wins the faceoff." % (away_center.name)
         p_w_puck = randrange(0,5)
@@ -258,6 +314,8 @@ def get_line_defense(line_list):
     awareness = .20 * get_line_awareness(line_list)
     leadership = .04 * get_line_leadership(line_list)
     return stick_handling + checking + positioning + skating + strength + awareness + leadership
+
+def get_line_offense_zone0(line_list):
 
 def get_line_penalty(line_list):
     stick_handling = .125 * get_line_stick_handling(line_list)

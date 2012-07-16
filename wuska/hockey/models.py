@@ -292,7 +292,19 @@ class PlayerGame(models.Model):
     faceoffs_won = models.SmallIntegerField(default=0)
     checks = models.SmallIntegerField(default=0)
     shots_blocked = models.SmallIntegerField(default=0)
-         
+    exp_shooting = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_passing = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_stick_handling = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_checking = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_positioning = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_endurance = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_skating = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_strength = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_faceoff = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_fighting = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_awareness = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    exp_leadership = models.DecimalField(default=0,max_digits=5,decimal_places=3)
+    
     def __unicode__(self):
         return u'%s' % (self.player_id)
 
