@@ -120,75 +120,147 @@ def start_game(game):
         no_stoppage = True
         while no_stoppage:
             if home_possession:
-                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(game,player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone)
             else:
-                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(game,player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone)
         
-            
+          
+
+  
 
    # @ zone: 0 = defensive zone, 1 = neutral zone, 2 = offensive zone
-def do_possession_even_strength(player_w_puck,primary_assist,second_assist,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone):
+def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone):
     off_penalty = get_line_penalty(off_line)
     def_penalty = get_line_penalty(def_line)
+    penalty_odds = def_penalty - off_penalty + 30
+    penalty_odds = adjust_odds(penalty_odds,90,10)
+    off_penalty_choices = ["Boarding","Clipping","Charging","Elbowing","High-sticking","Holding","Roughing","Kneeing","Tripping","Slashing","Goaltender Interference","Interference","Unsportsmanlike Conduct","Delay of Game (Puck over the glass)"]
+    def_penalty_choices = ["Boarding","Clipping","Charging","Elbowing","High-sticking","Holding","Roughing","Kneeing","Tripping","Slashing","Goaltender Interference","Interference","Unsportsmanlike Conduct","Holding the Stick","Hooking","Cross-checking"]
+
+    #TO DO: Handle major penalties
     
     off_line_pair_no_puck = off_line + off_pairing
     off_line_pair_no_puck.remove(player_w_puck)
     def_line_pair = def_line + def_pairing
     
     if zone == 0:
-        #options: 1: pass in zone (15 %), 2: pass to neutral zone(40%), 3: stickhandle & skate to skate to neutral zone(40%), 4: penalty(5%)
+        #options: 1: pass in zone (15 %), 2: pass to neutral zone(40%), 3: stickhandle & skate to skate to neutral zone(40%), 4: penalty(5%)       
+        option_odds = get_line_offense(off_line) - get_line_defense(def_line) + 50
+        option_odds = adjust_odds(option_odds,90,10)  
         
-        option_odds = get_line_offense(off_line) - get_line_defense(def_line) + 60
-        if option_odds > 90:
-            option_odds = 90
-        elif option_odds < 10:
-            option_odds = 10
-         
+        #calculate the which option the player takes
         option = randrange(1,101)
-        if option <= 15:
+        if option <= 55:
             #pass in the same zone (15% chance of happening)
+            #pass to neutral zone (40% chance of happening)
             pass_to = off_line_pair_no_puck[randrange(0,4)]
             log += "<BR> %s attempts to pass the puck to %s." %(player_w_puck.name,pass_to.name)
             if randrange(1,101) > option_odds:
                 #option was unsuccessful
-                pass_to = def_line_pair[randrange(0,4)]
-                log +="<BR> %s intercepts the puck." % (pass_to.name)
-                home_pg = player_games_off[player_w_puck]
-                home_pg.exp_passing -= 0.001
-                home_pg.save()
-                home_pg = player_games_off[pass_to]
+                pass_to = def_line_pair[randrange(0,5)]
+                log += "<BR> %s intercepts the puck." % (pass_to.name)
+                off_pg = player_games_off[player_w_puck.id]
+                off_pg.exp_passing -= 0.001
+                off_pg.save()
+                def_pg = player_games_def[pass_to.id]
                 temp = randrange(0,3)
                 if temp == 0:
-                    home_pg.exp_positioning += 0.001
+                    def_pg.exp_positioning += 0.001
                 elif temp == 1:
-                    home_pg.exp_skating += 0.001
+                    def_pg.exp_skating += 0.001
                 else:
-                    home_pg.exp_awareness += 0.001                  
-                home_pg.save()
+                    def_pg.exp_awareness += 0.001                  
+                def_pg.save()
                 #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
-                #zone should now be 2 (offensive zone)
-                return False,False,pass_to,None,None,False,False,2,log
+                if option <= 35:
+                    #if option was <= 15 then was a pass to the same zone; if option <= 35 then it was a pass to the neutral zone but intercepted in the intercepting player's offensive zone(zone 2). There is a 50% (1/2 of 40% = 20 % so the range of (15,35]
+                    return False,False,pass_to,None,None,False,False,2,log
+                else:
+                    #pass was to the neutral zone, and intercepted in the neutral zone
+                    return False,False,pass_to,None,None,False,False,1,log
             else:
                 #option was successful
-                home_pg = player_games_off[player_w_puck]
-                home_pg.exp_passing += 0.001
-                home_pg.save()
-                home_pg = player_games_off[pass_to]
+                off_pg = player_games_off[player_w_puck.id]
+                off_pg.exp_passing += 0.001
+                off_pg.save()
+                off_pg = player_games_off[pass_to.id]
                 temp = randrange(0,3)
                 if temp == 0:
-                    home_pg.exp_positioning += 0.001
+                    off_pg.exp_positioning += 0.001
                 elif temp == 1:
-                    home_pg.exp_skating += 0.001
+                    off_pg.exp_skating += 0.001
                 else:
-                    home_pg.exp_awareness += 0.001                  
-                home_pg.save()
+                    off_pg.exp_awareness += 0.001                  
+                off_pg.save()
                 second_assist = primary_assist
                 primary_assist = player_w_puck
-                return False,True,pass_to,primary_assist,second_assist,False,False,0,log
-            
+                if option <= 15:
+                    #pass to the same zone
+                    return False,True,pass_to,primary_assist,second_assist,False,False,0,log
+                else:
+                    #pass to neutral zone(zone 1)
+                    return False,True,pass_to,primary_assist,second_assist,False,False,1,log
 
-    
-    
+        elif option <= 95:
+            #player with puck skates & stickhandles to neutral zone
+            log += "<BR> %s attempts to skate the puck into the neutral zone." %(player_w_puck.name)
+            if randrange(1,101) > option_odds:
+                #option was unsuccessful
+                def_player_w_puck = def_line_pair[randrange(0,5)]
+                off_pg = player_games_off[player_w_puck.id]
+                def_pg = player_games_def[def_player_w_puck.id]
+                temp = randrange(0,4)
+                if temp == 0:
+                    log +="<BR> %s poke checks the puck loose and recovers it." % (def_player_w_puck.name)
+                    off_pg.exp_stick_handling -= 0.001
+                    def_pg.exp_positioning += 0.001
+                elif temp == 1:
+                    log +="<BR> %s steals the puck." % (def_player_w_puck.name)
+                    off_pg.exp_skating -= 0.001
+                    def_pg.exp_skating += 0.001
+                elif temp == 2:
+                    log +="<BR> %s is checked into the boards and loses the puck to %s." % (player_w_puck.name,def_player_w_puck.name)
+                    off_pg.exp_strength -= 0.001
+                    def_pg.checks += 1
+                    def_pg.exp_checking += 0.001
+                else:
+                    log +="<BR> %s loses the puck to %s." % (player_w_puck.name,def_player_w_puck.name)
+                    off_pg.exp_awareness -= 0.001
+                    def_pg.exp_awareness += 0.001                  
+                off_pg.save()
+                def_pg.save()
+                #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
+                if randrange(0,2) == 0:
+                    #puck interecepted in intercepting player's offensive zone
+                    return False,False,pass_to,None,None,False,False,2,log
+                else:
+                    #puck intercepted in the neutral zone
+                    return False,False,pass_to,None,None,False,False,1,log
+            else:
+                #option was successful
+                off_pg = player_games_off[player_w_puck.id]
+                temp = randrange(0,4)
+                if temp == 0:
+                    off_pg.stick_handling += 0.001
+                elif temp == 1:
+                    off_pg.exp_skating += 0.001
+                elif temp == 2:
+                    off_pg.exp_strength += 0.001
+                else:
+                    off_pg.exp_awareness += 0.001                  
+                off_pg.save()
+                #puck moves to neutral zone(zone 1)
+                return False,True,pass_to,primary_assist,second_assist,False,False,1,log
+        else:
+            #penalty was committed
+            if randrange(1,101) <= penalty_odds:
+                #offensive team commits a penalty
+                penalty_string = off_penalty_choices[randrange(0,len(off_penalty_choices))]
+                #base who gets the penalty on leadership
+            else:
+                #defense team commits a penalty
+                penalty_string = def_penalty_choices[randrange(0,len(def_penalty_choices))]
+            
 
 
 
@@ -210,11 +282,7 @@ def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,p
             away_center = away_line[2]
         log+= "<BR> %s is kicked out of the faceoff circle and replaced by %s." %(away_line[1].name,away_center.name)
     temp = (.8 * home_center.faceoff + .2 * home_center.strength) - (.8 * away_center.faceoff + .2 * away_center.strength)
-    home_odds = 50 + temp 
-    if temp > 90:
-        home_odds = 90
-    elif temp <10:
-        home_odds = 10
+    home_odds = adjust_odds(50 + temp,90,10) 
     if randrange(1,101) <= home_odds:
         #home team won the faceoff, update stats
         home_pg = player_games_home[home_center.id]
@@ -325,6 +393,9 @@ def get_line_penalty(line_list):
     awareness = .30 * get_line_awareness(line_list)
     return stick_handling + checking + positioning + skating + awareness
     
-        
-
-
+def adjust_odds(odds,upper,lower):
+    if odds > upper:
+        odds = upper
+    elif odds < lower:
+        odds = lower
+    return odds
