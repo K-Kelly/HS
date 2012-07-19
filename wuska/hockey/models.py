@@ -329,9 +329,9 @@ class Goal(models.Model):
         return u'%s(%s,%s) at %s of period %s' % (self.scorer_id,self.primary_assist_id,self.secondary_assist_id, self.time,self.period)
 
 class Penalty(models.Model):
-    player_id = models.IntegerField(default=-1)
+    player = models.ForeignKey(Player,related_name="penalty_player")
     team_id = models.IntegerField(default=-1)
-    time = models.SmallIntegerField(default=-1)
+    time = models.CharField(max_length=(default=-1)
     period = models.SmallIntegerField(default=-1)
     game = models.OneToOneField(Game,related_name = "penalty_game")
     is_minor = models.BooleanField()

@@ -106,30 +106,40 @@ def start_game(game):
     fo_a_p3 = 100 - fo_a_p1 - fo_a_p2
     
     home_line_matches = [home.tactics.match_line1 - 1,home.tactics.match_line2 - 1,home.tactics.match_line3 - 1,home.tactics.match_line4 - 1]
+    home_pp1_match_tactic = home.tactics.match_pp1
+    home_pk1_match_tactic = home.tactics.match_pk1
 
     away_team_line = away_lines[0]
     away_team_pairing = away_pairings[0]
     home_team_line = home_lines[home_lines_matches[0]]
     home_team_pairing = home_pairings[0]
 
+    #have a stoppage time always be time_bt_fo (time between faceoffs)
+    #time = 20 min * 60 seconds. start at 1197 to allow 3 seconds for faceoff
+    time = 1197
+    time_bt_fo = (1.0/num_faceoffs_p1) * time
     zone = 1
+    penalty = None
     #first period
     while num_faceoffs_p1 > 0:
         num_faceoffs_p1 -= 1
-        home_possession,player_w_puck,log = do_faceoff(home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,player_games_away,log)
+        if penalty is None:
+            home_possession,player_w_puck,log = do_faceoff(home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,player_games_away,log)
+        else:
+            
         no_stoppage = True
         while no_stoppage:
+            
             if home_possession:
-                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(game,player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,zone,log,time,penalty = do_possession_even_strength(game,player_w_puck,home_team_line,home_team_pairing,player_games_home,away_team_line,away_team_pairing,away_g,player_games_away,log,zone,period,time,time_bt_fo)
             else:
-                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log = do_possession_even_strength(game,player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone)
+                no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,zone,log,time,penalty = do_possession_even_strength(game,player_w_puck,away_team_line,away_team_pairing,player_games_away,home_team_line,home_team_pairing,home_g,player_games_home,log,zone,period,time,time_bt_fo)
         
           
 
   
-
    # @ zone: 0 = defensive zone, 1 = neutral zone, 2 = offensive zone
-def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone):
+def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,off_line,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone,period,time,time_bt_fo):
     off_penalty = get_line_penalty(off_line)
     def_penalty = get_line_penalty(def_line)
     penalty_odds = def_penalty - off_penalty + 30
@@ -171,13 +181,13 @@ def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,
                 else:
                     def_pg.exp_awareness += 0.001                  
                 def_pg.save()
-                #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
+                #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,zone,log,time,penalty
                 if option <= 35:
                     #if option was <= 15 then was a pass to the same zone; if option <= 35 then it was a pass to the neutral zone but intercepted in the intercepting player's offensive zone(zone 2). There is a 50% (1/2 of 40% = 20 % so the range of (15,35]
-                    return False,False,pass_to,None,None,False,False,2,log
+                    return False,False,pass_to,None,None,2,log,time,None
                 else:
                     #pass was to the neutral zone, and intercepted in the neutral zone
-                    return False,False,pass_to,None,None,False,False,1,log
+                    return False,False,pass_to,None,None,1,log,time,None
             else:
                 #option was successful
                 off_pg = player_games_off[player_w_puck.id]
@@ -196,10 +206,11 @@ def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,
                 primary_assist = player_w_puck
                 if option <= 15:
                     #pass to the same zone
-                    return False,True,pass_to,primary_assist,second_assist,False,False,0,log
+                    #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log,time,penalty
+                    return False,True,pass_to,primary_assist,second_assist,0,log,time,None
                 else:
                     #pass to neutral zone(zone 1)
-                    return False,True,pass_to,primary_assist,second_assist,False,False,1,log
+                    return False,True,pass_to,primary_assist,second_assist,1,log,time,None
 
         elif option <= 95:
             #player with puck skates & stickhandles to neutral zone
@@ -232,10 +243,10 @@ def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,
                 #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
                 if randrange(0,2) == 0:
                     #puck interecepted in intercepting player's offensive zone
-                    return False,False,pass_to,None,None,False,False,2,log
+                    return False,False,def_player_w_puck,None,None,2,log,time,None
                 else:
                     #puck intercepted in the neutral zone
-                    return False,False,pass_to,None,None,False,False,1,log
+                    return False,False,def_player_w_puck,None,None,1,log,time,None
             else:
                 #option was successful
                 off_pg = player_games_off[player_w_puck.id]
@@ -250,19 +261,30 @@ def do_possession_even_strength(game,player_w_puck,primary_assist,second_assist,
                     off_pg.exp_awareness += 0.001                  
                 off_pg.save()
                 #puck moves to neutral zone(zone 1)
-                return False,True,pass_to,primary_assist,second_assist,False,False,1,log
+                return False,True,player_w_puck,primary_assist,second_assist,1,log,time,None
         else:
             #penalty was committed
+            time += time_bt_fo
+            is_double_minor = True if randrange(1,101) < 5 else False
             if randrange(1,101) <= penalty_odds:
                 #offensive team commits a penalty
                 penalty_string = off_penalty_choices[randrange(0,len(off_penalty_choices))]
-                #base who gets the penalty on leadership
+                offender = get_penalty_taker(off_line + off_pairing)
+                penalty = Penalty(offender.id,offender.team_id,time,period,game,not(is_double_minor),is_double_minor,False,penalty_string)
             else:
                 #defense team commits a penalty
                 penalty_string = def_penalty_choices[randrange(0,len(def_penalty_choices))]
+                offender = get_penalty_taker(def_line + def_pairing)
+                penalty = Penalty(offender.id,offender.team_id,time,period,game,not(is_double_minor),is_double_minor,False,penalty_string)
+            penalty.save()
+            game.add(penalty)
+            game.save()
+            return True,False,None,None,None,2,log,time,penalty
             
 
-
+def do_possession_penalty(game,player_w_puck,primary_assist,second_assist,off_line,off_pairing,player_games_off,def_line,def_pairing,def_g,player_games_def,log,zone,period,time,time_bt_fo):
+    #create method for offensive skill on pk/pp and just use normal possession
+    return None
 
 def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,player_games_away,log):
     #calculate who wins the faceoff
@@ -311,7 +333,6 @@ def do_faceoff(home_line,home_pairing,player_games_home,away_line,away_pairing,p
         p_w_puck = randrange(0,5)
         player_w_puck = away_line[p_w_puck] if p_w_puck < 3 else away_pairing[p_w_puck - 3]
         return False,player_w_puck,log
-
 
 def get_line_passing(line_list):
     pas_sum = 0
@@ -383,7 +404,19 @@ def get_line_defense(line_list):
     leadership = .04 * get_line_leadership(line_list)
     return stick_handling + checking + positioning + skating + strength + awareness + leadership
 
-def get_line_offense_zone0(line_list):
+def get_penalty_taker(line_list):
+    temp_sum = 0
+    line_penalties = []
+    for p in line_list:
+        temp_sum += get_line_penalty([p])
+        line_penalties.append(p)
+    taker = randrange(1,temp_sum + 1)
+    temp_sum = 0
+    for i in range(len(a)):
+        if taker <= temp_sum + line_penalties[i]:
+            return line_list[i]
+        temp_sum += line_penalties[i]  
+    return line_list[i]
 
 def get_line_penalty(line_list):
     stick_handling = .125 * get_line_stick_handling(line_list)
@@ -399,3 +432,44 @@ def adjust_odds(odds,upper,lower):
     elif odds < lower:
         odds = lower
     return odds
+
+def get_lines(away_team,last_line_away,away_lines_even,away_pairing_even,away_pp,away_pk,home_lines_even,home_pairings,home_pp,home_pk,home_line_matches,home_pp1_match,home_pk1_match,penalty_list):
+    if penalty_list is None:
+        #Use even strength lines
+        a = 5
+    else:
+        #there is a penalty
+        away_penalties = 0
+        home_penalties = 0
+        for penalty in penalty_list:
+            if penalty.team_id == away_team.id:
+                away_penalties += 1
+            else:
+                home_penalties += 1
+        if away_penalties > home_penalties:
+            #away team on penalty kill
+            if last_line_away != away_pk[0]:
+                return home_pp[home_pk1_match -1],away_pk[0]
+            else:
+                if (home_pk1_match - 1) == -1:
+                    return home_pp[1],away_pk[1]
+        elif away_penalties < home_penalties:
+            #home team on penalty kill
+            if last_line_away != away_pp[0]:
+                return home_pk[home_pp1_match -1],away_pp[0]
+            else:
+                if (home_pp1_match - 1) == -1:
+                    return home_pk[1],away_pp[1]
+        else:
+            #both teams on penalty kill
+
+        
+    #away_lines = [away_line1,away_line2,away_line3,away_line4]
+    #away_pairings = [away_pair1,away_pair2,away_pair3]
+    #away_pp = [away_pp1,away_pp2]
+    #away_pk = [away_pk1,away_pk2]
+    #home_lines = [home_line1,home_line2,home_line3,home_line4]
+    home_pairings = [home_pair1,home_pair2,home_pair3]
+    home_pp = [home_pp1,home_pp2]
+    home_pk = [home_pk1,home_pk2]
+    home_line_matches = [home.tactics.match_line1 - 1,home.tactics.match_line2 - 1,home.tactics.match_line3 - 1,home.tactics.match_line4 - 1]
