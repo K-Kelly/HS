@@ -462,6 +462,8 @@ def get_lines(away_team,last_line_away,away_lines_even,away_pairing_even,away_pp
                     return home_pk[1],away_pp[1]
         else:
             #both teams on penalty kill
+            if last_line != away_pk[0]
+            return home_pp
 
         
     #away_lines = [away_line1,away_line2,away_line3,away_line4]
