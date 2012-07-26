@@ -331,13 +331,13 @@ class Goal(models.Model):
 class Penalty(models.Model):
     player = models.ForeignKey(Player,related_name="penalty_player")
     team_id = models.IntegerField(default=-1)
-    time = models.CharField(max_length=(default=-1)
+    time = models.CharField(max_length=5,default="-1")
     period = models.SmallIntegerField(default=-1)
     game = models.OneToOneField(Game,related_name = "penalty_game")
     is_minor = models.BooleanField()
     is_double_minor = models.BooleanField()
     is_major = models.BooleanField()
     description = models.CharField(max_length=35)
-
+    
     def __unicode__(self):
         return u'Penalty committed by %s' % (self.player_id)
