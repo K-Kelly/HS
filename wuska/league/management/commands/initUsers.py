@@ -95,17 +95,17 @@ class Command(NoArgsCommand):
                     position = "G"
                 height = 70
                 weight = 180
-                team_id = team.id#free agent
+                team_id = team.id
                 user_id = user.id 
                 upgrades = 10
                 level = 1
                 experience = 0
                 age = 18
                 retired = False
-                salary = 0
-                contract_end = 0
+                salary = 50000
+                contract_end = 2
                 no_trade = False
-                style = 1 # need to make user choose this
+                style = 1 
                 shooting = 1
                 passing = 1
                 stick_handling = 1
@@ -124,10 +124,69 @@ class Command(NoArgsCommand):
                 pants = 0
                 skates = 0
                 stick = 0
-                free_agent = True
+                free_agent = False
                 player = Player(team_id = team_id, user_id = user_id, upgrades = upgrades, level = level, experience = experience, name = name, age = age, retired = retired, height = height, weight = weight, salary =salary, contract_end = contract_end, no_trade = no_trade, position = position, style = style, shooting = shooting, passing = passing, stick_handling = stick_handling, checking = checking, positioning = positioning, endurance = endurance, skating = skating, strength = strength, faceoff = faceoff, fighting = fighting, awareness = awareness, leadership = leadership, helmet = helmet, gloves = gloves, shoulder_pads = shoulder_pads, pants = pants, skates = skates, stick = stick, free_agent = free_agent,new_contract=False)
                 player.save()
                 team.players.add(player)
+                #set lines
+                if player_num == 1:
+                    team.lw1 = player.id
+                    team.pp1lw = player.id
+                elif player_num == 2:
+                    team.lw2 = player.id
+                    team.pp2lw = player.id
+                elif player_num == 3:
+                    team.lw3 = player.id
+                    team.pk1w = player.id
+                elif player_num == 4:
+                    team.lw4 = player.id
+                    team.pk2w = player.id
+                elif player_num == 5:
+                    team.c1 = player.id
+                    team.pp1c = player.id
+                elif player_num == 6:
+                    team.c2 = player.id
+                    team.pp2c = player.id
+                elif player_num == 7:
+                    team.c3 = player.id
+                    team.pk1c = player.id
+                elif player_num == 8:
+                    team.c4 = player.id
+                    team.pk2c = player.id
+                elif player_num == 9:
+                    team.rw1 = player.id
+                    team.pp1rw = player.id
+                elif player_num == 10:
+                    team.rw2 = player.id
+                    team.pp2rw = player.id
+                elif player_num == 11:
+                    team.rw3 = player.id
+                elif player_num == 12:
+                    team.rw4 = player.id
+                elif player_num == 13:
+                    team.defense1 = player.id
+                    team.pp1ld = player.id
+                    team.pk1ld = player.id
+                elif player_num == 14:
+                    team.defense2 = player.id
+                    team.pp1rd = player.id
+                    team.pk1rd = player.id
+                elif player_num == 15:
+                    team.defense3 = player.id
+                    team.pp2ld = player.id
+                elif player_num == 16:
+                    team.defense4 = player.id
+                    team.pp2rd = player.id
+                elif player_num == 17:
+                    team.defense5 = player.id
+                    team.pk2ld = player.id
+                elif player_num == 18:
+                    team.defense6 = player.id
+                    team.pk2rd = player.id
+                elif player_num == 19:
+                    team.goalie1 = player.id
+                elif player_num == 20:
+                    team.goalie2 = player.id
                 team.save()
                 user.get_profile().players.add(player) 
                 user.get_profile().save()
