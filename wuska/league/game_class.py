@@ -133,9 +133,9 @@ class PlayGame:
             do_faceoff()
             while self.no_stoppage:   
                 if self.home_possession:
-                    self.player_games_home,self.player_games_away = do_possession(self.cur_home_line,self.cur_home_pairing,self.player_games_home,self.cur_away_line,self.cur_away_pairing,self.player_games_away)
+                    self.player_games_home,self.player_games_away = do_possession(self.cur_home_line,self.cur_home_pairing,self.player_games_home,self.cur_away_line,self.cur_away_pairing,self.away_g,self.player_games_away)
                 else:
-                    self.player_games_away,self.player_games_home = do_possession(self.cur_away_line,self.cur_away_pairing,self.player_games_away,self.cur_home_line,self.cur_home_pairing,self.player_games_home)
+                    self.player_games_away,self.player_games_home = do_possession(self.cur_away_line,self.cur_away_pairing,self.player_games_away,self.cur_home_line,self.cur_home_pairing,self.home_g,self.player_games_home)
             #get the next lines
             get_lines()
     
@@ -143,7 +143,7 @@ class PlayGame:
 
     
     # @ zone: 0 = defensive zone, 1 = neutral zone, 2 = offensive zone
-    def do_possession(off_line,off_pair,player_games_off,def_line,def_pair,player_games_def):
+    def do_possession(off_line,off_pair,player_games_off,def_line,def_pair,def_g,player_games_def):
         #reset value of no_stoppage to True
         self.no_stoppage = True
         off_penalty = get_line_penalty(off_line)
@@ -168,7 +168,7 @@ class PlayGame:
         elif self.zone == 1:
             return do_zone1_possession(off_line,off_pair,player_games_off,def_line,def_pair,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds)
         else:
-            return do_zone2_possession(off_line,off_pair,player_games_off,def_line,def_pair,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds)
+            return do_zone2_possession(off_line,off_pair,player_games_off,def_line,def_pair,deg_g,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds)
             
             
     def do_zone0_possession(off_line,off_pair,player_games_off,def_line,def_pair,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds):
@@ -176,7 +176,7 @@ class PlayGame:
         off_line_pair_no_puck.remove(player_w_puck)
         def_line_pair = def_line + def_pairing
         #options: 1: pass in zone (15 %), 2: pass to neutral zone(40%), 3: stickhandle & skate to skate to neutral zone(40%), 4: penalty(5%)                          
-        #calculate the which option the player takes
+        #calculate which option the player takes
         option = randrange(1,101)
         if option <= 55:
             #pass in the same zone (15% chance of happening)
@@ -336,7 +336,7 @@ class PlayGame:
         def_line_pair = def_line + def_pairing
         #options: 1: pass in zone (15 %), 2: dump to offensive zone(40%), 3: stickhandle & skate to skate to neutral zone(40%), 4: penalty(5%)      
         #TO DO: base dump vs skate in on team tactics
-        #calculate the which option the player takes
+        #calculate which option the player takes
         option = randrange(1,101)
         if option <= 15:
             #pass in the same zone (15% chance of happening)
@@ -552,31 +552,58 @@ class PlayGame:
             return player_games_off,player_games_def
 
 
-    def do_zone2_possession(off_line,off_pair,player_games_off,def_line,def_pair,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds):
+    def do_zone2_possession(off_line,off_pair,player_games_off,def_line,def_pair,def_g,player_games_def,penalty_odds,off_penalty_choices,def_penalty_choices,option_odds):
         off_line_pair_no_puck = off_line + off_pairing
         off_line_pair_no_puck.remove(player_w_puck)
         def_line_pair = def_line + def_pairing
         #What about breakaway?
-        take_shot_or_pass = adjust_odds(self.player_w_puck.shooting - self.player_w_puck.passing + 50,90,10)
-        take_shot_or_stick = adjust_odds(self.player_w_puck.shooting - self.player_w_puck.stick_handling + 50,90,10)
         """
-        split offensive zone into zones:
+        TO DO: split offensive zone into zones:
         -----------------------------blue line
-        -  1           2          3 -
+        - 1           2           3 -
         -                           - 
         -                           -
         -                           -
-        -8    +       9       +   4 -
+        - 8   +       9       +   4 -
         -                           -
         -                           -
         -                           -
-        -7------------------------5--Goal line
+        --7-----------------------5--Goal line
          -           6             -
           -------------------------
         """
+        pass_or_stick = adjust_odds(self.player_w_puck.passing - self.player_w_puck.stick_handling + 50,90,10)
+        #choices are 0:shoot, 1:pass, 2:stickhandle
+        choice = -1
+        if randrange(1,101) <= pass_or_stick:
+            #then passes, check if shoots
+            choice = 1
+            take_shot = adjust_odds(self.player_w_puck.shooting - self.player_w_puck.passing + 50,90,10)
+            if randrange(1,101) <= take_shot:
+                #then shoots
+                choice = 0
+        else:
+            #then stickhandles
+            choice = 2 
+            take_shot = adjust_odds(self.player_w_puck.shooting - self.player_w_puck.stick_handling + 50,90,10)
+            if randrange(1,101) <= take_shot:
+                #then shoots
+                choice = 0
+        if choice == 0:
+            def_player = defpair[randrange(0,len(def_pair))]#TO DO: Find better way of determining who blocks shot
+            is_blocked = adjust_odds(self.player_w_puck.shooting - def_player.positioning + 50,90,10)
+            if randrange(1,101) <= is_blocked:
+                #shot is not blocked, check if goal
+                is_goal = adjust_odds(self.player_w_puck.shooting - get_goalie_save_skill(def_g) + 5,20,5)
+                if randrange(1,101) <= is_goal:
+                    #goal has been scored
+                    
+                
+                
+            
 
         #options: 1: pass in zone (35 %), 2: take a shot(40%), 3: stickhandle & skate in offensive(40%), 4: penalty(5%)                          
-        #calculate the which option the player takes
+        #calculate which option the player takes
         option = randrange(1,101)
         if option <= 55:
             #pass in the same zone (15% chance of happening)
@@ -919,6 +946,21 @@ class PlayGame:
         elif odds < lower:
             odds = lower
         return odds
+    def get_goalie_save_skill(goalie):
+        #shooting = blocker side
+        #passing = passing
+        #stick_handling = Rebound control
+        #checking = poke checking
+        #positioning = stick side
+        #skating = glove
+        #strength = strength
+        #faceoff = 5 hole
+        #fighting = fighting
+        #awareness = awareness
+        #leadership = leadership
+        temp = .19*goalie.shooting + .19*goalie.faceoff + .19*goalie.positioning + .19*goalie.skating + .23*goalie.awareness + .01*goalie.leadership
+        return temp
+                                      
 
     def get_lines():
         if len(self.penalty_list) == 0:
