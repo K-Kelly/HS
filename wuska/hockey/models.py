@@ -287,11 +287,11 @@ class PlayerGame(models.Model):
     points = models.ManyToManyField('hockey.Goal',blank=True,related_name = 'playergame_points')
     penalty = models.ManyToManyField('hockey.Penalty',blank=True,related_name = 'playergame_penalties')
     plus_minus = models.SmallIntegerField(default=0)
-    shots = models.SmallIntegerField(default=0)
+    shots = models.SmallIntegerField(default=0)#equivalent to shots face for g
     faceoffs_taken = models.SmallIntegerField(default=0)
     faceoffs_won = models.SmallIntegerField(default=0)
     checks = models.SmallIntegerField(default=0)
-    shots_blocked = models.SmallIntegerField(default=0)
+    shots_blocked = models.SmallIntegerField(default=0)#equivalent to savs for g
     exp_shooting = models.DecimalField(default=0,max_digits=5,decimal_places=3)
     exp_passing = models.DecimalField(default=0,max_digits=5,decimal_places=3)
     exp_stick_handling = models.DecimalField(default=0,max_digits=5,decimal_places=3)
