@@ -17,7 +17,7 @@ class PlayGame:
         self.game.has_started = True
         self.game.save()
         self.log = ""
-        # Construct home lines
+        # Construct the home lines
         # need to handle exceptions
         self.home = game.home_team
         self.home_line1 = [Player.objects.get(pk=self.home.lw1),Player.objects.get(pk=self.home.c1),Player.objects.get(pk=self.home.rw1)]

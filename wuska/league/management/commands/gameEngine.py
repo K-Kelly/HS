@@ -16,7 +16,7 @@ from math import trunc
 
 class Command(BaseCommand):
     help = 'Runs the games for this 15 min period'
-    def handle(self,*args, **options):       
+    def handle(self,*args, **options):
         run_time_period()
         self.stdout.write("Successfully ran this 15 min period.\n")
 

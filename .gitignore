@@ -5,6 +5,7 @@ settings_local.py~
 settings_local.pyc
 settings.py~
 settings.pyc
+.#settings.py
 *.pyc
 *.html~
 *.py~
