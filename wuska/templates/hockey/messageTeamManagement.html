@@ -1,0 +1,14 @@
+{% extends "teamPageNav.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content_span9 %}
+
+<form class="well" action="" method="post">{% csrf_token %}
+  <fieldset>
+    <legend>Message {{team.name}}'s Management</legend>
+    {{ form|bootstrap }}
+    <button type="submit" class="btn btn-primary">{% trans 'Send Message' %}</button>
+  </fieldset>
+</form>
+ 
+{% endblock %}

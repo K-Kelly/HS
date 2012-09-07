@@ -1,0 +1,11 @@
+Django==1.4
+-e git://github.com/earle/django-bootstrap.git@779bba81de35a3eec488d5833825cba8dc3106f3#egg=bootstrap-dev
+distribute==0.6.24
+dj-database-url==0.2.0
+django-bootstrap-form==2.0.3
+django-registration==0.8
+psycopg2==2.4.5
+pycrypto==2.6
+selenium==2.23.0
+simplejson==2.5.2
+wsgiref==0.1.2

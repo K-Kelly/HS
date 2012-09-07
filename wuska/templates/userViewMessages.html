@@ -1,0 +1,98 @@
+{% extends "userPageNav.html" %}
+{% load i18n %}
+{% load tz %}
+{% block content_span9 %}
+
+{% if sent %}
+<a class="btn btn-primary pull-right"
+   href="/users/{{user.id}}/viewMessages/received/10/">Go
+  To Received Messages</a>
+<h2> Sent Messages </h2>
+{% else %}
+<a class="btn btn-primary pull-right"
+   href="/users/{{user.id}}/viewMessages/sent/10/">Go To Sent
+  Messages</a> 
+<h2> Received Messages </h2>
+{% endif %}
+{% if message_list %}
+{% for message,sender_user,has_sender_player,sender_player,has_sender_team,sender_team,has_sender_cc,sender_cc,has_concerning_players,concerning_players,has_concerning_teams,concerning_teams,receiver_users,is_automated in message_list %}
+<div class="alert alert-information">
+  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+  <strong>
+    <div class="pull-right">
+      {{message.datetime|localtime}} ({{message.datetime|timesince}} ago)
+    </div>
+    To Agent(s):
+    {% for r_user in receiver_users %}
+       <a href="/users/{{r_user.id}}/"> {{r_user.user.username}}</a>
+    {% endfor %}
+    {% if has_concerning_players %}
+       , Concerning Player(s):
+       {% for player in concerning_players %}
+          <a href="/player/{{player.id}}/"> {{player.name}}</a>&nbsp
+       {% endfor %}
+    {% endif %}
+    {% if has_concerning_teams %}
+       , Concerning Team(s):
+       {% for team in concerning_teams %}
+	  <a href="/team/{{team.id}}/"> {{team.name}}</a>&nbsp
+       {% endfor %}
+    {% endif %}
+       <BR/>
+    From Agent: 
+       <a href="/users/{{sender_user.id}}/">{{sender_user.user.username}}</a> 
+    {% if has_sender_player %}
+       , on behalf of Player:
+       <a href="/player/{{sender_player.id}}/">{{sender_player.name}}</a>
+    {% endif %}
+    {% if has_sender_team %}
+       , on behalf of Team:
+       <a href="/team/{{sender_team.id}}/">{{sender_team.name}}</a>
+    {% endif %}
+    {% if has_sender_cc %}
+       <BR/>
+       Also viewable to Agent(s):
+       {% for s_user in sender_cc %}
+        <a href="/users/{{s_user.id}}/"> {{s_user.user.username}}</a>&nbsp
+       {% endfor %}
+    {% endif %}
+  </strong>
+  <BR/><BR>
+  <pre>
+  <strong>Title:  </strong>{{message.title}}
+  <BR/>
+  {{message.body}}
+  </pre>
+{% if is_automated %}
+  <em>*This is an automated message.</em>
+{% endif %}
+</div>
+{% endfor %}
+{% else %}
+No messages!
+{% endif %}
+{% if have_older_messages %}
+{% if sent %}
+<a class="btn btn-primary"
+   href="/users/{{user.id}}/viewMessages/sent/{{older_message}}/">Older
+  Messages</a>
+{% else %}
+<a class="btn btn-primary"
+   href="/users/{{user.id}}/viewMessages/received/{{older_message}}/">Older
+  Messages</a>
+{% endif %}
+{% endif %}
+{% if have_new_messages %}
+{% if sent %}
+<a class="btn btn-primary pull-right"
+   href="/users/{{user.id}}/viewMessages/sent/{{newer_message}}/">Newer
+  Messages</a>
+{% else %}
+<a class="btn btn-primary pull-right"
+   href="/users/{{user.id}}/viewMessages/received/{{newer_message}}/">Newer
+  Messages</a>
+{% endif %}
+{% endif %}
+</div>
+{% endblock %}

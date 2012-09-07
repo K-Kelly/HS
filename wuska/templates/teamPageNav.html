@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3">
+    <div class="well sidebar-nav-fixed">
+      <div class="tabbable tabs-left">
+	<ul class="nav nav-tabs">
+	  <li class="active">
+	    <a href="#1A" data-toggle="tab">{{team.name}}</a>
+	  </li>
+	  <li class>
+	    <a href="#1B" data-toggle="tab">Other</a>
+	  </li>
+	</ul>
+	<div class="tab-content">
+	  <div class="tab-pane active" id="1A">
+	    <ul class="nav nav-list">
+	      <li>
+		<a href="{{ team.get_absolute_url }}">{{team.name}} Home</a>
+	      </li>
+	      <li>
+		<a href="/league/{{team.league_id}}/">View League</a>
+	      </li>
+	      <li>
+		<a href="{{ team.get_absolute_url }}schedule/">Schedule</a>
+	      </li>
+	      {% if can_manage %}
+	      <li>
+		<a href="{{ team.get_absolute_url }}editLines/">Edit Lines</a>
+	      </li>	      
+	      <li>
+		<a href="{{ team.get_absolute_url }}tactics/">Tactics</a>
+	      </li>
+	      <li>
+		<a href="{{ team.get_absolute_url }}viewContracts/">Contracts</a>
+	      </li>
+	      <li>
+		<a href="{{ team.get_absolute_url }}messagePlayersOnTeam/">Message
+		Players on Team</a>
+	      </li>
+	      <li>
+		<a href="{{ team.get_absolute_url }}arena/">Arena</a>
+	      </li>
+	      <li>
+		<a href="/freeAgents/all/25/">View Free Agents </a>
+	      </li>
+	      {% else %}
+	      <li>
+		<a href="{{ team.get_absolute_url }}messageTeamManagement/">Message
+		{{team.name}}'s Management</a>
+	      </li>
+	      {% endif %}
+	      {% if owner %}
+	      <li>
+		<a href="{{ team.get_absolute_url }}viewManagement/">Change
+		Management</a>
+	      </li>
+	      {% endif %}
+	      
+	    </ul>
+	  </div>
+	  <div class="tab-pane" id="1B">
+	    <ul class="nav nav-list">	    
+	      <li>
+		<a href="/allPlayers/All/25/">All Players </a>
+	      </li>
+	      <li>
+		<a href="/freeAgents/All/25/">Free Agents </a>
+	      </li>
+	      <li>
+		<a href="/allTeams/25/">All Teams </a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div class="span9">
+  {% if can_manage %}
+  {% if contract_status_change %}
+  <div class="alert alert-info">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <h4 class="alert-heading">Contract Status Change!</h4>
+    A contract status has changed! <a class="btn btn-info"
+    href="{{ team.get_absolute_url }}viewContracts/">View Contract</a>
+  </div>
+  {% endif %}
+{% endif %}
+    
+
+    {% block content_span9 %}
+    
+    {% endblock %}
+
+  </div>
+</div>
+{% endblock %}  

@@ -1,0 +1,18 @@
+{% extends "teamPageNav.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content_span9 %}
+
+<div class="alert alert-info">
+  <strong>Important!</strong> An empty input indicates that no user
+  will fill that position.
+</div>
+<form class="well" action="" method="post">{% csrf_token %}
+  <fieldset>
+    <legend>Change Management</legend>
+    {{form|bootstrap}}
+    <button type="submit" class="btn btn-primary">{% trans 'Save Changes' %}</button>
+  </fieldset>
+</form>
+</div>
+{% endblock %}

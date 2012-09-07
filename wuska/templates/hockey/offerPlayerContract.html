@@ -1,0 +1,52 @@
+{% extends "playerPageNav.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content_span9 %}
+
+{% if alert_success %}
+<div class="alert alert-success">
+  <a class="close" data-dismiss="alert" href="#">x</a>
+  <h4 class="alert-heading">Success!</h4>
+  {{ alert_message }}
+</div>
+{% else %}
+{% if is_free_agent %}
+{% if not_valid %}
+<div class="alert alert-error">
+  <button class="close" data-dismiss="alert">x</button>
+  Unable to offer the contract! Make sure salary and length are integers and don't have commas!
+</div>
+{% endif %}
+{% if not_owner %}
+<div class="alert alert-block">
+  <button class="close" data-dismiss="alert">x</button>
+  You are not the agent of this Player!
+</div>
+{% else %}
+<form class="well" action="" method="post">{% csrf_token %}
+  <fieldset>
+    <legend>Offer Contract</legend>
+    <div class="team">
+      <label for="team">Team</label>
+      <div class="input">
+	<select id="team" name="team">
+	  {% for team in team_list %}
+	  <option value='{{team.id}}'>{{team.name}}</option>
+	  {% endfor %}
+	</select>
+      </div>
+    </div>	   
+    {{ form|bootstrap }}
+    <button type="submit" class="btn btn-primary">{% trans 'Offer Contract' %}</button>
+  </fieldset>
+</form>
+{% endif %}  
+{% else %}
+<div class="alert alert-info">
+  <button class="close" data-dismiss="alert">x</button>
+  <strong>Unable to offer contract! </strong>
+  {{player_name}} has <strong>{{contract_end}}</strong> season(s) left before becoming a free agent.
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

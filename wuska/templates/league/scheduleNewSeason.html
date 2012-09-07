@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3"></div>
+  <div class="span9">
+    {% if form.errors %}
+    {{ form.errors|bootstrap }}
+    {% endif %}
+    {% if alert %}
+    <div class="alert alert-success">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+      <h4 class="alert-heading">Season Scheduled!</h4>
+      {{alert}}
+    </div>
+
+    {% endif %}
+
+    <div class="alert alert-block">
+      <a class="close" data-dismiss="alert" href="#">×</a>
+      <h4 class="alert-heading">Warning!</h4>
+      Make sure to update the season number before doing anything!
+    </div>
+
+    <form class="well" action="" method="post">{% csrf_token %}
+      <h3>Schedule New Season!</h3>      
+      {{form|bootstrap}}
+      <button class="btn btn-primary" type="submit" id="submit"
+	      name="submit">{% trans 'Schedule Season' %}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

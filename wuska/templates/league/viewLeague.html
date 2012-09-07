@@ -1,0 +1,97 @@
+{% extends "leaguePageNav.html" %}
+{% load i18n %}
+{% block content_span9 %}
+
+{% if alert_success %}
+<div class="alert alert-success">
+  <a class="close" data-dismiss="alert" href="#">x</a>
+  <h4 class="alert-heading">Success!</h4>
+  {{ alert_message }}
+</div>
+{% endif %}
+<div class="hero-unit">
+  <center><legend><h2>Conference 1</h2></legend></center>
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="well">
+	<h2>Division 1 </h2>
+	<ul class="unstyled">
+	  {% for team in division1 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+
+    <div class="span4">
+      <div class="well">
+	<h2>Division 2 </h2>
+	<ul class="unstyled">
+	  {% for team in division2 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+
+    <div class="span4">
+      <div class="well">
+	<h2>Division 3 </h2>
+	<ul class="unstyled">
+	  {% for team in division3 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+  </div>
+
+  <center><legend><h2>Conference 2</h2></legend></center>
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="well">
+	<h2>Division 4 </h2>
+	<ul class="unstyled">
+	  {% for team in division4 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+
+    <div class="span4">
+      <div class="well">
+	<h2>Division 5 </h2>
+	<ul class="unstyled">
+	  {% for team in division5 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+
+    <div class="span4">
+      <div class="well">
+	<h2>Division 6 </h2>
+	<ul class="unstyled">
+	  {% for team in division6 %}
+	  <li>
+	    <a href="/team/{{team.id}}/">{{team.name}}</a>
+	  </li>
+	  {% endfor %}
+	</ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

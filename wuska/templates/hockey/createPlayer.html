@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load bootstrap %}
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3"></div>
+  <div class="span9">
+    {% if form.errors %}
+    {{ form.errors|bootstrap }}
+    {% endif %}
+    <form class="well" action="" method="post">{% csrf_token %}
+      <h3>Create Your Player!</h3>
+      {{form|bootstrap}}
+      <button class="btn btn-primary" type="submit" id="submit"
+	      name="submit">{% trans 'Create Player' %}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

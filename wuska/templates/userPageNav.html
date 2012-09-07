@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3">
+    <div class="well sidebar-nav-fixed">
+      <div class="tabbable tabs-left">
+	<ul class="nav nav-tabs">
+	  <li class="active">
+	    <a href="#1A" data-toggle="tab">{{user.username}}</a>
+	  </li>
+	  <li class>
+	    <a href="#1B" data-toggle="tab">Other</a>
+	  </li>
+	</ul>
+	<div class="tab-content">
+	  <div class="tab-pane active" id="1A">
+	    <ul class="nav nav-list">	
+	      {% if owner %}
+	      <li>
+		<a href="/users/{{user.id}}/viewMessages/received/10/">View Messages</a>
+	      </li>
+	      <li>
+		<a href="{% url auth_password_change %}">Change Password</a>
+	      </li>
+	      <li>
+		<a href="{% url auth_logout %}">Log Out</a>
+	      </li>
+	      {% endif %}	      
+	    </ul>
+	  </div>
+	  <div class="tab-pane" id="1B">
+	    <ul class="nav nav-list">	    
+	      <li>
+		<a href="/allPlayers/All/25/">All Players </a>
+	      </li>
+	      <li>
+		<a href="/freeAgents/All/25/">Free Agents </a>
+	      </li>
+	      <li>
+		<a href="/allTeams/25/">All Teams </a>
+	      </li>
+	      <li>
+		<a href="/allUsers/25/">All Users </a>
+	      </li>
+	    </ul>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+  <div class="span9">
+
+  {% if owner %}
+    {% if profile.new_message %}
+  <div class="alert alert-info">
+    <a class="close" data-dismiss="alert" href="#">x</a>
+    <h4 class="alert-heading">New Message!</h4>
+    You have a new message! <a class="btn btn-info"
+    href="/users/{{profile.id}}/viewMessages/">View Message</a>
+  </div>
+  {% endif %}
+  {% endif %}
+    
+
+    {% block content_span9 %}
+    
+    {% endblock %}
+
+  </div>
+</div>
+{% endblock %}  

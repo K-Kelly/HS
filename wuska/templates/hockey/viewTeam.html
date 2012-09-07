@@ -1,0 +1,30 @@
+{% extends "teamPageNav.html" %}
+{% load i18n %}
+{% block content_span9 %}
+
+{% if alert_success %}
+<div class="alert alert-success">
+  <a class="close" data-dismiss="alert" href="#">x</a>
+  <h4 class="alert-heading">Success!</h4>
+  {{ alert_message }}
+</div>
+{% endif %}
+<div class="hero-unit">
+  <center><legend><h2>{{team.name}}</h2></legend></center>
+  <div class="row-fluid">
+    <div class="span4">
+      Owner: <a href="{{owner_profile.get_absolute_url}}">{{owner_profile.user.username}}</a>
+    </div>
+    <div class="span4">
+      {% if gm1_profile %}
+      General Manager: <a href="{{gm1_profile.get_absolute_url}}">{{gm1_profile.user.username}}</a>
+      {% endif %}
+    </div>
+    <div class="span4">
+      {% if gm2_profile %}
+      Assistant General Manager: <a href="{{gm2_profile.get_absolute_url}}">{{gm2_profile.user.username}}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

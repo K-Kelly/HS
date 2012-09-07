@@ -1,0 +1,128 @@
+{% extends "playerPageNav.html" %}
+{% load i18n %}
+
+{% block content_span9 %}
+
+{% if alert_success %}
+<div class="alert alert-success">
+  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+  <strong>Success! </strong>{{alert_message}}
+</div>
+{% endif %}
+{% if owner %}
+ {% if can_upgrade %}
+<div class="alert alert-success">
+  <button class="close" data-dismiss="alert"
+	  type="button">x</button>
+  You have <strong>{{ player.upgrades }}</strong> upgrade points to spend!	
+  <form class="well" action="upgradeSkill/" method="post">{% csrf_token %}
+    <label>Click on the skill you wish to upgrade:</label>
+    <div class="well" style="padding: 15px 20px;">
+      <div class="btn-group">
+	<button class="btn btn-primary" name="skill"
+		value="shooting"> Shooting</button>
+	<button class="btn btn-primary" name="skill"
+		value="passing"> Passing</button> 
+	<button class="btn btn-primary" name="skill"
+		value="stick_handling">Stick Handling</button> 
+	<button class="btn btn-primary" name="skill"
+		value="skating"> Skating</button>
+	<button class="btn btn-primary" name="skill"
+		value="endurance"> Endurance</button> 
+	<button class="btn btn-primary" name="skill"
+		value="strength"> Strength</button> 
+      </div>
+      <BR/>
+      <div class="btn-group">
+	<button class="btn btn-primary" name="skill"
+		value="checking"> Checking</button> 
+	<button class="btn btn-primary" name="skill"
+		value="positioning"> Positioning</button> 
+	<button class="btn btn-primary" name="skill"
+		value="awareness"> Awareness</button> 
+	<button class="btn btn-primary" name="skill"
+		value="faceoff"> Faceoffs</button> 
+	<button class="btn btn-primary" name="skill"
+		value="leadership"> Leadership</button> 
+	<button class="btn btn-primary" name="skill"
+		value="fighting"> Fighting</button>
+      </div>
+    </div>
+  </form>
+</div>
+ {% endif %}
+<div class="hero-unit">	      
+  <h2>{{ player.position }} - {{ player.name }}</h2><BR/>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Shooting: {{player.shooting}}</p>
+    </div>
+    <div class="span6">
+      <p>Strength: {{player.strength}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Passing: {{player.passing}}</p>
+    </div>
+    <div class="span6">
+      <p>Endurance: {{player.endurance}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Stick Handling: {{player.stick_handling}}</p>
+    </div>
+    <div class="span6">
+      <p>Skating: {{player.skating}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Checking: {{player.checking}}</p>
+    </div>
+    <div class="span6">
+      <p>Faceoffs: {{player.faceoff}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Positioning: {{player.positioning}}</p>
+    </div>
+    <div class="span6">
+      <p>Leadership: {{player.leadership}}</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span6 offset5">
+      <p>Awareness: {{player.awareness}}</p>
+    </div>
+    <div class="span6">
+      <p>Fighting: {{player.fighting}}</p>
+    </div>
+  </div>	
+  <BR/><BR/>
+  <table id="equipment">
+    <tr>
+      <td>Helmet: {{player.helmet}}</td>
+    </tr>
+    <tr>
+      <td>Gloves:  {{player.gloves}}</td>
+    </tr>
+    <tr>
+      <td>Pads:  {{player.shoulder_pads}}</td>
+    </tr>
+    <tr>
+      <td>Pants:  {{player.pants}}</td>
+    </tr>
+    <tr>
+      <td>Skates:  {{player.skates}}</td>
+    </tr>
+    <tr>
+      <td>Stick:  {{player.stick}}</td>
+    </tr>
+  </table>
+</div>
+{% endif %}   
+{% endblock %}
