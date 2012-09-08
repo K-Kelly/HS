@@ -71,7 +71,6 @@ class PlayGame:
             ps = player.seasons.filter(season=self.season_number)[0]
             ps.games.add(pg)
             ps.save()
-        #self.player_games_home.sorted()
 
         self.player_games_away = {}
         for player in self.away.players.all():
@@ -86,7 +85,6 @@ class PlayGame:
             ps = player.seasons.filter(season=season_number)[0]
             ps.games.add(pg)
             ps.save()
-        #self.player_games_away.sorted()
         #Number of faceoffs in each period
         self.num_faceoffs_p = randrange(15,25)
         #calculate percent of time that a line plays
@@ -135,16 +133,22 @@ class PlayGame:
         self.log = ""
             
     def play_game(self):
-        while self.num_faceoffs_p > 0:
-            self.num_faceoffs_p -= 1
-            self.do_faceoff()
-            while self.no_stoppage:   
-                if self.home_possession:
-                    self.player_games_home,self.player_games_away = self.do_possession(self.cur_home_line,self.cur_home_pairing,self.player_games_home,self.cur_away_line,self.cur_away_pairing,self.away_g,self.player_games_away)
-                else:
-                    self.player_games_away,self.player_games_home = self.do_possession(self.cur_away_line,self.cur_away_pairing,self.player_games_away,self.cur_home_line,self.cur_home_pairing,self.home_g,self.player_games_home)
+        temp = self.num_faceoffs_p
+        while self.period != 4:
+            while self.num_faceoffs_p > 0:
+                self.num_faceoffs_p -= 1
+                self.do_faceoff()
+                self.no_stoppage = True
+                while self.no_stoppage:   
+                    if self.home_possession:
+                        self.player_games_home,self.player_games_away = self.do_possession(self.cur_home_line,self.cur_home_pairing,self.player_games_home,self.cur_away_line,self.cur_away_pairing,self.away_g,self.player_games_away)
+                    else:
+                        self.player_games_away,self.player_games_home = self.do_possession(self.cur_away_line,self.cur_away_pairing,self.player_games_away,self.cur_home_line,self.cur_home_pairing,self.home_g,self.player_games_home)
             #get the next lines
-            self.get_lines()
+                self.get_lines()
+            self.period += 1
+            self.num_faceoffs_p = temp
+            
         self.game.is_completed = True
         self.game.summary = self.log
         self.game.save()
@@ -166,8 +170,7 @@ class PlayGame:
             def_penalty_choices.append("Goaltender Interference")
         
         #TO DO: Handle major penalties
-        #TO DO: If penalty expires while in play, recalculate lines and start new possession, so have the zone methods return when it detects play exiting penalty box
-        
+        #TO DO: If penalty expires while in play, recalculate lines and start new possession, so have the zone methods return when it detects play exiting penalty box       
         option_odds = self.get_line_offense(off_line) - self.get_line_defense(def_line) + 50
         option_odds = self.adjust_odds(option_odds,90,10) 
         if self.zone == 0:
@@ -294,7 +297,7 @@ class PlayGame:
                 off_pg = player_games_off[self.player_w_puck.id]
                 temp = randrange(0,4)
                 if temp == 0:
-                    off_pg.stick_handling += 0.001
+                    off_pg.exp_stick_handling += 0.001
                 elif temp == 1:
                     off_pg.exp_skating += 0.001
                 elif temp == 2:
@@ -312,19 +315,20 @@ class PlayGame:
             temp = self.time - self.time_bt_fo
             self.time = temp if temp >= 0 else 0
             is_double_minor = True if randrange(1,101) < 5 else False
+            offender = None
+            penalty_string = ""
             if randrange(1,101) <= penalty_odds:
                 #offensive team commits a penalty
                 penalty_string = off_penalty_choices[randrange(0,len(off_penalty_choices))]
-                offender = get_penalty_taker(off_line + off_pairing)
-                penalty = Penalty(offender.id,offender.team_id,self.time,self.period,self.game,not(is_double_minor),is_double_minor,False,penalty_string)
+                offender = self.get_penalty_taker(off_line + off_pair)
             else:
                 #defense team commits a penalty
                 penalty_string = def_penalty_choices[randrange(0,len(def_penalty_choices))]
-                offender = get_penalty_taker(def_line + def_pairing)
-                penalty = Penalty(offender.id,offender.team_id,self.time,self.period,self.game,not(is_double_minor),is_double_minor,False,penalty_string)
+                offender = self.get_penalty_taker(def_line + def_pair)
+            penalty = Penalty(player=offender,team_id=offender.team_id,time=format_time(self.time),period=self.period,game=self.game,is_minor=not(is_double_minor),is_double_minor=is_double_minor,is_major=False,description=penalty_string)
             penalty.save()
             self.penalty_list.append(penalty)
-            self.game.add(penalty)
+            self.game.penalty.add(penalty)
             self.game.save()
             #no_stoppage,same_team_w_puck,player_w_puck,primary_assist,second_assist,is_home_penalty,is_away_penalty,zone,log
             self.no_stoppage = False
@@ -543,19 +547,20 @@ class PlayGame:
             temp = self.time - self.time_bt_fo
             self.time = temp if temp >= 0 else 0 
             is_double_minor = True if randrange(1,101) < 5 else False
+            offender = None
+            penalty_string = ""
             if randrange(1,101) <= penalty_odds:
                 #offensive team commits a penalty
                 penalty_string = off_penalty_choices[randrange(0,len(off_penalty_choices))]
-                offender = self.get_penalty_taker(off_line + off_pairing)
-                penalty = Penalty(offender.id,offender.team_id,self.time,self.period,self.game,not(is_double_minor),is_double_minor,False,penalty_string)
+                offender = self.get_penalty_taker(off_line + off_pair)
             else:
                 #defense team commits a penalty
                 penalty_string = def_penalty_choices[randrange(0,len(def_penalty_choices))]
                 offender = self.get_penalty_taker(def_line + def_pair)
-                penalty = Penalty(offender.id,offender.team_id,self.time,self.period,self.game,not(is_double_minor),is_double_minor,False,penalty_string)
+            penalty = Penalty(player=offender,team_id=offender.team_id,time=format_time(self.time),period=self.period,game=self.game,is_minor=not(is_double_minor),is_double_minor=is_double_minor,is_major=False,description=penalty_string)
             penalty.save()
             self.penalty_list.append(penalty)
-            self.game.add(penalty)
+            self.game.penalty.add(penalty)
             self.game.save()
             self.no_stoppage = False
             self.player_w_puck = None
@@ -627,14 +632,13 @@ class PlayGame:
                     for player in (off_line + off_pair):
                         pg = player_games_off[player.id]
                         if is_pp:
-                            remove_penalty(def_g.team_id)
+                            self.remove_penalty(def_g.team_id)
                         else:
                             pg.plus_minus += 1
                         if player.id == self.player_w_puck.id:
                             pg.points.add(goal)
                             pg.shots += 1
                             pg.exp_shooting += .001                
-                            player_games_def[def_player_w_puck.id] = def_pg
                         elif player.id == self.primary_assist or player.id == self.second_assist:
                             pg.points.add(goal)
                             pg.exp_passing += .001
@@ -683,7 +687,7 @@ class PlayGame:
                         self.same_team_w_puck = False
                         self.home_possession = not(self.home_possession)
                         #do goalie pass to player, set player with puck to that player
-                        self.primary_assist = def_g
+                        self.primary_assist = def_g.id
                         self.player_w_puck = def_pair[randrange(0,len(def_pair))]
                     self.zone = 0
                     self.second_assist = -1
@@ -942,9 +946,8 @@ class PlayGame:
 
     #removes a penalty after a powerplay goal
     def remove_penalty(self,team_id):
-        penalty_to_remove = self.penalty_list = [0]
         for penalty in self.penalty_list:
-            if penalty.team.id == team_id:
+            if penalty.team_id == team_id:
                 self.penalty_list.remove(penalty)
                 break
                 
@@ -953,7 +956,7 @@ class PlayGame:
         num_away_penalty = 0
         num_home_penalty = 0
         for penalty in self.penalty_list:
-            if penalty.team.id == self.home.id:
+            if penalty.team_id == self.home.id:
                 num_home_penalty += 1
             else:
                 num_away_penalty += 1
@@ -981,7 +984,7 @@ class PlayGame:
         num_away_penalty = 0
         num_home_penalty = 0
         for penalty in self.penalty_list:
-            if penalty.team.id == self.home.id:
+            if penalty.team_id == self.home.id:
                 num_home_penalty += 1
             else:
                 num_away_penalty += 1
@@ -990,11 +993,11 @@ class PlayGame:
             if (num_home_penalty - num_away_penalty) >= 2:
                 #team is on 3v5 penalty kill
                 #stunt offence by 40%
-                return .6
+                return g_d(.6)
             elif (num_home_penalty - num_away_penalty) == 1:
                 # teams is on a 4v5 penalty kill
                 #stunt offence by 20%
-                return .8
+                return g_d(.8)
             else:
                 # team is not on a penalty kill (might be 4v4 or 3v3 though)
                 return 1
@@ -1003,11 +1006,11 @@ class PlayGame:
             if (num_away_penalty - num_home_penalty) >= 2:
                 #team is on 3v5 penalty kill
                 #stunt offence by 40%
-                return .6
+                return g_d(.6)
             elif (num_away_penalty - num_home_penalty) == 1:
                 # teams is on a 4v5 penalty kill
                 #stunt offence by 20%
-                return .8
+                return g_d(.8)
             else:
                 # team is not on a penalty kill (might be 4v4 or 3v3 though)
                 return 1
@@ -1017,15 +1020,16 @@ class PlayGame:
         temp_sum = 0
         line_penalties = []
         for p in line_list:
-            temp_sum += self.get_line_penalty([p])
-            line_penalties.append(p)
+            lp = self.get_line_penalty([p])
+            temp_sum += lp
+            line_penalties.append(lp)
         taker = randrange(1,temp_sum + 1)
         temp_sum = 0
-        for i in range(len(a)):
+        for i in range(len(line_penalties)):
             if taker <= temp_sum + line_penalties[i]:
                 return line_list[i]
             temp_sum += line_penalties[i]  
-        return line_list[i]
+        return line_list[0]
 
     def get_line_penalty(self,line_list):
         stick_handling = g_d(.125) * self.get_line_stick_handling(line_list)
@@ -1115,7 +1119,7 @@ class PlayGame:
             home_players = []
             away_players = []
             for penalty in self.penalty_list:
-                if penalty.team_id == away_team.id:
+                if penalty.team_id == self.away.id:
                     away_players.append(penalty.player)
                 else:
                     home_players.append(penalty.player)
@@ -1126,22 +1130,22 @@ class PlayGame:
                     #make sure a player who has taken a penalty is not playing
                     for pen_player in away_players:
                         if pen_player in line_choose:
-                            line_choose = find_replacement_player(pen_player,False,line_choose)
+                            line_choose = self.find_replacement_player(pen_player,False,line_choose)
                     line_home = self.home_pp1 if self.home_pk1_match_tactic == 1 else self.home_pp2
                     for pen_player in home_players:
                         if pen_player in line_home:
-                            line_home = find_replacement_player(pen_player,True,line_home)
+                            line_home = self.find_replacement_player(pen_player,True,line_home)
                     self.cur_away_line = line_choose
                     self.cur_home_line = line_home
                 else:
                     line_choose = self.away_pk[1]
                     for pen_player in away_players:
                         if pen_player in line_choose:
-                            line_choose = find_replacement_player(pen_player,False,line_choose)
+                            line_choose = self.find_replacement_player(pen_player,False,line_choose)
                     line_home = self.home_pp2 if self.home_pk1_match_tactic == 1 else self.home_pp1
                     for pen_player in home_players:
                         if pen_player in line_home:
-                            line_home = find_replacement_player(pen_player,True,line_home)
+                            line_home = self.find_replacement_player(pen_player,True,line_home)
                     self.cur_away_line = line_choose
                     self.cur_home_line = line_home
             elif len(away_players) > len(home_players):
@@ -1151,11 +1155,11 @@ class PlayGame:
                     #in the case of away player being in penalty box
                     for pen_player in away_players:
                         if pen_player in line_away:
-                            line_away = find_replacement_player(pen_player,False,line_away)
+                            line_away = self.find_replacement_player(pen_player,False,line_away)
                     line_choose = self.home_pk1 if self.home_pp1_match_tactic == 1 else self.home_pk2
                     for pen_player in home_players:
                         if pen_player in line_choose:
-                            line_choose = find_replacement_player(pen_player,True,line_choose)
+                            line_choose = self.find_replacement_player(pen_player,True,line_choose)
                     self.cur_away_line = line_away
                     self.cur_home_line = line_choose
                 else:
@@ -1163,11 +1167,11 @@ class PlayGame:
                     #in the case of away player being in penalty box
                     for pen_player in away_players:
                         if pen_player in line_away:
-                            line_away = find_replacement_player(pen_player,False,line_away)         
+                            line_away = self.find_replacement_player(pen_player,False,line_away)         
                     line_choose = self.home_pk2 if self.home_pp1_match_tactic == 1 else self.home_pk1
                     for pen_player in home_players:
                         if pen_player in line_choose:
-                            line_choose = find_replacement_player(pen_player,True,line_choose)
+                            line_choose = self.find_replacement_player(pen_player,True,line_choose)
                     self.cur_away_line = line_away
                     self.cur_home_line = line_choose
             else:
@@ -1176,22 +1180,22 @@ class PlayGame:
                     line_away = self.away_pk[0]
                     for pen_player in away_players:
                         if pen_player in line_away:
-                            line_away = find_replacement_player(pen_player,False,line_away)
+                            line_away = self.find_replacement_player(pen_player,False,line_away)
                     line_home = self.home_pk1 if self.home_pk1_match_tactic == 1 else self.home_pk2                  
                     for pen_player in home_players:
                         if pen_player in line_home:
-                            line_choose = find_replacement_player(pen_player,True,line_home)
+                            line_choose = self.find_replacement_player(pen_player,True,line_home)
                     self.cur_away_line = line_away
                     self.cur_home_line = line_home
                 else:
                     line_away = self.away_pk[1]
                     for pen_player in away_players:
                         if pen_player in line_away:
-                            line_away = find_replacement_player(pen_player,False,line_away)
+                            line_away = self.find_replacement_player(pen_player,False,line_away)
                     line_home = self.home_pk2 if self.home_pk1_match_tactic == 1 else self.home_pk1                  
                     for pen_player in home_players:
                         if pen_player in line_home:
-                            line_choose = find_replacement_player(pen_player,True,line_home)
+                            line_choose = self.find_replacement_player(pen_player,True,line_home)
                     self.cur_away_line = line_away
                     self.cur_home_line = line_home
 
@@ -1324,3 +1328,7 @@ class PlayGame:
 #converts float to decimal. Stands for get_decimal
 def g_d(a):
     return Decimal('%s'%a)
+
+#converts float to 2 decimal place string
+def format_time(time):
+    return "%.f" % time

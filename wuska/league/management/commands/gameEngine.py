@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from game_class import PlayGame
-from wuska.hockey import models as hockey_models
+from wuska.hockey.models import Game,Team
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import utc
 from random import randrange
@@ -25,9 +25,9 @@ def run_time_period():
     dt = datetime.now()
     start_time = dt - timedelta(minutes=dt.minute % 15,seconds = dt.second, microseconds = dt.microsecond)
     #games_now = Game.objects.filter(datetime = start_time)
-    season_number = get_object_or_404(hockey_models.Team,pk=1).seasons.all().count()
-    game = get_object_or_404(hockey_models.Game,pk=1)
-    games_now = [game]
+    season_number = get_object_or_404(Team,pk=1).seasons.all().count()
+    game = get_object_or_404(Game,pk=3)
+    games_now = Game.objects.all()
     for game in games_now:
         pg = PlayGame(game,season_number)
         pg.play_game()

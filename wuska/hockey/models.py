@@ -323,7 +323,7 @@ class Goal(models.Model):
     team_id = models.IntegerField(default=-1)
     time = models.SmallIntegerField(default=-1)
     period = models.SmallIntegerField(default=-1)
-    game = models.OneToOneField(Game)
+    game = models.ForeignKey(Game,related_name = "goal_game")
 
     def __unicode__(self):
         return u'%s(%s,%s) at %s of period %s' % (self.scorer_id,self.primary_assist_id,self.secondary_assist_id, self.time,self.period)
@@ -333,11 +333,11 @@ class Penalty(models.Model):
     team_id = models.IntegerField(default=-1)
     time = models.CharField(max_length=5,default="-1")
     period = models.SmallIntegerField(default=-1)
-    game = models.OneToOneField(Game,related_name = "penalty_game")
+    game = models.ForeignKey(Game,related_name = "penalty_game")
     is_minor = models.BooleanField()
     is_double_minor = models.BooleanField()
     is_major = models.BooleanField()
-    description = models.CharField(max_length=35)
+    description = models.CharField(max_length=40)
     
     def __unicode__(self):
         return u'Penalty committed by %s' % (self.player_id)
