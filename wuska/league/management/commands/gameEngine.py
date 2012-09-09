@@ -29,6 +29,7 @@ def run_time_period():
     game = get_object_or_404(Game,pk=3)
     games_now = Game.objects.all()
     for game in games_now:
-        pg = PlayGame(game,season_number)
-        pg.play_game()
+        if not game.has_started:
+            pg = PlayGame(game,season_number)
+            pg.play_game()
         

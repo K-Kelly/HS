@@ -53,76 +53,82 @@
 </div>
  {% endif %}
 <div class="hero-unit">	      
-  <h2>{{ player.position }} - {{ player.name }}</h2><BR/>
-  <div class="row">
-    <div class="span6 offset5">
-      <p>Shooting: {{player.shooting}}</p>
+  <center><h2>{{ player.position }} - {{ player.name }}</h2></center><BR/>
+  <div class="row-fluid">
+    <div class="span4">
+      <center>
+	Owner: <a href="{{player_owner.get_absolute_url}}">{{player_owner.user.username}}</a>
+      </center>
     </div>
-    <div class="span6">
-      <p>Strength: {{player.strength}}</p>
+    <div class="span4">
+      <center>
+	Team: 
+	{% if player.team_id == -1 %}
+	Free Agent
+	{% else %}
+	<a href="{{team.get_absolute_url}}">{{team.name}}</a>
+	{% endif %}
+      </center>
+    </div>
+    {% if player.team_id != -1 %}
+    <div class="span4">
+      <center>
+	League: <a href="{{league.get_absolute_url}}">{{league.name}}</a>
+      </center>
+    </div>
+    {% endif %}
+  </div>
+  <BR/>
+  <div class="row-fluid">
+    <div class="span4">
+      <center>
+	Age: {{player.age}}
+      </center>
+    </div>
+    <div class="span4">
+      <center>
+	Height: {{player.height}}
+      </center>
+    </div>
+    <div class="span4">
+      <center>
+	Weight: {{player.weight}}
+      </center>
     </div>
   </div>
-  <div class="row">
-    <div class="span6 offset5">
+	
+</div>
+<div class="row-fluid">
+  <div class="span4 well">
+    <center>
+      <p>Shooting: {{player.shooting}}</p>  
       <p>Passing: {{player.passing}}</p>
-    </div>
-    <div class="span6">
-      <p>Endurance: {{player.endurance}}</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span6 offset5">
       <p>Stick Handling: {{player.stick_handling}}</p>
-    </div>
-    <div class="span6">
-      <p>Skating: {{player.skating}}</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span6 offset5">
       <p>Checking: {{player.checking}}</p>
-    </div>
-    <div class="span6">
-      <p>Faceoffs: {{player.faceoff}}</p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="span6 offset5">
       <p>Positioning: {{player.positioning}}</p>
-    </div>
-    <div class="span6">
-      <p>Leadership: {{player.leadership}}</p>
-    </div>
+      <p>Awareness: {{player.awareness}}</p>  
+    </center>
   </div>
-  <div class="row">
-    <div class="span6 offset5">
-      <p>Awareness: {{player.awareness}}</p>
-    </div>
-    <div class="span6">
+  <div class="span4 well">
+    <center>
+      <p>Strength: {{player.strength}}</p>
+      <p>Endurance: {{player.endurance}}</p>
+      <p>Skating: {{player.skating}}</p>
+      <p>Faceoffs: {{player.faceoff}}</p>
+      <p>Leadership: {{player.leadership}}</p>
       <p>Fighting: {{player.fighting}}</p>
-    </div>
-  </div>	
-  <BR/><BR/>
-  <table id="equipment">
-    <tr>
-      <td>Helmet: {{player.helmet}}</td>
-    </tr>
-    <tr>
-      <td>Gloves:  {{player.gloves}}</td>
-    </tr>
-    <tr>
-      <td>Pads:  {{player.shoulder_pads}}</td>
-    </tr>
-    <tr>
-      <td>Pants:  {{player.pants}}</td>
-    </tr>
-    <tr>
-      <td>Skates:  {{player.skates}}</td>
-    </tr>
-    <tr>
-      <td>Stick:  {{player.stick}}</td>
-    </tr>
-  </table>
+    </center>
+  </div>
+  <div class="span4 well">
+    <center>
+      <p>Helmet: {{player.helmet}} </p>
+      <p>Gloves:  {{player.gloves}}</p>
+      <p>Pads:  {{player.shoulder_pads}}</p>
+      <p>Pants:  {{player.pants}}</p>
+      <p>Skates:  {{player.skates}}</p>
+      <p>Stick:  {{player.stick}}</p>
+    </center>
+  </div>
 </div>
 {% endif %}   
 {% endblock %}

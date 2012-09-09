@@ -149,6 +149,7 @@ class PlayGame:
             self.period += 1
             self.num_faceoffs_p = temp
             
+        self.check_end_game()
         self.game.is_completed = True
         self.game.summary = self.log
         self.game.save()
@@ -1324,6 +1325,32 @@ class PlayGame:
                         return line
             else:
                 return line
+
+#decides whether to send game to overtime, shootout, or game finished
+    def check_end_game(self):
+        if self.home_goals == self.away_goals:
+            if self.game.is_playoff:
+                if self.period == 4:
+                    self.game.overtime = True
+            #do playoff overtime
+                    print "playoff overtime here"
+            else:
+                if self.period == 4:
+                    self.game.overtime = True
+                    print "do regular overtime here"
+                else:
+                    self.game.shootout = True
+                    print "do shootout here"
+        elif self.home_goals > self.away_goals:
+        #home team wins
+            self.game.winning_team_id = self.home.id
+            self.game.home_win = True
+        elif self.home_goals < self.away_goals:
+            self.game.winning_team_id = self.away.id
+            self.game.home_win = False
+        else:
+            print "Error: this shouldn't happen"
+        self.game.save()
 
 #converts float to decimal. Stands for get_decimal
 def g_d(a):

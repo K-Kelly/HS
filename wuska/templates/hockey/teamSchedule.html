@@ -1,6 +1,7 @@
 {% extends "teamPageNav.html" %}
 {% load i18n %}
 {% load tz %}
+{% load league_tags %}
 {% block content_span9 %}
 
 <div class="well">
@@ -71,25 +72,23 @@
 	    {% for game in games_completed %}
 	    <tr>
 	      <td><center> 
-		  {{ game.datetime|localtime }} (
-		  {% if game.has_started %}
-		  In Progress
-		  {% else %}
-		  {{game.datetime|timeuntil}}
-		  {% endif %}
-		  )
+		  {{ game.datetime|localtime }}
 	      </center></td>
 	      <td><center>
 		  <a href="{{game.home_team.get_absolute_url}}">{{game.home_team.abbreviation|upper}}</a>
 	      </center></td>
-	      <td><center> {{ game.home_goals|length }} </center></td>
+	      <td><center> {{ game.home_goals|count }} </center></td>
 	      <td><center> 
 		  <a href="{{game.away_team.get_absolute_url}}">{{game.away_team.abbreviation|upper}}</a>
 	      </center></td>
-	      <td><center> {{ game.away_goals|length }} </center></td>
-	      <td><center> {{ game.penalty|length }} </center></td>
+	      <td><center> {{ game.away_goals|count }} </center></td>
+	      <td><center> {{ game.penalty|count }} </center></td>
 	      <td><center> {{ game.overtime|yesno:"Yes,No" }} </center></td>
 	      <td><center> {{ game.shootout|yesno:"Yes,No" }}</center></td>
+	      <td><center>
+		  <a class="btn btn-primary"
+		     href="{{game.get_absolute_url }}">View</a>
+	      </center></td>
 	    </tr>
 	    {% endfor %}
 	  </tbody>

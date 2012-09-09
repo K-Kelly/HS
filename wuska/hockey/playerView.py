@@ -21,8 +21,10 @@ def viewPlayer(request, player_id):
     if player.upgrades > 0 :
         can_upgrade = True
     owner = True if request.user.id == player.user_id else False
-
-    return render_to_response('hockey/viewPlayer.html', {'player': player, 'user':request.user, 'profile':request.user.get_profile(),'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner), 'new_contract':player.new_contract},context_instance=RequestContext(request))
+    player_owner = get_object_or_404(UserProfile,pk=player.user_id)
+    team = get_object_or_404(Team,pk=player.team_id)
+    league = get_object_or_404(League,pk=team.league_id)
+    return render_to_response('hockey/viewPlayer.html', {'player': player, 'user':request.user, 'profile':request.user.get_profile(),'can_upgrade':can_upgrade, 'player_list':player_list, 'team_list':team_list, 'can_manage':can_manage_by_num_teams(team_list), 'show_manage':True, 'owner':owner, 'not_owner':not(owner), 'new_contract':player.new_contract,'player_owner':player_owner,'team':team,'league':league},context_instance=RequestContext(request))
 
 @login_required
 def createPlayer(request):

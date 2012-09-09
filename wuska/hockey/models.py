@@ -269,8 +269,8 @@ class Game(models.Model):
     away_goals = models.ManyToManyField('hockey.Goal',blank=True,related_name = 'game_goals_away')
     penalty = models.ManyToManyField('hockey.Penalty',blank=True,related_name = 'game_penalties')
     home_win = models.BooleanField(blank=True)
-    overtime = models.BooleanField(blank=True)
-    shootout = models.BooleanField(blank=True)
+    overtime = models.BooleanField(default = False)
+    shootout = models.BooleanField(default = False)
     summary = models.TextField(default="-1")
        
     def __unicode__(self):
