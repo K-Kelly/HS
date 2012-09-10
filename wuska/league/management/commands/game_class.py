@@ -150,6 +150,7 @@ class PlayGame:
             self.num_faceoffs_p = temp
             
         self.check_end_game()
+        self.do_experience()
         self.game.is_completed = True
         self.game.summary = self.log
         self.game.save()
@@ -1351,6 +1352,54 @@ class PlayGame:
         else:
             print "Error: this shouldn't happen"
         self.game.save()
+    
+    def do_experience(self):
+        self.add_experience(self.home.players.all())
+        self.add_experience(self.away.players.all())
+
+    #transfers experience from player game to player
+    def add_experience(self,player_list):
+        for player in player_list:
+            pg = self.player_games_home[player.id]
+            player.shooting += pg.exp_shooting
+            player.passing += pg.exp_passing
+            player.stick_handling += pg.exp_stick_handling
+            player.checking += pg.exp_checking
+            player.positioning += pg.exp_positioning
+            player.endurance += pg.exp_endurance
+            player.skating += pg.exp_skating
+            player.strength += pg.exp_strength
+            player.faceoff += pg.exp_faceoff
+            player.fighting += pg.exp_fighting
+            player.awareness += pg.exp_awareness
+            player.leadership += pg.exp_leadership
+            temp = 0
+            temp += abs(pg.exp_shooting)
+            temp += abs(pg.exp_passing)
+            temp += abs(pg.exp_stick_handling)
+            temp += abs(pg.exp_checking)
+            temp += abs(pg.exp_positioning)
+            temp += abs(pg.exp_endurance)
+            temp += abs(pg.exp_skating)
+            temp += abs(pg.exp_strength)
+            temp += abs(pg.exp_faceoff)
+            temp += abs(pg.exp_fighting)
+            temp += abs(pg.exp_awareness)
+            temp += abs(pg.exp_leadership)
+            player.experience += temp * 100 + .25
+            player.save()
+            self.check_level_up(player)
+
+    def check_level_up(self,player):
+        exp_needed = 10*pow(player.level,2) - 5
+        diff = player.experience - exp_needed
+        if diff >= 0:
+            #player levels up
+            player.level += 1
+            player.experience = diff
+            player.upgrades += 10
+            player.save()
+            
 
 #converts float to decimal. Stands for get_decimal
 def g_d(a):
